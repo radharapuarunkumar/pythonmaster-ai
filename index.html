@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Python Master AI - The job-focused dark-neon interactive web application. Master Python coding, build real projects, prepare for job interviews, and earn certificates.">
+  <title>Python Master AI | From Zero to Job-Ready Python Programmer</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Material Symbols rounded -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="auth-gate-active">
+
+  <!-- ==========================================
+       GMAIL SIGN-IN SPLASH OVERLAY
+       ========================================== -->
+  <div id="signin-gateway" class="gateway-overlay">
+    <div class="gateway-container">
+      <div class="gateway-logo">
+        <span class="material-symbols-rounded neon-icon">smart_toy</span>
+        <h2>Python Master AI</h2>
+        <p class="neon-text-blue">Job-Ready Python Certification & AI Tutor</p>
+      </div>
+      <div class="gateway-form-card">
+        <h3>Gmail Sign-In Portal</h3>
+        <p class="text-secondary text-center">Simulate secure account access and resume your job roadmap.</p>
+        
+        <div class="input-group">
+          <label for="txt-signin-name">Full Name</label>
+          <input type="text" id="txt-signin-name" value="Radharapu Arun Kumar">
+        </div>
+        <div class="input-group">
+          <label for="txt-signin-email">Gmail Address</label>
+          <input type="email" id="txt-signin-email" value="radharapuarunkumar01@gmail.com">
+        </div>
+        
+        <button class="btn-google-signin" onclick="simulateGoogleSignIn()">
+          <svg class="google-svg" viewBox="0 0 24 24" width="20" height="20">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l3.66-2.85z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.85c.87-2.6 3.3-4.53 6.16-4.53z"/>
+          </svg>
+          <span>Sign In with Gmail</span>
+        </button>
+        
+        <div class="legal-disclaimer">
+          <p>By signing in, you unlock 20+ job prep courses. <br><strong>All rights reserved to Radharapu Arun Kumar only. Developed and designed by Radharapu Arun Kumar.</strong></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       MAIN DUAL COMMAND HUB SCREEN
+       ========================================== -->
+  <div class="app-container">
+    <!-- Left Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="logo">
+        <span class="material-symbols-rounded logo-icon">smart_toy</span>
+        <span class="logo-text">Python Master</span>
+        <span class="badge-mini-ai">AI</span>
+      </div>
+
+      <!-- Quick progress card in sidebar -->
+      <div class="sidebar-progress-card">
+        <div class="sb-progress-row">
+          <span id="lbl-sb-level">Beginner</span>
+          <span><span id="lbl-sb-xp">0</span> XP</span>
+        </div>
+        <div class="sb-progress-bar-container">
+          <div class="sb-progress-bar" id="bar-sb-xp" style="width: 0%;"></div>
+        </div>
+        <div class="sb-streak-row">
+          <span class="material-symbols-rounded icon-streak">local_fire_department</span>
+          <span><strong id="lbl-sb-streak">1</strong> Day Streak</span>
+        </div>
+      </div>
+
+      <nav class="nav-menu">
+        <div class="nav-section-title">LEARN & PRACTICE</div>
+        <button class="nav-item active" id="btn-nav-dashboard" onclick="switchView('dashboard')">
+          <span class="material-symbols-rounded icon-purple">space_dashboard</span>
+          <span>Roadmap Hub</span>
+        </button>
+        <button class="nav-item" id="btn-nav-lessons" onclick="switchView('lessons')">
+          <span class="material-symbols-rounded icon-cyan">menu_book</span>
+          <span>AI Tutor & Lessons</span>
+        </button>
+        <button class="nav-item" id="btn-nav-projects" onclick="switchView('projects')">
+          <span class="material-symbols-rounded icon-emerald">terminal</span>
+          <span>Real Projects</span>
+        </button>
+        <button class="nav-item" id="btn-nav-bookmarks" onclick="switchView('bookmarks')">
+          <span class="material-symbols-rounded icon-gold">bookmark_added</span>
+          <span>Notes & Saves</span>
+        </button>
+
+        <div class="nav-section-title">CAREER PREPARATION</div>
+        <button class="nav-item" id="btn-nav-interview" onclick="switchView('interview')">
+          <span class="material-symbols-rounded icon-orange">workspace_premium</span>
+          <span>Interview Prep</span>
+        </button>
+        <button class="nav-item" id="btn-nav-resume" onclick="switchView('resume')">
+          <span class="material-symbols-rounded icon-blue">description</span>
+          <span>Resume Generator</span>
+        </button>
+        <button class="nav-item" id="btn-nav-jobs" onclick="switchView('jobs')">
+          <span class="material-symbols-rounded icon-emerald">work_history</span>
+          <span>Jobs & Internships</span>
+        </button>
+
+        <div class="nav-section-title">COMMUNITY & SOCIAL</div>
+        <button class="nav-item" id="btn-nav-community" onclick="switchView('community')">
+          <span class="material-symbols-rounded icon-purple">forum</span>
+          <span>Community Feed</span>
+        </button>
+        <button class="nav-item" id="btn-nav-leaderboard" onclick="switchView('leaderboard')">
+          <span class="material-symbols-rounded icon-gold">leaderboard</span>
+          <span>Leaderboard</span>
+        </button>
+
+        <div class="nav-section-title">UPGRADES & CONTROLS</div>
+        <button class="nav-item" id="btn-nav-premium" onclick="switchView('premium')">
+          <span class="material-symbols-rounded icon-orange">lock_open</span>
+          <span>AI Pro (₹2 Monthly)</span>
+        </button>
+        <button class="nav-item" id="btn-nav-admin" onclick="switchView('admin')">
+          <span class="material-symbols-rounded icon-red">admin_panel_settings</span>
+          <span>Admin Console</span>
+        </button>
+      </nav>
+
+      <!-- Copyright branding footer -->
+      <div class="sidebar-legal">
+        <p class="copyright-txt">All rights reserved to Radharapu Arun Kumar only. Developed and designed by Radharapu Arun Kumar.</p>
+        <button class="btn-signout" onclick="signOutUser()">
+          <span class="material-symbols-rounded">logout</span> Sign Out
+        </button>
+      </div>
+    </aside>
+
+    <!-- Right Container -->
+    <main class="main-content">
+      <!-- Universal Top Nav Bar -->
+      <header class="top-header">
+        <div class="header-left">
+          <h1 id="lbl-header-title">Welcome Back, Arun Kumar!</h1>
+          <p class="text-secondary" id="lbl-header-subtitle">Your job-focused coding portal is primed. Active Streak is live.</p>
+        </div>
+        <div class="header-right">
+          <!-- Multilingual Buttons -->
+          <div class="lang-selector-group">
+            <button class="btn-lang active" id="btn-lang-en" onclick="setLanguage('en')">EN</button>
+            <button class="btn-lang" id="btn-lang-te" onclick="setLanguage('te')">తెలుగు</button>
+            <button class="btn-lang" id="btn-lang-hi" onclick="setLanguage('hi')">हिंदी</button>
+          </div>
+          
+          <!-- Offline indicator -->
+          <div class="offline-mode-card">
+            <span class="material-symbols-rounded icon-offline">wifi_off</span>
+            <span class="offline-txt">Offline Mode</span>
+            <label class="switch">
+              <input type="checkbox" id="chk-offline" onchange="toggleOfflineMode()">
+              <span class="slider round"></span>
+            </label>
+          </div>
+
+          <!-- Contact Support Pill -->
+          <div class="support-pill" onclick="alert('Support Channels:\nPhone: 9052672335\nEmail: radharapuarunkumar01@gmail.com')">
+            <span class="material-symbols-rounded">contact_support</span>
+            <span>Support</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- ==========================================
+           VIEW 1: ROADMAP DASHBOARD HUB
+           ========================================== -->
+      <section id="view-dashboard" class="content-view active-view">
+        <div class="dashboard-banner neon-border-purple">
+          <div class="banner-content">
+            <span class="badge-premium" id="lbl-premium-status">FREE ACCOUNT</span>
+            <h2>Complete the Course, Auto-Generate Resume & Apply to Python Jobs!</h2>
+            <p>Skip dry definitions. Build real products, survive high-fidelity mock interview boards, and claim your job certificates immediately.</p>
+            <div class="support-inline">
+              <span><strong>Help Line:</strong> 9052672335</span> | 
+              <span><strong>Email:</strong> radharapuarunkumar01@gmail.com</span>
+            </div>
+          </div>
+          <div class="daily-checkin-widget" id="checkin-panel">
+            <span class="material-symbols-rounded checkin-icon">emoji_events</span>
+            <h4>Daily Attendance</h4>
+            <button class="btn-checkin" id="btn-daily-checkin" onclick="triggerDailyCheckin()">
+              Check In (+10 XP)
+            </button>
+          </div>
+        </div>
+
+        <div class="dashboard-grid">
+          <!-- Left Col: Roadmap paths -->
+          <div class="col-main-roadmap">
+            <!-- Smart AI Roadmap Generator Card -->
+            <div class="card ai-roadmap-card neon-border-cyan">
+              <div class="card-header-row">
+                <span class="material-symbols-rounded text-cyan">psychology</span>
+                <h3>Smart AI Dynamic Roadmap</h3>
+              </div>
+              <p class="text-secondary card-desc">AI scans your weak domains and test history to update your path.</p>
+              <div class="ai-roadmap-results" id="ai-roadmap-summary">
+                <div class="ai-pulse-bar">
+                  <div class="ai-pulse-dot"></div>
+                  <span>AI Monitor active: Click 'Evaluate Weaknesses' to customize your pipeline.</span>
+                </div>
+              </div>
+              <button class="btn-cyan btn-small" onclick="generateSmartAIRoadmap()">
+                Evaluate Weaknesses & Re-Model Roadmap
+              </button>
+            </div>
+
+            <!-- The Structural Roadmap Nodes -->
+            <div class="card roadmap-path-card">
+              <div class="card-header-row">
+                <h3>Job Readiness Foundation Roadmap</h3>
+                <span class="badge-accent">Job Focused</span>
+              </div>
+              <p class="text-secondary card-desc">Progress sequentially through 6 coding chapters with active assignments.</p>
+              <div class="roadmap-nodes-container" id="roadmap-container">
+                <!-- Rendered dynamically in app.js -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Col: Streak, challenges, achievements -->
+          <div class="col-side-widgets">
+            <!-- Daily Coding Challenge -->
+            <div class="card challenge-card neon-border-orange">
+              <span class="badge-orange-neon">DAILY PROBLEM</span>
+              <h3>Quest of the Day</h3>
+              <div class="timer-row">
+                <span class="material-symbols-rounded">alarm</span>
+                <span id="lbl-challenge-timer">23:59:59</span>
+              </div>
+              <p class="text-secondary font-sm" id="lbl-daily-challenge-prompt">Create a variable named 'salary' equal to 50000, then compute annual bonus (15% of salary) and print it.</p>
+              <button class="btn-orange w-full" onclick="loadDailyChallengeToPlayground()">
+                Code Daily Challenge
+              </button>
+            </div>
+
+            <!-- Unlocked Achievements Badges -->
+            <div class="card achievements-card">
+              <h3>Earned Badges</h3>
+              <p class="text-secondary font-sm">Complete projects and score perfect quizzes to display milestones.</p>
+              <div class="achievements-mini-grid" id="achievements-container">
+                <!-- Dynamic cards -->
+              </div>
+            </div>
+
+            <!-- Dynamic certificate claim container -->
+            <div class="card certificate-claim-card neon-border-emerald" id="card-claim-certificate-dashboard">
+              <span class="material-symbols-rounded icon-cert text-emerald">workspace_premium</span>
+              <h3>Course Certificate</h3>
+              <p class="text-secondary font-sm">Complete all 6 Python modules to generate your job certificate.</p>
+              <button class="btn-success w-full font-sm" onclick="switchView('certificate')">
+                View Certificate Panel
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           VIEW 2: LESSONS, PLAYGROUND & MULTILINGUAL AI TUTOR
+           ========================================== -->
+      <section id="view-lessons" class="content-view">
+        <div class="lessons-main-grid">
+          <!-- Left Column: Lesson Details, AI Chatbox Tutor, & Quizzes -->
+          <div class="lesson-flow-wrapper">
+            <!-- Lesson Concept Card -->
+            <div class="card lesson-content-card">
+              <div class="lesson-header">
+                <button class="btn-icon" onclick="switchView('dashboard')">
+                  <span class="material-symbols-rounded">arrow_back</span>
+                </button>
+                <h2 id="lbl-lesson-title">Lesson Title</h2>
+                <div class="lesson-actions">
+                  <button class="btn-secondary btn-small" id="btn-bookmark-lesson" onclick="bookmarkCurrentLesson()">
+                    <span class="material-symbols-rounded">bookmark</span> Bookmark
+                  </button>
+                </div>
+              </div>
+              <div class="lesson-body-scroll" id="lesson-text-body">
+                <!-- Rendered dynamically -->
+              </div>
+            </div>
+
+            <!-- Multilingual AI Motherly Tutor -->
+            <div class="card ai-chat-card neon-border-purple">
+              <div class="ai-chat-header">
+                <div class="tutor-profile">
+                  <span class="material-symbols-rounded text-purple">smart_toy</span>
+                  <div>
+                    <h3>AI Motherly Tutor</h3>
+                    <p class="tutor-subtitle">Guiding you step-by-step through bugs with voice explains</p>
+                  </div>
+                </div>
+                <div class="tutor-controls">
+                  <!-- Audio select -->
+                  <button class="btn-audio-speak" id="btn-tts-speak" onclick="speakCurrentAITutorExplanation()" title="Explain in Motherly Audio Accent">
+                    <span class="material-symbols-rounded">volume_up</span> Explain via Audio
+                  </button>
+                </div>
+              </div>
+              <div class="ai-chat-messages" id="ai-chat-box">
+                <div class="chat-msg system">
+                  <p><strong>AI Tutor:</strong> Namaste beta! I am your AI Python tutor. I will explain your syntax errors and output details just like a mother's voice guides you. Write code on the right and ask me any doubt!</p>
+                </div>
+              </div>
+              <div class="ai-chat-input-row">
+                <input type="text" id="txt-ai-chat-input" placeholder="Ask a doubt (e.g. 'explain print statements in hindi')..." onkeypress="if(event.key==='Enter') sendChatMessageToAI()">
+                <button class="btn-send-chat" onclick="sendChatMessageToAI()">
+                  <span class="material-symbols-rounded">send</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Quiz card -->
+            <div class="card lesson-quiz-card">
+              <div class="quiz-header">
+                <span class="badge-accent">Knowledge Check</span>
+                <h3>Quick Quiz</h3>
+              </div>
+              <div class="quiz-body" id="quiz-container">
+                <!-- Dynamic quiz -->
+              </div>
+              <div class="quiz-footer" id="quiz-feedback-area"></div>
+            </div>
+          </div>
+
+          <!-- Right Column: Line-numbered editor, goals checker, and terminal -->
+          <div class="editor-flow-wrapper">
+            <!-- Active coding editor -->
+            <div class="card editor-card">
+              <div class="editor-header">
+                <div class="tab-info">
+                  <span class="material-symbols-rounded icon-python">description</span>
+                  <span>main.py</span>
+                </div>
+                <div class="editor-actions">
+                  <button class="btn-secondary btn-small" onclick="resetEditor()">
+                    <span class="material-symbols-rounded">restart_alt</span> Reset
+                  </button>
+                  <button class="btn-run" onclick="runCode()">
+                    <span class="material-symbols-rounded">play_arrow</span> Run Code
+                  </button>
+                </div>
+              </div>
+              <div class="editor-workspace">
+                <div class="editor-gutter" id="editor-gutter">
+                  <span>1</span>
+                </div>
+                <textarea class="editor-textarea" id="code-editor" spellcheck="false" placeholder="# Write your Python code here..."></textarea>
+              </div>
+            </div>
+
+            <!-- Quest requirements checklist -->
+            <div class="card challenge-card" id="challenge-details-card">
+              <div class="challenge-header">
+                <span class="badge-quest">ACTIVE ASSIGNMENT</span>
+                <h3 id="lbl-challenge-name">Quest Title</h3>
+              </div>
+              <div class="challenge-body">
+                <p id="lbl-challenge-desc">Write code to achieve the goal.</p>
+                <div class="challenge-checks">
+                  <h4>Checkpoints</h4>
+                  <ul class="checks-list" id="lst-challenge-goals">
+                    <!-- Checkpoints list -->
+                  </ul>
+                </div>
+              </div>
+              <div class="challenge-footer">
+                <button class="btn-success w-full" id="btn-submit-challenge" onclick="submitChallenge()">
+                  <span class="material-symbols-rounded">verified</span> Submit Verification
+                </button>
+              </div>
+            </div>
+
+            <!-- Terminal output screen -->
+            <div class="card terminal-card">
+              <div class="terminal-header">
+                <span>Terminal Console Logs</span>
+                <button class="btn-icon btn-small" onclick="clearTerminal()">
+                  <span class="material-symbols-rounded">delete_sweep</span>
+                </button>
+              </div>
+              <div class="terminal-body" id="terminal-output">
+                <div class="terminal-welcome">Python Master AI Terminal Ready...</div>
+              </div>
+            </div>
+
+            <!-- AI Project Reviewer Panel -->
+            <div class="card reviewer-card neon-border-cyan">
+              <div class="card-header-row">
+                <span class="material-symbols-rounded text-cyan">rate_review</span>
+                <h3>AI Project & Code Reviewer</h3>
+              </div>
+              <p class="text-secondary font-sm">Upload your playground file to get AI code quality ratings and bug checks.</p>
+              <button class="btn-cyan w-full font-sm" onclick="triggerAICodeReview()">
+                Analyze Sandbox Code Quality
+              </button>
+              <div class="review-output-box" id="ai-reviewer-feedback" style="display:none;"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           VIEW 3: REAL PROJECTS SECTION
+           ========================================== -->
+      <section id="view-projects" class="content-view">
+        <div class="view-header-intro">
+          <h2>Teach by Building: Real Portfolio Projects</h2>
+          <p class="text-secondary">Develop standard, functional software modules to showcase in interviews.</p>
+        </div>
+
+        <div class="projects-grid">
+          <!-- Card 1: Calculator -->
+          <div class="card project-item-card">
+            <span class="material-symbols-rounded icon-proj text-purple">calculate</span>
+            <h3>1. Interactive Calculator</h3>
+            <p class="text-secondary card-desc">Learn loops, operators, and inputs by parsing user-defined sums.</p>
+            <button class="btn-primary btn-small" onclick="openProjectSandbox('calculator')">Build & Preview</button>
+          </div>
+          <!-- Card 2: Weather App -->
+          <div class="card project-item-card">
+            <span class="material-symbols-rounded icon-proj text-cyan">thermostat</span>
+            <h3>2. Weather Forecaster</h3>
+            <p class="text-secondary card-desc">Understand dictionaries, functions, and JSON parsing by creating a mock API lookup.</p>
+            <button class="btn-primary btn-small" onclick="openProjectSandbox('weather')">Build & Preview</button>
+          </div>
+          <!-- Card 3: Quiz App -->
+          <div class="card project-item-card">
+            <span class="material-symbols-rounded icon-proj text-emerald">quiz</span>
+            <h3>3. Dynamic Quiz App</h3>
+            <p class="text-secondary card-desc">Organize lists, arrays, and trackers inside custom Python classes.</p>
+            <button class="btn-primary btn-small" onclick="openProjectSandbox('quiz')">Build & Preview</button>
+          </div>
+          <!-- Card 4: AI Chatbot -->
+          <div class="card project-item-card">
+            <span class="material-symbols-rounded icon-proj text-orange">forum</span>
+            <h3>4. Conversational Chatbot</h3>
+            <p class="text-secondary card-desc">Formulate dictionary map structures, text loops, and custom keyword replies.</p>
+            <button class="btn-primary btn-small" onclick="openProjectSandbox('chatbot')">Build & Preview</button>
+          </div>
+          <!-- Card 5: Portfolio Website -->
+          <div class="card project-item-card">
+            <span class="material-symbols-rounded icon-proj text-blue">public</span>
+            <h3>5. Dev Portfolio Page</h3>
+            <p class="text-secondary card-desc">Compile your skills, projects, and certifications into a beautiful layout.</p>
+            <button class="btn-primary btn-small" onclick="openProjectSandbox('portfolio')">Build & Preview</button>
+          </div>
+        </div>
+
+        <!-- Virtual Sandbox Overlay for Previewing Projects -->
+        <div class="virtual-sandbox-overlay" id="sandbox-modal" style="display:none;">
+          <div class="sandbox-container">
+            <div class="sandbox-header">
+              <h3 id="lbl-sandbox-title">Calculator Sandbox</h3>
+              <button class="btn-icon" onclick="closeProjectSandbox()">
+                <span class="material-symbols-rounded">close</span>
+              </button>
+            </div>
+            <div class="sandbox-grid">
+              <div class="sandbox-code-side">
+                <h4>Editable Python Source</h4>
+                <textarea id="txt-sandbox-code" spellcheck="false" class="sandbox-textarea"></textarea>
+                <button class="btn-primary w-full" onclick="runSandboxProject()">Compile & Launch Preview</button>
+              </div>
+              <div class="sandbox-preview-side">
+                <h4>Interactive Live Preview Output</h4>
+                <div class="sandbox-live-frame" id="sandbox-visual-frame">
+                  <!-- Custom virtual frames rendered dynamically -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           VIEW 4: BOOKMARKS & NOTES
+           ========================================== -->
+      <section id="view-bookmarks" class="content-view">
+        <div class="view-header-intro">
+          <h2>Your Bookmark Archive & Personal Study Notes</h2>
+          <p class="text-secondary">Review save points and compile personal logs to review core Python topics.</p>
+        </div>
+
+        <div class="notes-layout-grid">
+          <!-- Notes Editor -->
+          <div class="card notes-editor-card">
+            <h3>Compile Custom Notes</h3>
+            <textarea id="txt-personal-notes" placeholder="Type your personal programming study notes, code blocks, or reminders here..."></textarea>
+            <button class="btn-primary btn-small mt-1" onclick="savePersonalNotes()">Save Notes</button>
+          </div>
+
+          <!-- Saved Chapters & Bookmarks -->
+          <div class="card bookmarks-list-card">
+            <h3>Bookmarked Chapters</h3>
+            <div class="bookmarks-list" id="bookmarks-container">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           VIEW 5: INTERVIEW PREPARATION MODULE
+           ========================================== -->
+      <section id="view-interview" class="content-view">
+        <div class="view-header-intro">
+          <h2>Job Interview Preparation Suite</h2>
+          <p class="text-secondary">Navigate custom technical challenges, mock loops, and structural resume advice.</p>
+        </div>
+
+        <div class="tabs-control-header">
+          <button class="btn-tab-link active" onclick="switchInterviewSubTab('hr')">HR Questions</button>
+          <button class="btn-tab-link" onclick="switchInterviewSubTab('coding')">Coding Rounds</button>
+          <button class="btn-tab-link" onclick="switchInterviewSubTab('mock')">Simulated AI Interview</button>
+          <button class="btn-tab-link" onclick="switchInterviewSubTab('tips')">Resume Builder Tips</button>
+        </div>
+
+        <!-- HR Subtab -->
+        <div id="subtab-hr" class="interview-subtab active-subtab">
+          <div class="card">
+            <h3>Top Python HR Questions</h3>
+            <p class="text-secondary mb-1">Standard structural behavioral and basic operational questions.</p>
+            
+            <div class="collapsible-qa-list">
+              <div class="qa-item">
+                <button class="qa-toggle" onclick="this.nextElementSibling.classList.toggle('active')">
+                  Q1. Tell me about yourself and your Python project experience?
+                </button>
+                <div class="qa-content">
+                  <p><strong>Answer Blueprint:</strong> Start with your name, educational status, and focus on the real projects you built under Python Master AI (like the calculator and AI chatbot). Mention that you code daily, maintain streaks, and focus on structured, clean Python scripts.</p>
+                </div>
+              </div>
+              <div class="qa-item">
+                <button class="qa-toggle" onclick="this.nextElementSibling.classList.toggle('active')">
+                  Q2. Why did you choose Python over other programming languages?
+                </button>
+                <div class="qa-content">
+                  <p><strong>Answer Blueprint:</strong> Detail that Python has clean, highly readable syntax which allows quick prototyping, features rich frameworks, and is the core language for building modern artificial intelligence, automation systems, and backend APIs.</p>
+                </div>
+              </div>
+              <div class="qa-item">
+                <button class="qa-toggle" onclick="this.nextElementSibling.classList.toggle('active')">
+                  Q3. How do you debug errors when your code fails?
+                </button>
+                <div class="qa-content">
+                  <p><strong>Answer Blueprint:</strong> Explain that you parse terminal tracebacks line-by-line, utilize print logs to track active variable assignments, reference Python Master AI's interactive tutor explanations, and test boundary edge cases in separate sandboxes.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Coding Rounds Subtab -->
+        <div id="subtab-coding" class="interview-subtab">
+          <div class="card">
+            <h3>Python Interview Coding Challenges</h3>
+            <p class="text-secondary mb-1">Standard coding challenges tested in tech screens.</p>
+            
+            <div class="coding-challenges-grid">
+              <div class="challenge-item-card">
+                <h4>1. String Reversal</h4>
+                <p class="text-secondary font-sm">Write a function to reverse a string without using built-in methods.</p>
+                <button class="btn-cyan btn-small" onclick="loadInterviewChallengeToPlayground(0)">Load in Sandbox</button>
+              </div>
+              <div class="challenge-item-card">
+                <h4>2. FizzBuzz Classic</h4>
+                <p class="text-secondary font-sm">Print integers 1 to 15. Print 'Fizz' for multiples of 3, 'Buzz' for 5, 'FizzBuzz' for both.</p>
+                <button class="btn-cyan btn-small" onclick="loadInterviewChallengeToPlayground(1)">Load in Sandbox</button>
+              </div>
+              <div class="challenge-item-card">
+                <h4>3. List Max Finder</h4>
+                <p class="text-secondary font-sm">Identify the maximum value inside a numerical array without utilizing max().</p>
+                <button class="btn-cyan btn-small" onclick="loadInterviewChallengeToPlayground(2)">Load in Sandbox</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mock Interview Subtab -->
+        <div id="subtab-mock" class="interview-subtab">
+          <div class="card neon-border-orange">
+            <h3>AI Mock Interview Board</h3>
+            <p class="text-secondary">Simulate live technical interview loops. Respond to the AI recruiter's questions.</p>
+            
+            <div class="mock-interview-wrapper">
+              <div class="mock-ai-avatar">
+                <span class="material-symbols-rounded">support_agent</span>
+                <span>Interviewer AI</span>
+              </div>
+              <div class="mock-chat-bubble" id="lbl-mock-question">
+                "Hello, Arun Kumar! Let's start. Can you explain the difference between a Python List and a Tuple?"
+              </div>
+              <div class="mock-input-row">
+                <input type="text" id="txt-mock-answer" placeholder="Type your technical answer here...">
+                <button class="btn-orange" onclick="submitMockInterviewAnswer()">Submit Answer</button>
+              </div>
+              <div class="mock-evaluation-box" id="lbl-mock-feedback" style="display:none;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tips Subtab -->
+        <div id="subtab-tips" class="interview-subtab">
+          <div class="card">
+            <h3>ATS-Friendly Python Resume Tips</h3>
+            <p class="text-secondary mb-1">Follow these structured checklist strategies to pass automated filters.</p>
+            <ul class="tips-checked-list">
+              <li><strong>Focus on Products:</strong> List practical repositories and dynamic projects instead of listing dry tutorials.</li>
+              <li><strong>Detail Dynamic Skills:</strong> Highlight Python variables, object-oriented concepts, loops, API parameters, and JSON storage.</li>
+              <li><strong>Incorporate Metrics:</strong> Detail active learning parameters: e.g. "Completed comprehensive Python Master AI track with consecutive streak metrics."</li>
+              <li><strong>Branding details:</strong> Keep it clean and presentable. Export as PDF from our Generator page.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           VIEW 6: RESUME GENERATOR
+           ========================================== -->
+      <section id="view-resume" class="content-view">
+        <div class="view-header-intro">
+          <h2>Dynamic Resume Generator</h2>
+          <p class="text-secondary">Automate compiling your python credentials and export an ATS-compliant PDF resume.</p>
+        </div>
+
+        <div class="resume-generator-grid">
+          <!-- Input settings card -->
+          <div class="card resume-form-card">
+            <h3>Customize Your Resume Credentials</h3>
+            <p class="text-secondary card-desc">Add learned parameters, databases, and custom achievements.</p>
+            
+            <div class="form-scroll-area">
+              <div class="input-group">
+                <label for="res-name">Full Name</label>
+                <input type="text" id="res-name" value="Radharapu Arun Kumar">
+              </div>
+              <div class="input-group">
+                <label for="res-email">Email</label>
+                <input type="email" id="res-email" value="radharapuarunkumar01@gmail.com">
+              </div>
+              <div class="input-group">
+                <label for="res-phone">Phone Number</label>
+                <input type="text" id="res-phone" value="9052672335">
+              </div>
+              <div class="input-group">
+                <label for="res-skills">Technical Skills (comma separated)</label>
+                <input type="text" id="res-skills" value="Python Variables, OOP Foundations, File Operations, Real Chatbots, API Integration">
+              </div>
+              <div class="input-group">
+                <label for="res-projects">Python Projects Developed</label>
+                <textarea id="res-projects">Interactive Calculator: Built numeric operational parser.\nConversational AI Chatbot: Structured dynamic dictionary string responders.\nWeather Forecaster: Implemented dictionary lookups representing data.</textarea>
+              </div>
+              <div class="input-group">
+                <label for="res-certifications">Certifications</label>
+                <input type="text" id="res-certifications" value="Python Master AI Certification (Radharapu Arun Kumar)">
+              </div>
+            </div>
+            
+            <button class="btn-primary w-full mt-1" onclick="compileResumePreview()">
+              Compile & Refresh Resume
+            </button>
+            <button class="btn-success w-full mt-1" onclick="window.print()">
+              Print / Export to PDF
+            </button>
+          </div>
+
+          <!-- Live Resume Preview Sheet -->
+          <div class="card resume-preview-card neon-border-cyan">
+            <div class="resume-a4-sheet" id="resume-sheet">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           VIEW 7: JOBS & INTERNSHIPS BOARD
+           ========================================== -->
+      <section id="view-jobs" class="content-view">
+        <div class="view-header-intro">
+          <h2>Job & Internship Openings Feed</h2>
+          <p class="text-secondary">Discover active fresher postings, remote python coding tracks, and developer placements.</p>
+        </div>
+
+        <div class="jobs-list-layout" id="jobs-list-container">
+          <!-- Rendered dynamically in app.js -->
+        </div>
+      </section>
+
+      <!-- ==========================================
+           VIEW 8: COMMUNITY FEED HUB
+           ========================================== -->
+      <section id="view-community" class="content-view">
+        <div class="view-header-intro">
+          <h2>Community Coding Forum</h2>
+          <p class="text-secondary">Interact with peer programmers, post coding doubts, and publish your project repos.</p>
+        </div>
+
+        <div class="community-grid">
+          <!-- Input card -->
+          <div class="card community-post-card">
+            <h3>Publish a Post</h3>
+            <textarea id="txt-community-post" placeholder="Ask a doubt or share some Python code you completed..."></textarea>
+            <button class="btn-primary btn-small mt-1" onclick="publishCommunityPost()">Publish Post</button>
+          </div>
+
+          <!-- Feed lists -->
+          <div class="community-feed-flow" id="community-feed-container">
+            <!-- Dynamic postings -->
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           VIEW 9: LEADERBOARD
+           ========================================== -->
+      <section id="view-leaderboard" class="content-view">
+        <div class="view-header-intro">
+          <h2>Weekly XP Leaderboard</h2>
+          <p class="text-secondary">Compare your daily coding streak metrics and total experience counts with global users.</p>
+        </div>
+
+        <div class="card leaderboard-table-card">
+          <div class="leaderboard-table-header">
+            <span>Rank</span>
+            <span>Learner Profile</span>
+            <span>Status / Streak</span>
+            <span>Total XP</span>
+          </div>
+          <div class="leaderboard-flow" id="leaderboard-container">
+            <!-- Rendered dynamically in app.js -->
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           VIEW 10: PREMIUM ₹2 UPGRADE PLATFORM
+           ========================================== -->
+      <section id="view-premium" class="content-view">
+        <div class="premium-layout-container">
+          <div class="card premium-display-card neon-border-orange">
+            <span class="badge-accent">AI PRO UPGRADE</span>
+            <h2>Unlock Unlimited Multilingual AI Tutor Audio Explanations</h2>
+            <p class="pricing-headline">Just ₹2 / month</p>
+            <p class="text-secondary card-desc">Unlock advanced AI project code reviews, interview audio prep loops, and personal dynamic roadmaps.</p>
+            
+            <div class="premium-features-row">
+              <div class="p-feat"><span class="material-symbols-rounded">check</span> Unlimited TTS Motherly Accent explanations</div>
+              <div class="p-feat"><span class="material-symbols-rounded">check</span> Advanced error line tracing</div>
+              <div class="p-feat"><span class="material-symbols-rounded">check</span> Auto-AI portfolio website developer compiler</div>
+            </div>
+
+            <!-- Simulated UPI Payment Gateway Mock -->
+            <div class="upi-payment-mock-box" id="upi-payment-panel">
+              <h4>Simulated UPI Gateway</h4>
+              <p class="font-sm text-secondary">No actual money is charged. Click below to mock complete the ₹2 payment.</p>
+              <div class="upi-input-row">
+                <input type="text" id="txt-upi-id" value="radharapuarunkumar01@okaxis" placeholder="Enter UPI ID">
+                <button class="btn-success" onclick="processMockUPIPayment()">Mock Pay ₹2</button>
+              </div>
+            </div>
+            
+            <div class="premium-unlocked-status" id="lbl-premium-success-msg" style="display:none;">
+              <span class="material-symbols-rounded text-emerald">verified</span>
+              <h4>PRO Account Unlocked! All premium AI resources enabled.</h4>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           VIEW 11: ADMIN POWER CONSOLE
+           ========================================== -->
+      <section id="view-admin" class="content-view">
+        <div class="view-header-intro">
+          <h2>Admin Control Center</h2>
+          <p class="text-secondary">Alter database values, reset streaks, simulate experience points, or unlock certificates.</p>
+        </div>
+
+        <div class="admin-controls-grid">
+          <!-- Active Config Form -->
+          <div class="card admin-status-card neon-border-cyan">
+            <h3>Profile Database Configuration</h3>
+            <p class="text-secondary card-desc">Override any database variables instantly.</p>
+            <div class="admin-variables-list">
+              <div class="input-group">
+                <label for="adm-input-name">User Full Name</label>
+                <input type="text" id="adm-input-name" value="Radharapu Arun Kumar">
+              </div>
+              <div class="input-group">
+                <label for="adm-input-email">Gmail Address</label>
+                <input type="email" id="adm-input-email" value="radharapuarunkumar01@gmail.com">
+              </div>
+              <div class="input-group">
+                <label for="adm-input-xp">Experience Points (XP)</label>
+                <input type="number" id="adm-input-xp" value="0">
+              </div>
+              <div class="input-group">
+                <label for="adm-input-streak">Streak Days</label>
+                <input type="number" id="adm-input-streak" value="1">
+              </div>
+              <div class="input-group">
+                <label for="adm-select-pro">Premium AI Pro State</label>
+                <select id="adm-select-pro" class="editor-textarea" style="height:40px;padding:8px;background-color:var(--bg-darkest);border:1px solid var(--border-color);color:#fff;width:100%;">
+                  <option value="false">Free Account</option>
+                  <option value="true">Premium Active (₹2 Paid)</option>
+                </select>
+              </div>
+              <button class="btn-cyan w-full mt-1" onclick="adminApplyConfigChanges()">
+                Apply Variable Override
+              </button>
+            </div>
+          </div>
+
+          <!-- Action commands & chapters toggler panel -->
+          <div class="card admin-actions-card neon-border-purple">
+            <h3>Chapter Progress Matrix Control</h3>
+            <p class="text-secondary card-desc">Individually toggle chapter completion checklists to simulate roadmap milestones.</p>
+            <div class="admin-chapter-checkboxes" id="admin-chaps-grid" style="display:flex;flex-direction:column;gap:8px;margin-bottom:18px;max-height:220px;overflow-y:auto;background-color:var(--bg-darkest);padding:10px;border-radius:var(--border-radius-sm);border:1px solid var(--border-color);">
+              <!-- Checkboxes dynamically populated in app.js -->
+            </div>
+            
+            <h3>Simulator Tools</h3>
+            <div class="admin-buttons-row">
+              <button class="btn-primary" onclick="adminGrantXP(500)">Grant +500 XP</button>
+              <button class="btn-cyan" onclick="adminSimulateStreak(7)">Set 7-Day Streak</button>
+              <button class="btn-orange" onclick="adminTogglePremium()">Toggle Pro State</button>
+              <button class="btn-success" onclick="adminCompleteAllChapters()">Autocomplete All Chapters</button>
+              <button class="btn-secondary" onclick="adminResetAllData()">Reset LocalStorage DB</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           VIEW 12: CERTIFICATE VAULT
+           ========================================== -->
+      <section id="view-certificate" class="content-view">
+        <div class="view-header-intro">
+          <h2>Verified Completion Certificate Portal</h2>
+          <p class="text-secondary">Verify and print your official Python Master AI certification.</p>
+        </div>
+
+        <div class="certificate-workspace-row">
+          <!-- Cert Container -->
+          <div class="card cert-frame-card neon-border-emerald">
+            <div class="certificate-inner-box" id="printable-certificate">
+              <div class="cert-border-outer">
+                <div class="cert-border-inner">
+                  <!-- Header branding -->
+                  <div class="cert-header">
+                    <span class="material-symbols-rounded cert-logo">smart_toy</span>
+                    <h2>PYTHON MASTER AI</h2>
+                    <p class="cert-sub">Advanced Machine Learning & Programming Academy</p>
+                  </div>
+                  
+                  <!-- Main body -->
+                  <div class="cert-body">
+                    <p class="cert-title-txt">CERTIFICATE OF COMPLETION</p>
+                    <p class="cert-sub-txt">This official document proudly verifies that</p>
+                    <h3 class="cert-recipient-name" id="lbl-cert-name">RADHARAPU ARUN KUMAR</h3>
+                    <p class="cert-achievement-desc">
+                      has successfully completed the intensive, job-ready certification program in 
+                      <strong>Python Programming foundations, Variable Math algorithms, Decision Conditionals, Loop Iterations, List collections, and customized Object-Oriented Functions.</strong>
+                    </p>
+                    <p class="cert-verdict">Developed and designed to meet high ATS industry criteria.</p>
+                  </div>
+
+                  <!-- Footer signatures & stamps -->
+                  <div class="cert-footer">
+                    <div class="cert-sign-col">
+                      <div class="cert-signature-line">Python Master AI Board</div>
+                      <span class="sign-title">Authorized Committee Signature</span>
+                    </div>
+                    <div class="cert-verification-col">
+                      <div class="qr-mock-box">
+                        <!-- Simulated QR Code SVG -->
+                        <svg viewBox="0 0 100 100" width="60" height="60">
+                          <rect width="100" height="100" fill="#fff"/>
+                          <rect x="10" y="10" width="30" height="30" fill="#000"/>
+                          <rect x="15" y="15" width="20" height="20" fill="#fff"/>
+                          <rect x="60" y="10" width="30" height="30" fill="#000"/>
+                          <rect x="65" y="15" width="20" height="20" fill="#fff"/>
+                          <rect x="10" y="60" width="30" height="30" fill="#000"/>
+                          <rect x="15" y="65" width="20" height="20" fill="#fff"/>
+                          <rect x="50" y="50" width="10" height="10" fill="#000"/>
+                          <rect x="70" y="70" width="20" height="20" fill="#000"/>
+                          <rect x="50" y="80" width="10" height="10" fill="#000"/>
+                        </svg>
+                      </div>
+                      <span class="qr-title">Scan to Verify ID</span>
+                    </div>
+                  </div>
+
+                  <!-- Legal & copyright markers -->
+                  <div class="cert-legal-copyright">
+                    <p>Certificate ID: <strong id="lbl-cert-id">PMAI-9052-8821</strong> | Security Checked & Signed</p>
+                    <p class="copyright-watermark">All rights reserved to Radharapu Arun Kumar only. Developed and designed by Radharapu Arun Kumar.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Controls side card -->
+          <div class="card cert-download-controls-card">
+            <h3>Print & Save</h3>
+            <p class="text-secondary font-sm mb-1">Export this vector certificate directly to your desktop printer or PDF portfolio.</p>
+            <button class="btn-success w-full" onclick="printCertificateElement()">
+              <span class="material-symbols-rounded">print</span> Print Certificate
+            </button>
+            
+            <div class="legal-warning-card">
+              <span class="material-symbols-rounded text-orange">warning</span>
+              <p>Warning: Modifying recipient names on this document violates licensing covenants. <strong>All rights reserved to Radharapu Arun Kumar only.</strong></p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
