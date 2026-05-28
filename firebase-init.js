@@ -39,12 +39,12 @@ import {
 // ⚙️  REPLACE THIS CONFIG WITH YOUR FIREBASE PROJECT CONFIG
 // =============================================================
 const firebaseConfig = {
-  apiKey:            "YOUR_API_KEY",
-  authDomain:        "YOUR_PROJECT.firebaseapp.com",
-  projectId:         "YOUR_PROJECT_ID",
-  storageBucket:     "YOUR_PROJECT.appspot.com",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId:             "YOUR_APP_ID"
+  apiKey: "AIza....",
+  authDomain: "python-master-ai.firebaseapp.com",
+  projectId: "python-master-ai",
+  storageBucket: "python-master-ai.appspot.com",
+  messagingSenderId: "6936....",
+  appId: "1:6936...."
 };
 // =============================================================
 
@@ -70,45 +70,78 @@ try {
 window.signInWithGoogle = async function() {
   if (!firebaseReady) {
     console.warn("Firebase not ready — falling back to manual sign-in.");
+    const statusEl = document.getElementById('signin-status-msg');
+    if (statusEl) {
+      statusEl.style.display = 'block';
+      statusEl.style.background = 'rgba(255,0,80,0.08)';
+      statusEl.style.color = '#ff3366';
+      statusEl.style.border = '1px solid rgba(255,0,80,0.3)';
+      statusEl.textContent = '⚠️ Firebase not configured. Please set up Firebase config in firebase-init.js or use manual sign-in below.';
+    }
     return false;
   }
 
   const statusEl = document.getElementById('signin-status-msg');
   try {
-    statusEl.style.display = 'block';
-    statusEl.style.background = 'rgba(0,200,255,0.08)';
-    statusEl.style.color = 'var(--neon-cyan)';
-    statusEl.style.border = '1px solid rgba(0,200,255,0.3)';
-    statusEl.textContent = '🔄 Connecting to Google...';
+    if (statusEl) {
+      statusEl.style.display = 'block';
+      statusEl.style.background = 'rgba(0,200,255,0.08)';
+      statusEl.style.color = 'var(--neon-cyan)';
+      statusEl.style.border = '1px solid rgba(0,200,255,0.3)';
+      statusEl.textContent = '🔄 Connecting to Google...';
+    }
 
     const result = await signInWithPopup(auth, provider);
     const user   = result.user;
 
-    statusEl.style.background = 'rgba(0,255,128,0.08)';
-    statusEl.style.color = 'var(--neon-green)';
-    statusEl.style.border = '1px solid rgba(0,255,128,0.3)';
-    statusEl.textContent = `✅ Verified: ${user.email}`;
+    if (statusEl) {
+      statusEl.style.background = 'rgba(0,255,128,0.08)';
+      statusEl.style.color = 'var(--neon-emerald)';
+      statusEl.style.border = '1px solid rgba(0,255,128,0.3)';
+      statusEl.textContent = `✅ Verified: ${user.email}`;
+    }
+
+    // Store user data locally
+    const userData = {
+      name: user.displayName || user.email.split('@')[0],
+      email: user.email,
+      photo: user.photoURL,
+      uid: user.uid,
+      isLoggedIn: true
+    };
+    localStorage.setItem('pythonMasterUser', JSON.stringify(userData));
 
     // Trigger app login with real verified data
-    await window.onGoogleAuthSuccess({
-      name:   user.displayName || user.email.split('@')[0],
-      email:  user.email,
-      photo:  user.photoURL,
-      uid:    user.uid
-    });
+    if (window.onGoogleAuthSuccess) {
+      await window.onGoogleAuthSuccess(userData);
+    }
+
+    // Redirect to dashboard after successful login
+    setTimeout(() => {
+      if (window.hideAuthGate) {
+        window.hideAuthGate();
+      }
+      if (window.switchView) {
+        window.switchView('dashboard');
+      }
+    }, 1000);
 
     return true;
   } catch (error) {
-    statusEl.style.display = 'block';
-    statusEl.style.background = 'rgba(255,0,80,0.08)';
-    statusEl.style.color = '#ff3366';
-    statusEl.style.border = '1px solid rgba(255,0,80,0.3)';
-    if (error.code === 'auth/popup-closed-by-user') {
-      statusEl.textContent = '⚠️ Sign-in cancelled. Try again.';
-    } else if (error.code === 'auth/unauthorized-domain') {
-      statusEl.textContent = '⚠️ Domain not authorized in Firebase. Use manual sign-in below.';
-    } else {
-      statusEl.textContent = `⚠️ ${error.message}`;
+    if (statusEl) {
+      statusEl.style.display = 'block';
+      statusEl.style.background = 'rgba(255,0,80,0.08)';
+      statusEl.style.color = '#ff3366';
+      statusEl.style.border = '1px solid rgba(255,0,80,0.3)';
+      if (error.code === 'auth/popup-closed-by-user') {
+        statusEl.textContent = '⚠️ Sign-in cancelled. Try again.';
+      } else if (error.code === 'auth/unauthorized-domain') {
+        statusEl.textContent = '⚠️ Domain not authorized in Firebase. Add your domain to Firebase console or use manual sign-in below.';
+      } else if (error.code === 'auth/configuration-not-found') {
+        statusEl.textContent = '⚠️ Firebase not configured. Please set up Firebase config in firebase-init.js.';
+      } else {
+        statusEl.textContent = `⚠️ ${error.message}`;
+      }
     }
     console.error("Google Sign-In error:", error);
     return false;
@@ -155,13 +188,25 @@ window.loadUserDataFromFirestore = async function(uid) {
  * Sign out from Firebase
  */
 window.firebaseSignOut = async function() {
-  if (!firebaseReady || !auth) return;
-  try {
-    await signOut(auth);
-    console.log("✅ Signed out from Firebase.");
-  } catch(e) {
-    console.warn("Sign-out error:", e);
+  // Clear local storage
+  localStorage.removeItem('pythonMasterUser');
+  
+  if (firebaseReady && auth) {
+    try {
+      await signOut(auth);
+      console.log("✅ Signed out from Firebase.");
+    } catch(e) {
+      console.warn("Sign-out error:", e);
+    }
   }
+  
+  // Redirect to landing page
+  if (window.showAuthGate) {
+    window.showAuthGate();
+  }
+  
+  // Reload page to clear state
+  window.location.reload();
 };
 
 /**
@@ -172,16 +217,36 @@ if (firebaseReady) {
     if (user && !window._authHandled) {
       window._authHandled = true;
       console.log("🔄 Auto-restoring session for:", user.email);
+      
+      // Store user data locally
+      const userData = {
+        name: user.displayName || user.email.split('@')[0],
+        email: user.email,
+        photo: user.photoURL,
+        uid: user.uid,
+        isLoggedIn: true
+      };
+      localStorage.setItem('pythonMasterUser', JSON.stringify(userData));
+      
       // Load from Firestore and restore session
       const cloudData = await window.loadUserDataFromFirestore(user.uid);
       if (cloudData && window.restoreSessionFromCloud) {
-        window.restoreSessionFromCloud(cloudData, {
-          name:  user.displayName || user.email.split('@')[0],
-          email: user.email,
-          photo: user.photoURL,
-          uid:   user.uid
-        });
+        window.restoreSessionFromCloud(cloudData, userData);
       }
+      
+      // Hide auth gate and show dashboard
+      setTimeout(() => {
+        if (window.hideAuthGate) {
+          window.hideAuthGate();
+        }
+        if (window.switchView) {
+          window.switchView('dashboard');
+        }
+      }, 500);
+    } else if (!user) {
+      // User signed out, clear local storage
+      localStorage.removeItem('pythonMasterUser');
+      window._authHandled = false;
     }
   });
 }

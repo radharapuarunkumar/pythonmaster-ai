@@ -546,6 +546,15 @@ function manualGmailSignIn() {
     state.lastLoginDate     = new Date().toLocaleString();
     if (!state.firstLoginDate) state.firstLoginDate = new Date().toLocaleString();
 
+    // Store user data locally
+    const userData = {
+      name: nameInput,
+      email: emailInput,
+      isLoggedIn: true,
+      isGoogleVerified: false
+    };
+    localStorage.setItem('pythonMasterUser', JSON.stringify(userData));
+
     saveSession();
     finishLogin();
 
@@ -554,6 +563,22 @@ function manualGmailSignIn() {
   }, 800);
 }
 
+/**
+ * Callback for Firebase Google Sign-In success
+ */
+window.onGoogleAuthSuccess = async function(userData) {
+  state.isAuthenticated   = true;
+  state.userName          = userData.name;
+  state.userEmail         = userData.email;
+  state.photoURL          = userData.photo;
+  state.uid               = userData.uid;
+  state.isGoogleVerified  = true;
+  state.lastLoginDate     = new Date().toLocaleString();
+  if (!state.firstLoginDate) state.firstLoginDate = new Date().toLocaleString();
+
+  saveSession();
+  finishLogin();
+};
 /**
  * Restore session when Firebase auto-detects returning user on page load
  */
@@ -567,6 +592,50 @@ window.restoreSessionFromCloud = function(cloudData, googleUser) {
   state.isGoogleVerified = true;
   saveSession();
   finishLogin();
+};
+
+/**
+ * Protected route check - ensures user is authenticated before accessing protected views
+ */
+function checkAuthentication() {
+  // Check localStorage for user data
+  const storedUser = localStorage.getItem('pythonMasterUser');
+  if (storedUser) {
+    try {
+      const userData = JSON.parse(storedUser);
+      if (userData.isLoggedIn) {
+        state.isAuthenticated = true;
+        state.userName = userData.name;
+        state.userEmail = userData.email;
+        state.photoURL = userData.photo;
+        state.uid = userData.uid;
+        state.isGoogleVerified = userData.isGoogleVerified || false;
+        
+        // Load progress data
+        const dbKey = `pmai_progress_${userData.email.replace(/[^a-zA-Z0-9]/g, '_')}`;
+        const saved = localStorage.getItem(dbKey);
+        if (saved) {
+          try {
+            const savedState = JSON.parse(saved);
+            state = { ...state, ...savedState };
+          } catch(e) {}
+        }
+        
+        return true;
+      }
+    } catch(e) {
+      console.error('Error parsing stored user data:', e);
+    }
+  }
+  return false;
+}
+
+/**
+ * Hide auth gate and show app
+ */
+window.hideAuthGate = function() {
+  document.body.classList.remove('auth-gate-active');
+  document.body.classList.remove('landing-active');
 };
 
 /**
@@ -2751,16 +2820,19 @@ window.addEventListener('DOMContentLoaded', () => {
   // Load saved theme
   loadSavedTheme();
   
+  // Check authentication status (protected routes)
+  const isAuthenticated = checkAuthentication();
+  
   // Initialize landing page
   document.body.classList.add('landing-active');
   
-  // Load sign-in overlay directly if unauthenticated
-  if (!state.isAuthenticated) {
-    document.body.classList.add('auth-gate-active');
-  } else {
+  // Show appropriate view based on authentication
+  if (isAuthenticated) {
     document.body.classList.remove('landing-active');
     document.body.classList.remove('auth-gate-active');
     switchView('dashboard');
+  } else {
+    document.body.classList.add('auth-gate-active');
   }
   
   // Initialize notifications
