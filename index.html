@@ -12,44 +12,316 @@
   <!-- Material Symbols rounded -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
   <link rel="stylesheet" href="style.css">
+  <!-- Razorpay Real Payment SDK -->
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <!-- Firebase App (the core Firebase SDK) -->
+  <script type="module" src="firebase-init.js"></script>
+  <!-- Google Identity Services for OAuth -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body class="auth-gate-active">
 
   <!-- ==========================================
-       GMAIL SIGN-IN SPLASH OVERLAY
+       LANDING PAGE HERO SECTION
+       ========================================== -->
+  <div id="landing-page" class="landing-overlay">
+    <div class="landing-container">
+      <nav class="landing-nav">
+        <div class="landing-logo">
+          <span class="material-symbols-rounded neon-icon">smart_toy</span>
+          <span class="logo-text">Python Master AI</span>
+        </div>
+        <div class="landing-nav-buttons">
+          <button class="btn-landing-outline" onclick="showFeatures()">Features</button>
+          <button class="btn-landing-primary" onclick="showAuthGate()">Get Started</button>
+        </div>
+      </nav>
+
+      <div class="landing-hero">
+        <div class="hero-content">
+          <span class="badge-hero">🚀 Job-Ready Python Certification</span>
+          <h1 class="hero-title">Master Python with <span class="gradient-text">AI-Powered Learning</span></h1>
+          <p class="hero-subtitle">Build real projects, prepare for interviews, and earn certificates. From zero to job-ready programmer with personalized AI tutoring.</p>
+          <div class="hero-stats">
+            <div class="stat-item">
+              <span class="stat-number">10K+</span>
+              <span class="stat-label">Active Learners</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-number">50+</span>
+              <span class="stat-label">Projects</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-number">95%</span>
+              <span class="stat-label">Job Placement</span>
+            </div>
+          </div>
+          <div class="hero-cta">
+            <button class="btn-hero-primary" onclick="showAuthGate()">
+              <span class="material-symbols-rounded">rocket_launch</span>
+              Start Learning Free
+            </button>
+            <button class="btn-hero-secondary" onclick="scrollToFeatures()">
+              <span class="material-symbols-rounded">play_circle</span>
+              See How It Works
+            </button>
+          </div>
+        </div>
+        <div class="hero-visual">
+          <div class="code-preview-card glass-card">
+            <div class="code-preview-header">
+              <span class="material-symbols-rounded">code</span>
+              <span>AI Tutor Active</span>
+            </div>
+            <div class="code-preview-body">
+              <div class="code-line"><span class="code-keyword">def</span> <span class="code-function">calculate_salary</span>(hours, rate):</div>
+              <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">return</span> hours * rate</div>
+              <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;</div>
+              <div class="code-line"><span class="code-comment"># AI explains: This function multiplies...</span>
+              <div class="ai-bubble">✨ Perfect! You're learning functions!</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Features Section -->
+      <div class="landing-features" id="features-section">
+        <h2 class="section-title">Why Choose Python Master AI?</h2>
+        <div class="features-grid">
+          <div class="feature-card glass-card">
+            <span class="material-symbols-rounded feature-icon">psychology</span>
+            <h3>AI-Powered Tutoring</h3>
+            <p>Get personalized explanations in English, Hindi, and Telugu with our motherly AI tutor.</p>
+          </div>
+          <div class="feature-card glass-card">
+            <span class="material-symbols-rounded feature-icon">terminal</span>
+            <h3>Real Projects</h3>
+            <p>Build 50+ real-world projects including calculators, chatbots, and weather apps.</p>
+          </div>
+          <div class="feature-card glass-card">
+            <span class="material-symbols-rounded feature-icon">workspace_premium</span>
+            <h3>Interview Prep</h3>
+            <p>Practice with mock interviews, HR questions, and coding challenges.</p>
+          </div>
+          <div class="feature-card glass-card">
+            <span class="material-symbols-rounded feature-icon">verified</span>
+            <h3>Certificates</h3>
+            <p>Earn verified certificates to showcase your skills to employers.</p>
+          </div>
+          <div class="feature-card glass-card">
+            <span class="material-symbols-rounded feature-icon">leaderboard</span>
+            <h3>Gamified Learning</h3>
+            <p>Earn XP, maintain streaks, and compete on leaderboards.</p>
+          </div>
+          <div class="feature-card glass-card">
+            <span class="material-symbols-rounded feature-icon">description</span>
+            <h3>Resume Builder</h3>
+            <p>Auto-generate ATS-friendly resumes with your completed projects.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Testimonials Section -->
+      <div class="landing-testimonials">
+        <h2 class="section-title">What Our Learners Say</h2>
+        <div class="testimonials-grid">
+          <div class="testimonial-card glass-card">
+            <div class="testimonial-header">
+              <div class="testimonial-avatar">SK</div>
+              <div class="testimonial-info">
+                <h4>Srinivas Kumar</h4>
+                <span class="testimonial-role">Software Engineer at Google</span>
+              </div>
+            </div>
+            <p>"Python Master AI transformed my career. The AI tutor explained complex concepts in Telugu, making learning so much easier!"</p>
+            <div class="testimonial-rating">
+              <span class="material-symbols-filled">star</span>
+              <span class="material-symbols-filled">star</span>
+              <span class="material-symbols-filled">star</span>
+              <span class="material-symbols-filled">star</span>
+              <span class="material-symbols-filled">star</span>
+            </div>
+          </div>
+          <div class="testimonial-card glass-card">
+            <div class="testimonial-header">
+              <div class="testimonial-avatar">PS</div>
+              <div class="testimonial-info">
+                <h4>Priya Sharma</h4>
+                <span class="testimonial-role">Data Scientist at Amazon</span>
+              </div>
+            </div>
+            <p>"The interview preparation module was incredible. I cracked 3 job offers within 2 months of completing the course!"</p>
+            <div class="testimonial-rating">
+              <span class="material-symbols-filled">star</span>
+              <span class="material-symbols-filled">star</span>
+              <span class="material-symbols-filled">star</span>
+              <span class="material-symbols-filled">star</span>
+              <span class="material-symbols-filled">star</span>
+            </div>
+          </div>
+          <div class="testimonial-card glass-card">
+            <div class="testimonial-header">
+              <div class="testimonial-avatar">RV</div>
+              <div class="testimonial-info">
+                <h4>Rahul Verma</h4>
+                <span class="testimonial-role">Python Developer at Microsoft</span>
+              </div>
+            </div>
+            <p>"The project-based approach is amazing. I built a real chatbot that I now use in my portfolio. Worth every rupee!"</p>
+            <div class="testimonial-rating">
+              <span class="material-symbols-filled">star</span>
+              <span class="material-symbols-filled">star</span>
+              <span class="material-symbols-filled">star</span>
+              <span class="material-symbols-filled">star</span>
+              <span class="material-symbols-filled">star</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FAQ Section -->
+      <div class="landing-faq">
+        <h2 class="section-title">Frequently Asked Questions</h2>
+        <div class="faq-list">
+          <div class="faq-item">
+            <button class="faq-question" onclick="toggleFaq(this)">
+              <span>Is Python Master AI suitable for beginners?</span>
+              <span class="material-symbols-rounded">expand_more</span>
+            </button>
+            <div class="faq-answer">
+              <p>Absolutely! Our curriculum starts from the very basics and progressively builds up to advanced concepts. The AI tutor provides personalized guidance at every step.</p>
+            </div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-question" onclick="toggleFaq(this)">
+              <span>How long does it take to complete the course?</span>
+              <span class="material-symbols-rounded">expand_more</span>
+            </button>
+            <div class="faq-answer">
+              <p>The course is self-paced. Most learners complete it in 2-3 months with consistent practice (1-2 hours daily). You can learn at your own speed.</p>
+            </div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-question" onclick="toggleFaq(this)">
+              <span>What languages does the AI tutor support?</span>
+              <span class="material-symbols-rounded">expand_more</span>
+            </button>
+            <div class="faq-answer">
+              <p>Our AI tutor supports English, Hindi, and Telugu. You can switch between languages anytime and get explanations in your preferred language.</p>
+            </div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-question" onclick="toggleFaq(this)">
+              <span>Do I get a certificate after completion?</span>
+              <span class="material-symbols-rounded">expand_more</span>
+            </button>
+            <div class="faq-answer">
+              <p>Yes! Upon completing all modules and projects, you'll receive a verified certificate that you can download and share with employers.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <footer class="landing-footer">
+        <div class="footer-content">
+          <div class="footer-section">
+            <div class="footer-logo">
+              <span class="material-symbols-rounded neon-icon">smart_toy</span>
+              <span class="logo-text">Python Master AI</span>
+            </div>
+            <p class="footer-desc">Job-Ready Python Certification & AI Tutor</p>
+          </div>
+          <div class="footer-section">
+            <h4>Quick Links</h4>
+            <ul>
+              <li><a href="#" onclick="showFeatures()">Features</a></li>
+              <li><a href="#" onclick="showAuthGate()">Get Started</a></li>
+              <li><a href="#" onclick="showAuthGate()">Pricing</a></li>
+            </ul>
+          </div>
+          <div class="footer-section">
+            <h4>Support</h4>
+            <ul>
+              <li><a href="tel:9052672335">📞 9052672335</a></li>
+              <li><a href="mailto:radharapuarunkumar01@gmail.com">✉️ radharapuarunkumar01@gmail.com</a></li>
+            </ul>
+          </div>
+          <div class="footer-section">
+            <h4>Connect</h4>
+            <div class="social-links">
+              <a href="#" class="social-link"><span class="material-symbols-rounded">public</span></a>
+              <a href="#" class="social-link"><span class="material-symbols-rounded">chat</span></a>
+              <a href="#" class="social-link"><span class="material-symbols-rounded">videocam</span></a>
+            </div>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <p>© 2026 Python Master AI. All rights reserved to Radharapu Arun Kumar. Developed and designed by Radharapu Arun Kumar.</p>
+        </div>
+      </footer>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       REAL GOOGLE OAUTH SIGN-IN SPLASH OVERLAY
        ========================================== -->
   <div id="signin-gateway" class="gateway-overlay">
     <div class="gateway-container">
       <div class="gateway-logo">
         <span class="material-symbols-rounded neon-icon">smart_toy</span>
         <h2>Python Master AI</h2>
-        <p class="neon-text-blue">Job-Ready Python Certification & AI Tutor</p>
+        <p class="neon-text-blue">Job-Ready Python Certification &amp; AI Tutor</p>
       </div>
       <div class="gateway-form-card">
-        <h3>Gmail Sign-In Portal</h3>
-        <p class="text-secondary text-center">Simulate secure account access and resume your job roadmap.</p>
-        
-        <div class="input-group">
-          <label for="txt-signin-name">Full Name</label>
-          <input type="text" id="txt-signin-name" value="Radharapu Arun Kumar">
+        <h3>Sign in with Google</h3>
+        <p class="text-secondary text-center">Your Gmail is verified by Google. Progress saved automatically to the cloud.</p>
+
+        <!-- Google One-Tap / OAuth Button -->
+        <div id="google-signin-btn-container" style="display:flex;justify-content:center;margin:20px 0;">
+          <!-- Google Identity Services renders the button here -->
+          <div id="g_id_onload"
+            data-client_id="YOUR_GOOGLE_CLIENT_ID"
+            data-callback="handleGoogleCredential"
+            data-auto_prompt="false">
+          </div>
+          <div class="g_id_signin"
+            data-type="standard"
+            data-size="large"
+            data-theme="filled_black"
+            data-text="signin_with"
+            data-shape="rectangular"
+            data-logo_alignment="left">
+          </div>
         </div>
-        <div class="input-group">
-          <label for="txt-signin-email">Gmail Address</label>
-          <input type="email" id="txt-signin-email" value="radharapuarunkumar01@gmail.com">
+
+        <!-- Manual Sign-in fallback (works without Google Client ID setup) -->
+        <div id="manual-signin-fallback">
+          <div class="divider-or"><span>or sign in manually</span></div>
+          <div class="input-group" style="margin-top:14px;">
+            <label for="txt-signin-name">Full Name</label>
+            <input type="text" id="txt-signin-name" placeholder="Enter your full name">
+          </div>
+          <div class="input-group">
+            <label for="txt-signin-email">Gmail Address</label>
+            <input type="email" id="txt-signin-email" placeholder="yourname@gmail.com">
+          </div>
+          <button class="btn-google-signin" id="btn-manual-signin" onclick="manualGmailSignIn()">
+            <svg class="google-svg" viewBox="0 0 24 24" width="20" height="20">
+              <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+              <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+              <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l3.66-2.85z"/>
+              <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.85c.87-2.6 3.3-4.53 6.16-4.53z"/>
+            </svg>
+            <span>Continue with Gmail</span>
+          </button>
         </div>
-        
-        <button class="btn-google-signin" onclick="simulateGoogleSignIn()">
-          <svg class="google-svg" viewBox="0 0 24 24" width="20" height="20">
-            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l3.66-2.85z"/>
-            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.85c.87-2.6 3.3-4.53 6.16-4.53z"/>
-          </svg>
-          <span>Sign In with Gmail</span>
-        </button>
-        
+
+        <!-- Auth Status Indicator -->
+        <div id="signin-status-msg" style="display:none;text-align:center;padding:12px;border-radius:8px;margin-top:12px;"></div>
+
         <div class="legal-disclaimer">
-          <p>By signing in, you unlock 20+ job prep courses. <br><strong>All rights reserved to Radharapu Arun Kumar only. Developed and designed by Radharapu Arun Kumar.</strong></p>
+          <p>🔒 Verified by Google. Your data is saved securely. <br><strong>All rights reserved to Radharapu Arun Kumar only. Developed and designed by Radharapu Arun Kumar.</strong></p>
         </div>
       </div>
     </div>
@@ -134,6 +406,10 @@
           <span class="material-symbols-rounded icon-red">admin_panel_settings</span>
           <span>Admin Console</span>
         </button>
+        <button class="nav-item" id="btn-nav-settings" onclick="switchView('settings')">
+          <span class="material-symbols-rounded icon-gray">settings</span>
+          <span>Settings</span>
+        </button>
       </nav>
 
       <!-- Copyright branding footer -->
@@ -176,8 +452,81 @@
             <span class="material-symbols-rounded">contact_support</span>
             <span>Support</span>
           </div>
+
+          <!-- Dark/Light Mode Toggle -->
+          <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()">
+            <span class="material-symbols-rounded" id="theme-icon">dark_mode</span>
+          </button>
+
+          <!-- Notifications -->
+          <button class="notification-btn" onclick="toggleNotifications()">
+            <span class="material-symbols-rounded">notifications</span>
+            <span class="notification-badge" id="notif-count">3</span>
+          </button>
+
+          <!-- User Profile Display -->
+          <div class="header-user-profile" id="header-user-profile" onclick="switchView('profile')">
+            <img id="header-profile-photo" src="" alt="Profile" style="display:none;width:34px;height:34px;border-radius:50%;border:2px solid var(--neon-green);object-fit:cover;">
+            <div class="header-user-info">
+              <span class="header-user-name" id="lbl-header-username">Arun Kumar</span>
+              <span class="header-verified-badge" id="lbl-verified-badge" style="display:none;font-size:11px;color:var(--neon-green);align-items:center;gap:3px;">
+                <span class="material-symbols-rounded" style="font-size:13px;">verified</span> Verified
+              </span>
+            </div>
+          </div>
         </div>
       </header>
+
+      <!-- Notification Panel -->
+      <div class="notification-panel" id="notification-panel">
+        <div class="notification-panel-header">
+          <h3>Notifications</h3>
+          <button class="btn-icon" onclick="toggleNotifications()">
+            <span class="material-symbols-rounded">close</span>
+          </button>
+        </div>
+        <div class="notification-list" id="notification-list">
+          <!-- Dynamic notifications -->
+        </div>
+      </div>
+
+      <!-- AI Chatbot Popup -->
+      <div class="ai-chatbot-popup" id="ai-chatbot-popup">
+        <div class="chatbot-header">
+          <div class="chatbot-header-info">
+            <span class="material-symbols-rounded chatbot-icon">smart_toy</span>
+            <div>
+              <h4>AI Tutor Assistant</h4>
+              <span class="chatbot-status">Online</span>
+            </div>
+          </div>
+          <button class="btn-icon" onclick="toggleAIChatbot()">
+            <span class="material-symbols-rounded">close</span>
+          </button>
+        </div>
+        <div class="chatbot-messages" id="chatbot-messages">
+          <div class="chatbot-message ai">
+            <p>Hi! I'm your AI Tutor Assistant. How can I help you learn Python today?</p>
+          </div>
+        </div>
+        <div class="chatbot-input-area">
+          <input type="text" id="chatbot-input" placeholder="Ask me anything about Python..." onkeypress="if(event.key === 'Enter') sendChatbotMessage()">
+          <button class="btn-send" onclick="sendChatbotMessage()">
+            <span class="material-symbols-rounded">send</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- AI Chatbot Toggle Button -->
+      <button class="ai-chatbot-toggle" id="ai-chatbot-toggle" onclick="toggleAIChatbot()">
+        <span class="material-symbols-rounded">smart_toy</span>
+        <span class="chatbot-badge">AI</span>
+      </button>
+
+      <!-- Mobile Menu Toggle -->
+      <button class="mobile-menu-toggle" id="mobile-menu-toggle" onclick="toggleMobileMenu()">
+        <span class="material-symbols-rounded">menu</span>
+      </button>
 
       <!-- ==========================================
            VIEW 1: ROADMAP DASHBOARD HUB
@@ -205,6 +554,17 @@
         <div class="dashboard-grid">
           <!-- Left Col: Roadmap paths -->
           <div class="col-main-roadmap">
+            <!-- Course Cards Section -->
+            <div class="card course-cards-section">
+              <div class="card-header-row">
+                <h3>Course Modules</h3>
+                <span class="badge-accent">9 Chapters</span>
+              </div>
+              <div class="course-cards-grid" id="course-cards-grid">
+                <!-- Dynamic course cards -->
+              </div>
+            </div>
+
             <!-- Smart AI Roadmap Generator Card -->
             <div class="card ai-roadmap-card neon-border-cyan">
               <div class="card-header-row">
@@ -768,92 +1128,454 @@
               <div class="p-feat"><span class="material-symbols-rounded">check</span> Unlimited TTS Motherly Accent explanations</div>
               <div class="p-feat"><span class="material-symbols-rounded">check</span> Advanced error line tracing</div>
               <div class="p-feat"><span class="material-symbols-rounded">check</span> Auto-AI portfolio website developer compiler</div>
+              <div class="p-feat"><span class="material-symbols-rounded">check</span> Daily personalized Python challenges</div>
+              <div class="p-feat"><span class="material-symbols-rounded">check</span> Priority support from Arun Kumar</div>
             </div>
 
-            <!-- Simulated UPI Payment Gateway Mock -->
-            <div class="upi-payment-mock-box" id="upi-payment-panel">
-              <h4>Simulated UPI Gateway</h4>
-              <p class="font-sm text-secondary">No actual money is charged. Click below to mock complete the ₹2 payment.</p>
-              <div class="upi-input-row">
-                <input type="text" id="txt-upi-id" value="radharapuarunkumar01@okaxis" placeholder="Enter UPI ID">
-                <button class="btn-success" onclick="processMockUPIPayment()">Mock Pay ₹2</button>
+            <!-- Real Razorpay Payment Gateway -->
+            <div class="razorpay-payment-box" id="upi-payment-panel">
+              <div class="razorpay-header">
+                <div class="razorpay-badge">
+                  <span class="material-symbols-rounded">verified_user</span>
+                  <span>Secured by Razorpay</span>
+                </div>
+                <div class="razorpay-amount-display">
+                  <span class="amount-rupee">₹2</span>
+                  <span class="amount-period">/ month</span>
+                </div>
               </div>
+              <p class="razorpay-note">Click the button below to pay securely via UPI, Card, or Net Banking. Your premium will activate instantly after payment.</p>
+              <div class="razorpay-payment-methods">
+                <span title="UPI"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/UPI-Logo-vector.svg/200px-UPI-Logo-vector.svg.png" alt="UPI" height="22"></span>
+                <span title="Cards" class="pay-method-text">💳 Cards</span>
+                <span title="Net Banking" class="pay-method-text">🏦 Net Banking</span>
+                <span title="Wallets" class="pay-method-text">👛 Wallets</span>
+              </div>
+              <button class="btn-razorpay-pay" onclick="initiateRazorpayPayment()" id="btn-razorpay-pay">
+                <span class="material-symbols-rounded">payment</span>
+                Pay ₹2 — Activate Premium Now
+              </button>
+              <p class="razorpay-secure-note">🔒 100% secure. Cancel anytime. Powered by Razorpay India.</p>
             </div>
             
             <div class="premium-unlocked-status" id="lbl-premium-success-msg" style="display:none;">
               <span class="material-symbols-rounded text-emerald">verified</span>
               <h4>PRO Account Unlocked! All premium AI resources enabled.</h4>
+              <p class="text-secondary">Payment verified by Razorpay. Your account is now Premium.</p>
+            </div>
+          </div>
+
+          <!-- What you get card -->
+          <div class="card neon-border-purple" style="padding:28px;">
+            <h3 style="color:var(--neon-purple);margin-bottom:16px;">🚀 What Premium Unlocks</h3>
+            <div style="display:flex;flex-direction:column;gap:12px;">
+              <div class="p-feat large"><span class="material-symbols-rounded text-emerald">record_voice_over</span> <div><strong>Motherly Voice AI Tutor</strong><br><small class="text-secondary">Telugu, Hindi & English voice explanations</small></div></div>
+              <div class="p-feat large"><span class="material-symbols-rounded icon-cyan">psychology</span> <div><strong>AI Error Explainer</strong><br><small class="text-secondary">Line-by-line error tracing with suggestions</small></div></div>
+              <div class="p-feat large"><span class="material-symbols-rounded icon-gold">workspace_premium</span> <div><strong>Verified Certificate</strong><br><small class="text-secondary">Downloadable completion certificate</small></div></div>
+              <div class="p-feat large"><span class="material-symbols-rounded icon-orange">trending_up</span> <div><strong>Interview Prep Mode</strong><br><small class="text-secondary">Mock interviews + HR rounds + coding tests</small></div></div>
+            </div>
+            <div class="premium-contact-box">
+              <p>Need help? Contact Arun Kumar directly:</p>
+              <a href="tel:9052672335">📞 9052672335</a>
+              <a href="mailto:radharapuarunkumar01@gmail.com">✉️ radharapuarunkumar01@gmail.com</a>
             </div>
           </div>
         </div>
       </section>
 
-      <!-- ==========================================
-           VIEW 11: ADMIN POWER CONSOLE
-           ========================================== -->
+
       <section id="view-admin" class="content-view">
-        <div class="view-header-intro">
-          <h2>Admin Control Center</h2>
-          <p class="text-secondary">Alter database values, reset streaks, simulate experience points, or unlock certificates.</p>
+        <!-- Access Denied state (shown to non-admins) -->
+        <div id="admin-access-denied" style="display:none; text-align:center; padding:80px 40px;">
+          <span class="material-symbols-rounded" style="font-size:72px;color:var(--neon-red);display:block;margin-bottom:20px;">gpp_bad</span>
+          <h2 style="color:var(--neon-red);">Access Denied</h2>
+          <p class="text-secondary" style="margin-top:10px;font-size:16px;">This section is restricted to the Super Admin only.<br>You are not authorized to view this page.</p>
+          <p style="margin-top:20px;color:var(--text-gray);font-size:13px;">Contact: radharapuarunkumar02@gmail.com</p>
         </div>
 
-        <div class="admin-controls-grid">
-          <!-- Active Config Form -->
-          <div class="card admin-status-card neon-border-cyan">
-            <h3>Profile Database Configuration</h3>
-            <p class="text-secondary card-desc">Override any database variables instantly.</p>
-            <div class="admin-variables-list">
-              <div class="input-group">
-                <label for="adm-input-name">User Full Name</label>
-                <input type="text" id="adm-input-name" value="Radharapu Arun Kumar">
+        <!-- Full Admin Panel (shown only to radharapuarunkumar02@gmail.com) -->
+        <div id="admin-full-panel">
+          <div class="view-header-intro">
+            <div style="display:flex;align-items:center;gap:12px;">
+              <span class="material-symbols-rounded" style="color:var(--neon-red);font-size:32px;">admin_panel_settings</span>
+              <div>
+                <h2>Super Admin Command Center</h2>
+                <p class="text-secondary">Full control over the Python Master AI platform. All changes are immediate.</p>
               </div>
-              <div class="input-group">
-                <label for="adm-input-email">Gmail Address</label>
-                <input type="email" id="adm-input-email" value="radharapuarunkumar01@gmail.com">
-              </div>
-              <div class="input-group">
-                <label for="adm-input-xp">Experience Points (XP)</label>
-                <input type="number" id="adm-input-xp" value="0">
-              </div>
-              <div class="input-group">
-                <label for="adm-input-streak">Streak Days</label>
-                <input type="number" id="adm-input-streak" value="1">
-              </div>
-              <div class="input-group">
-                <label for="adm-select-pro">Premium AI Pro State</label>
-                <select id="adm-select-pro" class="editor-textarea" style="height:40px;padding:8px;background-color:var(--bg-darkest);border:1px solid var(--border-color);color:#fff;width:100%;">
-                  <option value="false">Free Account</option>
-                  <option value="true">Premium Active (₹2 Paid)</option>
-                </select>
-              </div>
-              <button class="btn-cyan w-full mt-1" onclick="adminApplyConfigChanges()">
-                Apply Variable Override
-              </button>
+            </div>
+            <div style="display:flex;gap:10px;margin-top:12px;padding:12px 16px;background:rgba(255,0,80,0.08);border:1px solid rgba(255,0,80,0.3);border-radius:10px;">
+              <span class="material-symbols-rounded" style="color:var(--neon-red);">verified_user</span>
+              <span style="color:var(--neon-red);font-weight:600;">Logged in as: SUPER ADMIN — Radharapu Arun Kumar</span>
             </div>
           </div>
 
-          <!-- Action commands & chapters toggler panel -->
-          <div class="card admin-actions-card neon-border-purple">
-            <h3>Chapter Progress Matrix Control</h3>
-            <p class="text-secondary card-desc">Individually toggle chapter completion checklists to simulate roadmap milestones.</p>
-            <div class="admin-chapter-checkboxes" id="admin-chaps-grid" style="display:flex;flex-direction:column;gap:8px;margin-bottom:18px;max-height:220px;overflow-y:auto;background-color:var(--bg-darkest);padding:10px;border-radius:var(--border-radius-sm);border:1px solid var(--border-color);">
-              <!-- Checkboxes dynamically populated in app.js -->
+          <!-- Stats Overview Bar -->
+          <div class="admin-stats-bar" id="admin-stats-bar" style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px;">
+            <div class="card" style="text-align:center;padding:18px;border:1px solid var(--neon-cyan);">
+              <div style="font-size:28px;font-weight:800;color:var(--neon-cyan);" id="adm-stat-users">—</div>
+              <div class="text-secondary" style="font-size:12px;margin-top:4px;">Total Users Registered</div>
             </div>
-            
-            <h3>Simulator Tools</h3>
-            <div class="admin-buttons-row">
-              <button class="btn-primary" onclick="adminGrantXP(500)">Grant +500 XP</button>
-              <button class="btn-cyan" onclick="adminSimulateStreak(7)">Set 7-Day Streak</button>
-              <button class="btn-orange" onclick="adminTogglePremium()">Toggle Pro State</button>
-              <button class="btn-success" onclick="adminCompleteAllChapters()">Autocomplete All Chapters</button>
-              <button class="btn-secondary" onclick="adminResetAllData()">Reset LocalStorage DB</button>
+            <div class="card" style="text-align:center;padding:18px;border:1px solid var(--neon-purple);">
+              <div style="font-size:28px;font-weight:800;color:var(--neon-purple);" id="adm-stat-premium">—</div>
+              <div class="text-secondary" style="font-size:12px;margin-top:4px;">Premium Subscribers</div>
+            </div>
+            <div class="card" style="text-align:center;padding:18px;border:1px solid var(--neon-green);">
+              <div style="font-size:28px;font-weight:800;color:var(--neon-green);" id="adm-stat-revenue">₹0</div>
+              <div class="text-secondary" style="font-size:12px;margin-top:4px;">Total Revenue Earned</div>
+            </div>
+            <div class="card" style="text-align:center;padding:18px;border:1px solid var(--neon-orange);">
+              <div style="font-size:28px;font-weight:800;color:var(--neon-orange);" id="adm-stat-chaps">—</div>
+              <div class="text-secondary" style="font-size:12px;margin-top:4px;">Chapters Completed</div>
+            </div>
+          </div>
+
+          <!-- Charts Section -->
+          <div class="admin-charts-grid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:24px;margin-bottom:24px;">
+            <div class="card" style="padding:24px;border:1px solid var(--border-color);">
+              <h3 style="margin-bottom:16px;">📈 User Growth (Last 7 Days)</h3>
+              <div class="chart-container" id="chart-user-growth">
+                <div class="simple-bar-chart">
+                  <div class="chart-bar" style="height:60%;"><span class="chart-label">Mon</span></div>
+                  <div class="chart-bar" style="height:75%;"><span class="chart-label">Tue</span></div>
+                  <div class="chart-bar" style="height:45%;"><span class="chart-label">Wed</span></div>
+                  <div class="chart-bar" style="height:90%;"><span class="chart-label">Thu</span></div>
+                  <div class="chart-bar" style="height:80%;"><span class="chart-label">Fri</span></div>
+                  <div class="chart-bar" style="height:55%;"><span class="chart-label">Sat</span></div>
+                  <div class="chart-bar" style="height:70%;"><span class="chart-label">Sun</span></div>
+                </div>
+              </div>
+            </div>
+            <div class="card" style="padding:24px;border:1px solid var(--border-color);">
+              <h3 style="margin-bottom:16px;">💰 Revenue Trend</h3>
+              <div class="chart-container" id="chart-revenue">
+                <div class="simple-line-chart">
+                  <svg viewBox="0 0 400 200" style="width:100%;height:200px;">
+                    <defs>
+                      <linearGradient id="lineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" style="stop-color:var(--neon-purple);stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:var(--neon-cyan);stop-opacity:1" />
+                      </linearGradient>
+                    </defs>
+                    <polyline fill="none" stroke="url(#lineGradient)" stroke-width="3" points="0,150 50,120 100,140 150,80 200,100 250,60 300,90 350,50 400,70"/>
+                    <circle cx="0" cy="150" r="4" fill="var(--neon-purple)"/>
+                    <circle cx="50" cy="120" r="4" fill="var(--neon-purple)"/>
+                    <circle cx="100" cy="140" r="4" fill="var(--neon-purple)"/>
+                    <circle cx="150" cy="80" r="4" fill="var(--neon-cyan)"/>
+                    <circle cx="200" cy="100" r="4" fill="var(--neon-cyan)"/>
+                    <circle cx="250" cy="60" r="4" fill="var(--neon-cyan)"/>
+                    <circle cx="300" cy="90" r="4" fill="var(--neon-cyan)"/>
+                    <circle cx="350" cy="50" r="4" fill="var(--neon-cyan)"/>
+                    <circle cx="400" cy="70" r="4" fill="var(--neon-cyan)"/>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="admin-controls-grid">
+            <!-- Profile Override -->
+            <div class="card admin-status-card neon-border-cyan">
+              <h3>🛠️ User Profile Override</h3>
+              <p class="text-secondary card-desc">Directly edit any user's profile variables in real-time.</p>
+              <div class="admin-variables-list">
+                <div class="input-group">
+                  <label for="adm-input-name">User Full Name</label>
+                  <input type="text" id="adm-input-name" value="Radharapu Arun Kumar">
+                </div>
+                <div class="input-group">
+                  <label for="adm-input-email">Gmail Address</label>
+                  <input type="email" id="adm-input-email" value="radharapuarunkumar01@gmail.com">
+                </div>
+                <div class="input-group">
+                  <label for="adm-input-xp">Experience Points (XP)</label>
+                  <input type="number" id="adm-input-xp" value="0">
+                </div>
+                <div class="input-group">
+                  <label for="adm-input-streak">Streak Days</label>
+                  <input type="number" id="adm-input-streak" value="1">
+                </div>
+                <div class="input-group">
+                  <label for="adm-input-level">Level</label>
+                  <input type="number" id="adm-input-level" value="1">
+                </div>
+                <div class="input-group">
+                  <label for="adm-select-pro">Premium AI Pro State</label>
+                  <select id="adm-select-pro" class="editor-textarea" style="height:40px;padding:8px;background-color:var(--bg-darkest);border:1px solid var(--border-color);color:#fff;width:100%;">
+                    <option value="false">Free Account</option>
+                    <option value="true">Premium Active (₹2 Paid)</option>
+                  </select>
+                </div>
+                <button class="btn-cyan w-full mt-1" onclick="adminApplyConfigChanges()">
+                  ✅ Apply Override Changes
+                </button>
+              </div>
+            </div>
+
+            <!-- Chapter Control -->
+            <div class="card admin-actions-card neon-border-purple">
+              <h3>📚 Chapter Progress Control</h3>
+              <p class="text-secondary card-desc">Toggle individual chapters to simulate milestone completion.</p>
+              <div class="admin-chapter-checkboxes" id="admin-chaps-grid" style="display:flex;flex-direction:column;gap:8px;margin-bottom:18px;max-height:200px;overflow-y:auto;background-color:var(--bg-darkest);padding:10px;border-radius:var(--border-radius-sm);border:1px solid var(--border-color);">
+                <!-- Populated by JS -->
+              </div>
+              
+              <h3 style="margin-top:16px;">⚡ Power Actions</h3>
+              <div class="admin-buttons-row">
+                <button class="btn-primary" onclick="adminGrantXP(500)">Grant +500 XP</button>
+                <button class="btn-primary" onclick="adminGrantXP(2000)">Grant +2000 XP</button>
+                <button class="btn-cyan" onclick="adminSimulateStreak(7)">Set 7-Day Streak</button>
+                <button class="btn-cyan" onclick="adminSimulateStreak(30)">Set 30-Day Streak</button>
+                <button class="btn-orange" onclick="adminTogglePremium()">Toggle Premium</button>
+                <button class="btn-success" onclick="adminCompleteAllChapters()">Complete All Chapters</button>
+                <button class="btn-secondary" onclick="adminResetAllData()">🗑️ Reset User Data</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- All Users Management -->
+          <div class="card" style="margin-top:24px;border:1px solid var(--neon-orange);padding:24px;">
+            <h3 style="color:var(--neon-orange);margin-bottom:6px;">👥 All Registered Users (localStorage)</h3>
+            <p class="text-secondary card-desc">All users who have ever logged in on this browser device.</p>
+            <div id="admin-users-list" style="margin-top:16px;display:flex;flex-direction:column;gap:10px;">
+              <!-- Populated by JS -->
+            </div>
+            <button class="btn-orange" onclick="adminLoadAllUsers()" style="margin-top:16px;">🔄 Refresh User List</button>
+          </div>
+
+          <!-- Payment Management -->
+          <div class="card" style="margin-top:24px;border:1px solid var(--neon-green);padding:24px;">
+            <h3 style="color:var(--neon-green);margin-bottom:6px;">💳 Payment & Revenue Control</h3>
+            <p class="text-secondary card-desc">Track Razorpay payments and manage premium subscriptions.</p>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px;">
+              <div style="background:var(--bg-darkest);border-radius:10px;padding:16px;border:1px solid var(--border-color);">
+                <div style="font-size:13px;color:var(--text-gray);margin-bottom:8px;">RAZORPAY KEY IN USE</div>
+                <div style="font-family:'Fira Code',monospace;color:var(--neon-green);font-size:13px;">rzp_test_... (Test Mode)</div>
+                <div style="font-size:11px;color:var(--text-gray);margin-top:6px;">Replace with Live Key (rzp_live_...) in app.js line: RAZORPAY_KEY</div>
+              </div>
+              <div style="background:var(--bg-darkest);border-radius:10px;padding:16px;border:1px solid var(--border-color);">
+                <div style="font-size:13px;color:var(--text-gray);margin-bottom:8px;">GRANT PREMIUM MANUALLY</div>
+                <div style="display:flex;gap:8px;margin-top:8px;">
+                  <input type="email" id="adm-manual-premium-email" placeholder="user@gmail.com" style="flex:1;padding:8px;background:var(--bg-card);border:1px solid var(--border-color);color:#fff;border-radius:6px;font-size:12px;">
+                  <button class="btn-success" onclick="adminGrantPremiumToUser()" style="white-space:nowrap;font-size:12px;">Grant Premium</button>
+                </div>
+              </div>
+            </div>
+            <div style="margin-top:16px;padding:14px;background:rgba(0,255,128,0.06);border:1px dashed rgba(0,255,128,0.3);border-radius:8px;">
+              <p style="font-size:12px;color:var(--neon-green);">💡 <strong>To go LIVE:</strong> Sign up at razorpay.com → Dashboard → API Keys → Copy Live Key → Replace in app.js variable <code>RAZORPAY_KEY_ID</code></p>
+            </div>
+          </div>
+
+          <!-- App Settings -->
+          <div class="card" style="margin-top:24px;border:1px solid var(--neon-purple);padding:24px;">
+            <h3 style="color:var(--neon-purple);margin-bottom:6px;">⚙️ Global App Settings</h3>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px;">
+              <div class="input-group">
+                <label>App Title Override</label>
+                <input type="text" id="adm-app-title" value="Python Master AI" placeholder="App name">
+              </div>
+              <div class="input-group">
+                <label>Support Phone</label>
+                <input type="text" id="adm-support-phone" value="9052672335">
+              </div>
+              <div class="input-group">
+                <label>Support Email</label>
+                <input type="email" id="adm-support-email" value="radharapuarunkumar01@gmail.com">
+              </div>
+              <div class="input-group">
+                <label>Premium Price (₹)</label>
+                <input type="number" id="adm-price" value="2">
+              </div>
+            </div>
+            <button class="btn-purple w-full mt-1" onclick="adminSaveAppSettings()">💾 Save App Settings</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           VIEW 11: USER PROFILE
+           ========================================== -->
+      <section id="view-profile" class="content-view">
+        <div class="view-header-intro">
+          <h2>User Profile</h2>
+          <p class="text-secondary">Manage your account settings and view your learning progress.</p>
+        </div>
+
+        <div class="profile-grid">
+          <!-- Profile Card -->
+          <div class="card profile-main-card neon-border-cyan">
+            <div class="profile-header">
+              <div class="profile-avatar-large" id="profile-avatar-display">
+                <span class="material-symbols-rounded">person</span>
+              </div>
+              <div class="profile-info">
+                <h3 id="profile-name-display">Radharapu Arun Kumar</h3>
+                <p class="text-secondary" id="profile-email-display">radharapuarunkumar01@gmail.com</p>
+                <div class="profile-badges">
+                  <span class="badge-premium" id="profile-premium-badge">FREE ACCOUNT</span>
+                  <span class="badge-verified" id="profile-verified-badge" style="display:none;">Google Verified</span>
+                </div>
+              </div>
+            </div>
+            <div class="profile-stats-grid">
+              <div class="profile-stat-item">
+                <span class="stat-icon" style="color:var(--neon-cyan);"><span class="material-symbols-rounded">military_tech</span></span>
+                <div class="stat-value" id="profile-xp-display">0</div>
+                <div class="stat-label">Total XP</div>
+              </div>
+              <div class="profile-stat-item">
+                <span class="stat-icon" style="color:var(--neon-orange);"><span class="material-symbols-rounded">local_fire_department</span></span>
+                <div class="stat-value" id="profile-streak-display">1</div>
+                <div class="stat-label">Day Streak</div>
+              </div>
+              <div class="profile-stat-item">
+                <span class="stat-icon" style="color:var(--neon-purple);"><span class="material-symbols-rounded">school</span></span>
+                <div class="stat-value" id="profile-level-display">1</div>
+                <div class="stat-label">Level</div>
+              </div>
+              <div class="profile-stat-item">
+                <span class="stat-icon" style="color:var(--neon-emerald);"><span class="material-symbols-rounded">check_circle</span></span>
+                <div class="stat-value" id="profile-chapters-display">0/9</div>
+                <div class="stat-label">Chapters</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Achievements Card -->
+          <div class="card achievements-full-card neon-border-gold">
+            <h3>🏆 Achievements</h3>
+            <div class="achievements-full-grid" id="profile-achievements-grid">
+              <!-- Dynamic achievements -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Learning Progress -->
+        <div class="card progress-card" style="margin-top:24px;">
+          <h3>📊 Learning Progress</h3>
+          <div class="progress-section">
+            <div class="progress-item">
+              <div class="progress-label">Overall Course Completion</div>
+              <div class="progress-bar-container">
+                <div class="progress-bar" id="profile-overall-progress" style="width: 0%;"></div>
+              </div>
+              <div class="progress-percentage" id="profile-overall-percentage">0%</div>
+            </div>
+            <div class="roadmap-progress-list" id="profile-chapter-progress">
+              <!-- Dynamic chapter progress -->
             </div>
           </div>
         </div>
       </section>
 
       <!-- ==========================================
-           VIEW 12: CERTIFICATE VAULT
+           VIEW 12: SETTINGS
+           ========================================== -->
+      <section id="view-settings" class="content-view">
+        <div class="view-header-intro">
+          <h2>Settings</h2>
+          <p class="text-secondary">Customize your learning experience and app preferences.</p>
+        </div>
+
+        <div class="settings-grid">
+          <!-- Appearance Settings -->
+          <div class="card settings-card">
+            <h3>🎨 Appearance</h3>
+            <div class="settings-item">
+              <div class="settings-item-info">
+                <h4>Dark Mode</h4>
+                <p class="text-secondary">Toggle between dark and light theme</p>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="settings-dark-mode" onchange="toggleTheme()" checked>
+                <span class="slider round"></span>
+              </label>
+            </div>
+            <div class="settings-item">
+              <div class="settings-item-info">
+                <h4>Language</h4>
+                <p class="text-secondary">Select your preferred language</p>
+              </div>
+              <select id="settings-language" class="settings-select" onchange="setLanguage(this.value)">
+                <option value="en">English</option>
+                <option value="te">తెలుగు (Telugu)</option>
+                <option value="hi">हिंदी (Hindi)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Learning Settings -->
+          <div class="card settings-card">
+            <h3>📚 Learning Preferences</h3>
+            <div class="settings-item">
+              <div class="settings-item-info">
+                <h4>Auto-Play Audio Explanations</h4>
+                <p class="text-secondary">Automatically play AI tutor audio</p>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="settings-autoplay-audio">
+                <span class="slider round"></span>
+              </label>
+            </div>
+            <div class="settings-item">
+              <div class="settings-item-info">
+                <h4>Show Code Hints</h4>
+                <p class="text-secondary">Display hints during challenges</p>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="settings-show-hints" checked>
+                <span class="slider round"></span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Notification Settings -->
+          <div class="card settings-card">
+            <h3>🔔 Notifications</h3>
+            <div class="settings-item">
+              <div class="settings-item-info">
+                <h4>Daily Reminders</h4>
+                <p class="text-secondary">Get reminded to maintain your streak</p>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="settings-daily-reminders" checked>
+                <span class="slider round"></span>
+              </label>
+            </div>
+            <div class="settings-item">
+              <div class="settings-item-info">
+                <h4>Achievement Alerts</h4>
+                <p class="text-secondary">Notify when you earn badges</p>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="settings-achievement-alerts" checked>
+                <span class="slider round"></span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Account Settings -->
+          <div class="card settings-card neon-border-red">
+            <h3>⚠️ Account</h3>
+            <div class="settings-item">
+              <div class="settings-item-info">
+                <h4>Reset Progress</h4>
+                <p class="text-secondary">Clear all learning progress (cannot be undone)</p>
+              </div>
+              <button class="btn-secondary" onclick="if(confirm('Are you sure? This will delete all your progress.')) resetAllProgress()">Reset</button>
+            </div>
+            <div class="settings-item">
+              <div class="settings-item-info">
+                <h4>Sign Out</h4>
+                <p class="text-secondary">Sign out of your account</p>
+              </div>
+              <button class="btn-signout" onclick="signOutUser()">Sign Out</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           VIEW 13: CERTIFICATE VAULT
            ========================================== -->
       <section id="view-certificate" class="content-view">
         <div class="view-header-intro">

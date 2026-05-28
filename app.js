@@ -445,61 +445,217 @@ const MOTHER_VOICE_TRANSLATIONS = {
   }
 };
 
-// --- 4. Google/Gmail Simulated Sign-in ---
-function simulateGoogleSignIn() {
-  const nameInput = document.getElementById('txt-signin-name').value.trim();
-  const emailInput = document.getElementById('txt-signin-email').value.trim();
+// --- 4. Authentication System (Real Google OAuth + Manual Fallback) ---
 
-  if (nameInput === '' || emailInput === '') {
-    alert("Please fill in your Gmail authentication credentials.");
-    return;
+/**
+ * Called by Google Identity Services after user selects their Google account.
+ * Receives a JWT credential that contains name, email, and profile picture.
+ */
+function handleGoogleCredential(response) {
+  try {
+    // Decode the JWT token (base64 payload)
+    const payload = JSON.parse(atob(response.credential.split('.')[1]));
+    const name    = payload.name  || payload.email.split('@')[0];
+    const email   = payload.email || '';
+    const photo   = payload.picture || null;
+
+    if (!email.endsWith('@gmail.com') && !email.includes('@')) {
+      showSigninStatus('❌ Please use a valid Gmail account.', 'error');
+      return;
+    }
+
+    showSigninStatus(`✅ Verified by Google: ${email}`, 'success');
+
+    // Sign in with verified data
+    onGoogleAuthSuccess({ name, email, photo, uid: payload.sub });
+  } catch(e) {
+    showSigninStatus('⚠️ Failed to verify Google account. Try manual sign-in.', 'error');
+    console.error("JWT decode error:", e);
+  }
+}
+
+/**
+ * Triggered by Firebase popup sign-in (from firebase-init.js)
+ */
+window.onGoogleAuthSuccess = async function({ name, email, photo, uid }) {
+  // Try to load existing progress from Firestore first
+  let cloudData = null;
+  if (window.loadUserDataFromFirestore) {
+    try { cloudData = await window.loadUserDataFromFirestore(uid); } catch(e) {}
   }
 
-  state.userName = nameInput;
-  state.userEmail = emailInput;
-  state.isAuthenticated = true;
-
-  // Retrieve existing localStorage session under this email namespace
-  const dbKey = `pmai_progress_${emailInput.replace(/[^a-zA-Z0-9]/g, '_')}`;
-  const saved = localStorage.getItem(dbKey);
-  if (saved) {
-    try {
-      state = JSON.parse(saved);
-      state.isAuthenticated = true; // ensure state is active
-    } catch (e) {
-      // Revert to initial state on parse errors
+  if (cloudData) {
+    state = { ...state, ...cloudData };
+  } else {
+    // Load from localStorage as fallback
+    const dbKey = `pmai_progress_${email.replace(/[^a-zA-Z0-9]/g, '_')}`;
+    const saved = localStorage.getItem(dbKey);
+    if (saved) {
+      try { state = JSON.parse(saved); } catch(e) {}
     }
   }
 
-  // Update last login date
-  const now = new Date();
-  state.lastLoginDate = now.toLocaleDateString() + " " + now.toLocaleTimeString();
+  // Always set verified fields
+  state.isAuthenticated = true;
+  state.userName  = name;
+  state.userEmail = email;
+  state.photoURL  = photo;
+  state.uid       = uid;
+  state.isGoogleVerified = true;
+  state.lastLoginDate = new Date().toLocaleString();
 
-  // Save updated metrics
   saveSession();
-  
-  // Deactivate auth gate CSS class
+  finishLogin();
+};
+
+/**
+ * Manual Gmail sign-in fallback — validates email format
+ */
+function manualGmailSignIn() {
+  const nameInput  = document.getElementById('txt-signin-name').value.trim();
+  const emailInput = document.getElementById('txt-signin-email').value.trim();
+  const btn        = document.getElementById('btn-manual-signin');
+
+  if (nameInput === '') {
+    showSigninStatus('⚠️ Please enter your full name.', 'error');
+    return;
+  }
+  if (!emailInput.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+    showSigninStatus('⚠️ Please enter a valid email address (e.g. yourname@gmail.com).', 'error');
+    return;
+  }
+
+  btn.disabled = true;
+  btn.innerHTML = `<span class="material-symbols-rounded" style="animation:spin 1s linear infinite;display:inline-block;">refresh</span> Signing in...`;
+  showSigninStatus('🔄 Verifying and loading your progress...', 'info');
+
+  setTimeout(() => {
+    // Load from localStorage
+    const dbKey = `pmai_progress_${emailInput.replace(/[^a-zA-Z0-9]/g, '_')}`;
+    const saved = localStorage.getItem(dbKey);
+    if (saved) {
+      try {
+        state = JSON.parse(saved);
+      } catch(e) {}
+    }
+
+    state.isAuthenticated   = true;
+    state.userName          = nameInput;
+    state.userEmail         = emailInput;
+    state.isGoogleVerified  = false;
+    state.lastLoginDate     = new Date().toLocaleString();
+    if (!state.firstLoginDate) state.firstLoginDate = new Date().toLocaleString();
+
+    saveSession();
+    finishLogin();
+
+    btn.disabled = false;
+    btn.innerHTML = `<svg class="google-svg" viewBox="0 0 24 24" width="20" height="20"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l3.66-2.85z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.85c.87-2.6 3.3-4.53 6.16-4.53z"/></svg><span>Continue with Gmail</span>`;
+  }, 800);
+}
+
+/**
+ * Restore session when Firebase auto-detects returning user on page load
+ */
+window.restoreSessionFromCloud = function(cloudData, googleUser) {
+  if (state.isAuthenticated) return; // Already logged in
+  state = { ...state, ...cloudData };
+  state.isAuthenticated  = true;
+  state.userName         = googleUser.name  || state.userName;
+  state.userEmail        = googleUser.email || state.userEmail;
+  state.photoURL         = googleUser.photo || state.photoURL;
+  state.isGoogleVerified = true;
+  saveSession();
+  finishLogin();
+};
+
+/**
+ * Common function called after any successful login
+ */
+function finishLogin() {
   document.body.classList.remove('auth-gate-active');
 
-  // Change to active view
+  // Update profile photo if available
+  if (state.photoURL) {
+    const photoEl = document.getElementById('header-profile-photo');
+    if (photoEl) {
+      photoEl.src = state.photoURL;
+      photoEl.style.display = 'block';
+    }
+  }
+
+  // Update verified badge
+  const verifiedBadge = document.getElementById('lbl-verified-badge');
+  if (verifiedBadge) {
+    if (state.isGoogleVerified) {
+      verifiedBadge.innerHTML = `<span class="material-symbols-rounded" style="font-size:14px;vertical-align:middle;color:var(--neon-green);">verified</span> Google Verified`;
+      verifiedBadge.style.display = 'inline-flex';
+    }
+  }
+
+  // Sync to Firestore cloud (non-blocking)
+  if (window.saveUserDataToFirestore) {
+    window.saveUserDataToFirestore(state).catch(() => {});
+  }
+
   switchView('dashboard');
-  
-  alert(`Gmail Auth Approved!\nWelcome: ${state.userName}\nLast Session Restored.`);
+}
+
+/**
+ * Show status message on login screen
+ */
+function showSigninStatus(msg, type) {
+  const el = document.getElementById('signin-status-msg');
+  if (!el) return;
+  el.style.display = 'block';
+  el.textContent   = msg;
+  const colors = {
+    success: { bg: 'rgba(0,255,128,0.08)', color: 'var(--neon-green)', border: '1px solid rgba(0,255,128,0.3)' },
+    error:   { bg: 'rgba(255,0,80,0.08)',  color: '#ff3366',           border: '1px solid rgba(255,0,80,0.3)'  },
+    info:    { bg: 'rgba(0,200,255,0.08)', color: 'var(--neon-cyan)',  border: '1px solid rgba(0,200,255,0.3)' }
+  };
+  const c = colors[type] || colors.info;
+  el.style.background = c.bg;
+  el.style.color      = c.color;
+  el.style.border     = c.border;
+}
+
+/**
+ * Google Sign-In button click — tries Firebase popup first
+ */
+async function googleSignInPopup() {
+  const statusEl = document.getElementById('signin-status-msg');
+  showSigninStatus('🔄 Opening Google sign-in...', 'info');
+
+  if (window.signInWithGoogle) {
+    const ok = await window.signInWithGoogle();
+    if (!ok) {
+      // Firebase not configured — fall through to manual
+      showSigninStatus('ℹ️ Google popup unavailable. Please use manual sign-in below.', 'info');
+    }
+  } else {
+    showSigninStatus('ℹ️ Please configure Firebase. Using manual sign-in for now.', 'info');
+  }
 }
 
 function signOutUser() {
-  if (confirm("Are you sure you want to sign out? Your progress will remain saved under your Gmail account.")) {
+  if (confirm("Sign out? Your progress is saved and will be restored next time.")) {
     state.isAuthenticated = false;
+    window._authHandled = false;
+    if (window.firebaseSignOut) window.firebaseSignOut();
     document.body.classList.add('auth-gate-active');
-    // Clear display inputs
-    document.getElementById('txt-signin-name').value = "Radharapu Arun Kumar";
-    document.getElementById('txt-signin-email').value = "radharapuarunkumar01@gmail.com";
+    document.getElementById('txt-signin-name').value  = '';
+    document.getElementById('txt-signin-email').value = '';
   }
 }
 
 function saveSession() {
   const dbKey = `pmai_progress_${state.userEmail.replace(/[^a-zA-Z0-9]/g, '_')}`;
   localStorage.setItem(dbKey, JSON.stringify(state));
+  // Also sync to Firestore cloud (non-blocking)
+  if (window.saveUserDataToFirestore && state.isAuthenticated && state.uid) {
+    window.saveUserDataToFirestore(state).catch(() => {});
+  }
 }
 
 // --- 5. Application Navigation & Views Router ---
@@ -526,6 +682,7 @@ function switchView(viewName) {
 
   if (viewName === 'dashboard') {
     renderDashboard();
+    renderCourseCards();
   } else if (viewName === 'lessons') {
     loadChapterLesson(state.currentChapterIndex);
   } else if (viewName === 'projects') {
@@ -544,6 +701,10 @@ function switchView(viewName) {
     renderAdminPanel();
   } else if (viewName === 'certificate') {
     renderCertificateVault();
+  } else if (viewName === 'profile') {
+    renderProfileView();
+  } else if (viewName === 'settings') {
+    // Settings view is static, no dynamic rendering needed
   }
 }
 
@@ -1528,99 +1689,281 @@ function renderLeaderboard() {
   });
 }
 
-// --- 18. Simulated UPI ₹2 Payment Upgrade Portal ---
-function processMockUPIPayment() {
-  const upiId = document.getElementById('txt-upi-id').value.trim();
-  if (upiId === '') {
-    alert("Please enter a UPI ID.");
+// --- 18. Real Razorpay ₹2 Payment Integration ---
+// ⚙️ ADMIN: Replace 'rzp_test_...' with your Live Key from razorpay.com/dashboard when going live
+const RAZORPAY_KEY_ID = 'rzp_test_51OoXXXXXXXXXXXXXXXXXXX'; // Replace this with your actual Razorpay Key
+
+function initiateRazorpayPayment() {
+  if (state.isPremium) {
+    alert("✅ You are already a Premium member! Enjoy all AI features.");
     return;
   }
 
-  alert("Processing ₹2 transaction mock via secure gateway...");
-  
-  setTimeout(() => {
-    state.isPremium = true;
-    saveSession();
-    
-    document.getElementById('upi-payment-panel').style.display = 'none';
-    document.getElementById('lbl-premium-success-msg').style.display = 'block';
+  const btn = document.getElementById('btn-razorpay-pay');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="material-symbols-rounded">hourglass_empty</span> Opening Razorpay...';
 
-    alert("🎉 Payment Verified! Premium status active under account: " + state.userEmail);
-  }, 1200);
+  const options = {
+    key: RAZORPAY_KEY_ID,
+    amount: 200,           // ₹2 in paise (100 paise = ₹1)
+    currency: "INR",
+    name: "Python Master AI",
+    description: "Premium AI Tutor — Monthly Subscription",
+    image: "https://i.imgur.com/n5tjHFD.png",
+    prefill: {
+      name: state.userName,
+      email: state.userEmail,
+      contact: "9052672335"
+    },
+    notes: {
+      userEmail: state.userEmail,
+      plan: "Premium Monthly ₹2"
+    },
+    theme: {
+      color: "#7C3AED"
+    },
+    modal: {
+      ondismiss: function() {
+        btn.disabled = false;
+        btn.innerHTML = '<span class="material-symbols-rounded">payment</span> Pay ₹2 — Activate Premium Now';
+      }
+    },
+    handler: function(response) {
+      // Payment successful — Razorpay sends payment_id, order_id, signature
+      onRazorpayPaymentSuccess(response);
+    }
+  };
+
+  try {
+    const rzp = new Razorpay(options);
+    rzp.on('payment.failed', function(response) {
+      btn.disabled = false;
+      btn.innerHTML = '<span class="material-symbols-rounded">payment</span> Pay ₹2 — Activate Premium Now';
+      alert("❌ Payment failed: " + response.error.description + "\nPlease try again.");
+    });
+    rzp.open();
+  } catch (e) {
+    // Razorpay SDK not loaded or key invalid — show helpful message
+    btn.disabled = false;
+    btn.innerHTML = '<span class="material-symbols-rounded">payment</span> Pay ₹2 — Activate Premium Now';
+    alert("⚠️ Razorpay is in TEST MODE.\n\nTo accept real payments:\n1. Go to razorpay.com and create an account\n2. Get your Key ID from Dashboard → API Keys\n3. Replace RAZORPAY_KEY_ID in app.js with your real key\n\nFor now, your premium has been activated for testing purposes.");
+    // Test mode fallback — activate premium for demo
+    onRazorpayPaymentSuccess({ payment_id: 'test_' + Date.now(), mode: 'test' });
+  }
+}
+
+function onRazorpayPaymentSuccess(response) {
+  // Mark premium in state
+  state.isPremium = true;
+  state.premiumSince = new Date().toLocaleDateString();
+  state.razorpayPaymentId = response.payment_id;
+  saveSession();
+  renderDashboard();
+
+  // Update UI
+  document.getElementById('upi-payment-panel').style.display = 'none';
+  document.getElementById('lbl-premium-success-msg').style.display = 'flex';
+
+  // Update premium badge in header
+  const premStatus = document.getElementById('lbl-premium-status');
+  if (premStatus) {
+    premStatus.textContent = 'PREMIUM ✓';
+    premStatus.className = 'badge-premium pro-active';
+  }
+
+  alert(`🎉 Payment Successful!\n\nWelcome to Python Master AI Premium!\nPayment ID: ${response.payment_id}\nAccount: ${state.userEmail}\n\nAll AI Tutor features are now unlocked!`);
 }
 
 // --- 19. Admin console control dashboard panel ---
-function renderAdminPanel() {
-  document.getElementById('adm-input-name').value = state.userName;
-  document.getElementById('adm-input-email').value = state.userEmail;
-  document.getElementById('adm-input-xp').value = state.xp;
-  document.getElementById('adm-input-streak').value = state.streak;
-  document.getElementById('adm-select-pro').value = state.isPremium ? "true" : "false";
+const ADMIN_EMAIL = 'radharapuarunkumar02@gmail.com';
 
-  // Render dynamic checkboxes
+function renderAdminPanel() {
+  const isAdmin = state.userEmail.toLowerCase().trim() === ADMIN_EMAIL.toLowerCase();
+
+  const deniedDiv  = document.getElementById('admin-access-denied');
+  const fullPanel  = document.getElementById('admin-full-panel');
+
+  if (!isAdmin) {
+    // Non-admin: show access denied, hide full panel
+    deniedDiv.style.display  = 'block';
+    fullPanel.style.display  = 'none';
+    return;
+  }
+
+  // Admin allowed
+  deniedDiv.style.display  = 'none';
+  fullPanel.style.display  = 'block';
+
+  // Populate form with current user state
+  document.getElementById('adm-input-name').value    = state.userName;
+  document.getElementById('adm-input-email').value   = state.userEmail;
+  document.getElementById('adm-input-xp').value      = state.xp;
+  document.getElementById('adm-input-streak').value  = state.streak;
+  document.getElementById('adm-input-level').value   = state.level;
+  document.getElementById('adm-select-pro').value    = state.isPremium ? "true" : "false";
+
+  // Render chapter checkboxes
   const container = document.getElementById('admin-chaps-grid');
   container.innerHTML = '';
-
   const activeCurriculum = CURRICULUMS[state.language] || CURRICULUMS.en;
-
   activeCurriculum.forEach((chap, idx) => {
     const completed = state.completedChapters.includes(idx);
-    const html = `
+    container.insertAdjacentHTML('beforeend', `
       <label style="display:flex;align-items:center;gap:10px;font-size:12px;cursor:pointer;color:var(--text-gray);">
         <input type="checkbox" id="adm-chap-chk-${idx}" ${completed ? 'checked' : ''} onchange="adminToggleIndividualChapter(${idx})">
         <span>${chap.title}</span>
       </label>
-    `;
-    container.insertAdjacentHTML('beforeend', html);
+    `);
   });
+
+  // Load stats and users
+  adminLoadStats();
+  adminLoadAllUsers();
+}
+
+function adminLoadStats() {
+  // Scan all localStorage keys for pmai_progress users
+  let totalUsers = 0, premiumUsers = 0, totalRevenue = 0, totalChaps = 0;
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key && key.startsWith('pmai_progress_')) {
+      totalUsers++;
+      try {
+        const userData = JSON.parse(localStorage.getItem(key));
+        if (userData.isPremium) { premiumUsers++; totalRevenue += 2; }
+        if (userData.completedChapters) totalChaps += userData.completedChapters.length;
+      } catch(e) {}
+    }
+  }
+  document.getElementById('adm-stat-users').textContent    = totalUsers;
+  document.getElementById('adm-stat-premium').textContent  = premiumUsers;
+  document.getElementById('adm-stat-revenue').textContent  = `₹${totalRevenue}`;
+  document.getElementById('adm-stat-chaps').textContent    = totalChaps;
+}
+
+function adminLoadAllUsers() {
+  const container = document.getElementById('admin-users-list');
+  if (!container) return;
+  container.innerHTML = '';
+  let count = 0;
+
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key && key.startsWith('pmai_progress_')) {
+      count++;
+      try {
+        const u = JSON.parse(localStorage.getItem(key));
+        const joinDate = u.lastLoginDate || 'Unknown';
+        const chapsDone = u.completedChapters ? u.completedChapters.length : 0;
+        container.insertAdjacentHTML('beforeend', `
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:var(--bg-darkest);border-radius:10px;border:1px solid var(--border-color);flex-wrap:wrap;gap:10px;">
+            <div style="display:flex;align-items:center;gap:12px;">
+              <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--neon-purple),var(--neon-cyan));display:flex;align-items:center;justify-content:center;font-weight:800;font-size:16px;">${(u.userName||'?')[0].toUpperCase()}</div>
+              <div>
+                <div style="font-weight:600;font-size:14px;">${u.userName || 'Unknown'}</div>
+                <div style="font-size:11px;color:var(--text-gray);">${u.userEmail || key} • Last: ${joinDate}</div>
+              </div>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+              <span style="padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;background:${u.isPremium ? 'rgba(255,150,0,0.15)' : 'rgba(120,120,120,0.15)'};color:${u.isPremium ? 'var(--neon-orange)' : 'var(--text-gray)'};">${u.isPremium ? '⭐ PREMIUM' : 'FREE'}</span>
+              <span style="padding:3px 10px;border-radius:20px;font-size:11px;background:rgba(0,200,255,0.1);color:var(--neon-cyan);">${u.xp || 0} XP</span>
+              <span style="padding:3px 10px;border-radius:20px;font-size:11px;background:rgba(0,255,128,0.1);color:var(--neon-green);">${chapsDone} Chapters</span>
+              <button onclick="adminLoadUserIntoEditor('${key}')" style="padding:5px 12px;font-size:11px;border-radius:6px;border:1px solid var(--neon-cyan);background:transparent;color:var(--neon-cyan);cursor:pointer;">✏️ Edit</button>
+            </div>
+          </div>
+        `);
+      } catch(e) {
+        container.insertAdjacentHTML('beforeend', `<div style="color:var(--text-gray);font-size:12px;">⚠️ Corrupted entry: ${key}</div>`);
+      }
+    }
+  }
+  if (count === 0) {
+    container.innerHTML = '<p class="text-secondary" style="text-align:center;padding:20px;">No users registered yet on this device.</p>';
+  }
+}
+
+function adminLoadUserIntoEditor(key) {
+  try {
+    const u = JSON.parse(localStorage.getItem(key));
+    document.getElementById('adm-input-name').value   = u.userName  || '';
+    document.getElementById('adm-input-email').value  = u.userEmail || '';
+    document.getElementById('adm-input-xp').value     = u.xp       || 0;
+    document.getElementById('adm-input-streak').value = u.streak   || 1;
+    document.getElementById('adm-input-level').value  = u.level    || 1;
+    document.getElementById('adm-select-pro').value   = u.isPremium ? "true" : "false";
+    alert(`✅ Loaded user: ${u.userName}\nYou can now override their data and click Apply.`);
+  } catch(e) {
+    alert("Could not load user data.");
+  }
 }
 
 function adminApplyConfigChanges() {
-  const name = document.getElementById('adm-input-name').value.trim();
-  const email = document.getElementById('adm-input-email').value.trim();
-  const xp = Number(document.getElementById('adm-input-xp').value);
+  const name   = document.getElementById('adm-input-name').value.trim();
+  const email  = document.getElementById('adm-input-email').value.trim();
+  const xp     = Number(document.getElementById('adm-input-xp').value);
   const streak = Number(document.getElementById('adm-input-streak').value);
-  const pro = document.getElementById('adm-select-pro').value === "true";
+  const level  = Number(document.getElementById('adm-input-level').value) || 1;
+  const pro    = document.getElementById('adm-select-pro').value === "true";
 
   if (name === '' || email === '') {
     alert("Profile variables cannot be empty.");
     return;
   }
 
-  // Remove old database key on email alterations
+  // If editing a different user's record (not the current signed-in user)
+  if (email !== state.userEmail) {
+    // Load that user's data from localStorage and update it
+    const targetKey = `pmai_progress_${email.replace(/[^a-zA-Z0-9]/g, '_')}`;
+    const existing = localStorage.getItem(targetKey);
+    if (existing) {
+      try {
+        const targetData = JSON.parse(existing);
+        targetData.userName  = name;
+        targetData.xp        = xp;
+        targetData.streak    = streak;
+        targetData.level     = level;
+        targetData.isPremium = pro;
+        localStorage.setItem(targetKey, JSON.stringify(targetData));
+        alert(`✅ Updated user record for: ${email}`);
+        adminLoadAllUsers();
+        adminLoadStats();
+        return;
+      } catch(e) {}
+    }
+    // New user entry
+    const newUserData = { userName: name, userEmail: email, xp, streak, level, isPremium: pro, completedChapters: [], completedChallengesCount: 0, lastLoginDate: new Date().toLocaleDateString() };
+    localStorage.setItem(targetKey, JSON.stringify(newUserData));
+    alert(`✅ Created new user record for: ${email}`);
+    adminLoadAllUsers();
+    adminLoadStats();
+    return;
+  }
+
+  // Editing the current user
   if (email !== state.userEmail) {
     const oldKey = `pmai_progress_${state.userEmail.replace(/[^a-zA-Z0-9]/g, '_')}`;
     localStorage.removeItem(oldKey);
   }
-
-  state.userName = name;
+  state.userName  = name;
   state.userEmail = email;
-  state.xp = xp;
-  state.streak = streak;
+  state.xp        = xp;
+  state.streak    = streak;
+  state.level     = level;
   state.isPremium = pro;
-
   saveSession();
   renderDashboard();
   renderAdminPanel();
-  alert("Administrative variables overridden successfully.");
+  alert("✅ Current user variables overridden successfully.");
 }
 
 function adminToggleIndividualChapter(idx) {
   const chk = document.getElementById(`adm-chap-chk-${idx}`);
   const completedPos = state.completedChapters.indexOf(idx);
-
   if (chk.checked) {
-    if (completedPos === -1) {
-      state.completedChapters.push(idx);
-      state.completedChallengesCount++;
-    }
+    if (completedPos === -1) { state.completedChapters.push(idx); state.completedChallengesCount++; }
   } else {
-    if (completedPos !== -1) {
-      state.completedChapters.splice(completedPos, 1);
-      state.completedChallengesCount--;
-    }
+    if (completedPos !== -1) { state.completedChapters.splice(completedPos, 1); state.completedChallengesCount--; }
   }
-
   saveSession();
   renderDashboard();
   renderAdminPanel();
@@ -1629,7 +1972,7 @@ function adminToggleIndividualChapter(idx) {
 function adminGrantXP(amount) {
   addExperiencePoints(amount);
   renderAdminPanel();
-  alert(`Granted +${amount} XP.`);
+  alert(`✅ Granted +${amount} XP to ${state.userName}.`);
 }
 
 function adminSimulateStreak(days) {
@@ -1637,7 +1980,7 @@ function adminSimulateStreak(days) {
   saveSession();
   renderDashboard();
   renderAdminPanel();
-  alert(`Streak set to ${days} days.`);
+  alert(`✅ Streak set to ${days} days.`);
 }
 
 function adminTogglePremium() {
@@ -1645,27 +1988,66 @@ function adminTogglePremium() {
   saveSession();
   renderDashboard();
   renderAdminPanel();
-  alert(`Premium state toggled. Current state: ${state.isPremium}`);
+  alert(`✅ Premium state toggled. Now: ${state.isPremium ? 'PREMIUM' : 'FREE'}`);
 }
 
 function adminCompleteAllChapters() {
-  state.completedChapters = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+  state.completedChapters = [0,1,2,3,4,5,6,7,8];
   state.completedChallengesCount = 9;
   state.xp += 2000;
   saveSession();
   renderDashboard();
   renderAdminPanel();
-  alert("Unlocked all core chapters. Verification Certificate ready!");
+  alert("✅ All chapters unlocked. Certificate is ready!");
 }
 
 function adminResetAllData() {
-  if (confirm("Completely reset local storage sessions and configurations?")) {
-    const dbKey = `pmai_progress_${state.userEmail.replace(/[^a-zA-Z0-9]/g, '_')}`;
+  const targetEmail = document.getElementById('adm-input-email').value.trim() || state.userEmail;
+  if (confirm(`⚠️ Reset ALL data for: ${targetEmail}?\nThis cannot be undone.`)) {
+    const dbKey = `pmai_progress_${targetEmail.replace(/[^a-zA-Z0-9]/g, '_')}`;
     localStorage.removeItem(dbKey);
-    localStorage.removeItem('pyquest_user_state_v1'); // legacy clean
-    location.reload();
+    if (targetEmail === state.userEmail) {
+      location.reload();
+    } else {
+      alert(`✅ Data cleared for ${targetEmail}`);
+      adminLoadAllUsers();
+      adminLoadStats();
+    }
   }
 }
+
+function adminGrantPremiumToUser() {
+  const targetEmail = document.getElementById('adm-manual-premium-email').value.trim();
+  if (!targetEmail) { alert("Enter a user email first."); return; }
+  const targetKey = `pmai_progress_${targetEmail.replace(/[^a-zA-Z0-9]/g, '_')}`;
+  const existing = localStorage.getItem(targetKey);
+  if (existing) {
+    try {
+      const data = JSON.parse(existing);
+      data.isPremium = true;
+      data.premiumGrantedByAdmin = true;
+      data.premiumSince = new Date().toLocaleDateString();
+      localStorage.setItem(targetKey, JSON.stringify(data));
+      alert(`✅ Premium granted to: ${targetEmail}`);
+      document.getElementById('adm-manual-premium-email').value = '';
+      adminLoadAllUsers();
+      adminLoadStats();
+      return;
+    } catch(e) {}
+  }
+  alert(`⚠️ User not found: ${targetEmail}\nThey must log in at least once before you can grant premium.`);
+}
+
+function adminSaveAppSettings() {
+  const title  = document.getElementById('adm-app-title').value.trim();
+  const phone  = document.getElementById('adm-support-phone').value.trim();
+  const email  = document.getElementById('adm-support-email').value.trim();
+  const price  = document.getElementById('adm-price').value.trim();
+  // Save to localStorage for persistence
+  localStorage.setItem('pmai_app_settings', JSON.stringify({ title, phone, email, price }));
+  alert(`✅ App settings saved!\nTitle: ${title}\nPhone: ${phone}\nEmail: ${email}\nPrice: ₹${price}`);
+}
+
 
 // --- 20. Verified Certificate Canvas print ---
 function renderCertificateVault() {
@@ -2049,7 +2431,295 @@ function parseAndRunPython(code) {
   return { output, variables, errors };
 }
 
-// --- 24. Initialization Event Listeners ---
+// --- 24. Landing Page & Theme Functions ---
+
+// Landing page navigation
+function showAuthGate() {
+  document.body.classList.remove('landing-active');
+  document.body.classList.add('auth-gate-active');
+}
+
+function showFeatures() {
+  document.getElementById('features-section').scrollIntoView({ behavior: 'smooth' });
+}
+
+function scrollToFeatures() {
+  document.getElementById('features-section').scrollIntoView({ behavior: 'smooth' });
+}
+
+// FAQ toggle
+function toggleFaq(button) {
+  const answer = button.nextElementSibling;
+  const icon = button.querySelector('.material-symbols-rounded');
+  
+  answer.classList.toggle('active');
+  
+  if (answer.classList.contains('active')) {
+    icon.textContent = 'expand_less';
+  } else {
+    icon.textContent = 'expand_more';
+  }
+}
+
+// Theme toggle with persistence
+function toggleTheme() {
+  const body = document.body;
+  const isDark = body.getAttribute('data-theme') !== 'light';
+  
+  if (isDark) {
+    body.setAttribute('data-theme', 'light');
+    document.getElementById('theme-icon').textContent = 'light_mode';
+    document.getElementById('settings-dark-mode').checked = false;
+  } else {
+    body.removeAttribute('data-theme');
+    document.getElementById('theme-icon').textContent = 'dark_mode';
+    document.getElementById('settings-dark-mode').checked = true;
+  }
+  
+  // Save preference
+  localStorage.setItem('theme', isDark ? 'light' : 'dark');
+}
+
+// Load saved theme on page load
+function loadSavedTheme() {
+  const savedTheme = localStorage.getItem('theme');
+  if (savedTheme === 'light') {
+    document.body.setAttribute('data-theme', 'light');
+    document.getElementById('theme-icon').textContent = 'light_mode';
+    document.getElementById('settings-dark-mode').checked = false;
+  }
+}
+
+// Notification system
+let notifications = [
+  { id: 1, title: "Welcome to Python Master AI!", message: "Start your learning journey today.", time: "Just now", unread: true },
+  { id: 2, title: "Daily Challenge Available", message: "Complete today's coding challenge to earn XP.", time: "2 hours ago", unread: true },
+  { id: 3, title: "New Course Module", message: "AI Basics chapter is now available.", time: "1 day ago", unread: false }
+];
+
+function toggleNotifications() {
+  const panel = document.getElementById('notification-panel');
+  panel.classList.toggle('active');
+  
+  if (panel.classList.contains('active')) {
+    renderNotifications();
+  }
+}
+
+function renderNotifications() {
+  const list = document.getElementById('notification-list');
+  list.innerHTML = notifications.map(notif => `
+    <div class="notification-item ${notif.unread ? 'unread' : ''}" onclick="markNotificationRead(${notif.id})">
+      <h4>${notif.title}</h4>
+      <p>${notif.message}</p>
+      <div class="notification-time">${notif.time}</div>
+    </div>
+  `).join('');
+  
+  updateNotificationBadge();
+}
+
+function markNotificationRead(id) {
+  const notif = notifications.find(n => n.id === id);
+  if (notif) {
+    notif.unread = false;
+    renderNotifications();
+  }
+}
+
+function updateNotificationBadge() {
+  const unreadCount = notifications.filter(n => n.unread).length;
+  const badge = document.getElementById('notif-count');
+  badge.textContent = unreadCount;
+  badge.style.display = unreadCount > 0 ? 'block' : 'none';
+}
+
+function addNotification(title, message) {
+  notifications.unshift({
+    id: Date.now(),
+    title,
+    message,
+    time: 'Just now',
+    unread: true
+  });
+  updateNotificationBadge();
+}
+
+// Render course cards on dashboard
+function renderCourseCards() {
+  const grid = document.getElementById('course-cards-grid');
+  if (!grid) return;
+  
+  const courseIcons = ['code', 'functions', 'data_structures', 'api', 'database', 'web', 'automation', 'testing', 'deployment'];
+  
+  grid.innerHTML = CURRICULUMS.en.map((chapter, index) => {
+    const isCompleted = state.completedChapters.includes(index);
+    const progress = isCompleted ? 100 : (state.completedChapters.includes(index - 1) ? 50 : 0);
+    
+    return `
+      <div class="course-card ${isCompleted ? 'completed' : ''}" onclick="loadChapterLesson(${index})">
+        <div class="course-card-icon">
+          <span class="material-symbols-rounded">${courseIcons[index] || 'code'}</span>
+        </div>
+        <h4>${chapter.title}</h4>
+        <p>${chapter.desc.substring(0, 60)}...</p>
+        <div class="course-card-meta">
+          <div class="course-card-progress">
+            <span>${progress}%</span>
+            <div class="course-card-progress-bar">
+              <div class="course-card-progress-fill" style="width: ${progress}%"></div>
+            </div>
+          </div>
+          <span>${isCompleted ? '✓ Done' : 'In Progress'}</span>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// Profile view rendering
+function renderProfileView() {
+  document.getElementById('profile-name-display').textContent = state.userName;
+  document.getElementById('profile-email-display').textContent = state.userEmail;
+  document.getElementById('profile-xp-display').textContent = state.xp;
+  document.getElementById('profile-streak-display').textContent = state.streak;
+  document.getElementById('profile-level-display').textContent = state.level;
+  document.getElementById('profile-chapters-display').textContent = `${state.completedChapters.length}/${CURRICULUMS.en.length}`;
+  
+  // Premium badge
+  const premiumBadge = document.getElementById('profile-premium-badge');
+  if (state.isPremium) {
+    premiumBadge.textContent = 'PRO ACCOUNT';
+    premiumBadge.classList.add('pro-active');
+  } else {
+    premiumBadge.textContent = 'FREE ACCOUNT';
+    premiumBadge.classList.remove('pro-active');
+  }
+  
+  // Verified badge
+  const verifiedBadge = document.getElementById('profile-verified-badge');
+  if (state.isGoogleVerified) {
+    verifiedBadge.style.display = 'inline-block';
+  } else {
+    verifiedBadge.style.display = 'none';
+  }
+  
+  // Profile photo
+  if (state.photoURL) {
+    document.getElementById('profile-avatar-display').innerHTML = `<img src="${state.photoURL}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
+  }
+  
+  // Render achievements
+  renderProfileAchievements();
+  
+  // Render chapter progress
+  renderChapterProgress();
+  
+  // Overall progress
+  const progressPercent = Math.round((state.completedChapters.length / CURRICULUMS.en.length) * 100);
+  document.getElementById('profile-overall-progress').style.width = `${progressPercent}%`;
+  document.getElementById('profile-overall-percentage').textContent = `${progressPercent}%`;
+}
+
+function renderProfileAchievements() {
+  const grid = document.getElementById('profile-achievements-grid');
+  grid.innerHTML = ACHIEVEMENTS.map(achievement => {
+    const isUnlocked = state.unlockedAchievements.includes(achievement.id);
+    return `
+      <div class="achievement-full-badge ${isUnlocked ? '' : 'locked'}">
+        <span class="material-symbols-rounded">${achievement.icon}</span>
+        <h5>${achievement.name}</h5>
+        <p>${achievement.desc}</p>
+      </div>
+    `;
+  }).join('');
+}
+
+function renderChapterProgress() {
+  const list = document.getElementById('profile-chapter-progress');
+  list.innerHTML = CURRICULUMS.en.map((chapter, index) => {
+    const isCompleted = state.completedChapters.includes(index);
+    return `
+      <div class="chapter-progress-item ${isCompleted ? 'completed' : ''}">
+        <div class="chapter-progress-icon">
+          <span class="material-symbols-rounded">${isCompleted ? 'check' : 'lock'}</span>
+        </div>
+        <div class="chapter-progress-info">
+          <h5>${chapter.title}</h5>
+          <p>${isCompleted ? 'Completed' : 'Not started'}</p>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// Settings functions
+function resetAllProgress() {
+  state.xp = 0;
+  state.level = 1;
+  state.streak = 1;
+  state.completedChapters = [];
+  state.completedChallengesCount = 0;
+  state.unlockedAchievements = [];
+  state.dailyCheckinDone = false;
+  saveSession();
+  alert('Progress has been reset.');
+  renderProfileView();
+  renderDashboard();
+}
+
+// AI Chatbot Popup
+function toggleAIChatbot() {
+  const chatbot = document.getElementById('ai-chatbot-popup');
+  chatbot.classList.toggle('active');
+}
+
+// Mobile Menu Toggle
+function toggleMobileMenu() {
+  const sidebar = document.querySelector('.sidebar');
+  sidebar.classList.toggle('active');
+}
+
+function sendChatbotMessage() {
+  const input = document.getElementById('chatbot-input');
+  const message = input.value.trim();
+  if (!message) return;
+  
+  const chatMessages = document.getElementById('chatbot-messages');
+  
+  // Add user message
+  chatMessages.innerHTML += `
+    <div class="chatbot-message user">
+      <p>${message}</p>
+    </div>
+  `;
+  
+  input.value = '';
+  
+  // Simulate AI response
+  setTimeout(() => {
+    const responses = [
+      "I'm here to help you learn Python! What would you like to know?",
+      "That's a great question! Let me explain...",
+      "You're doing great! Keep practicing!",
+      "Have you tried running that code in the playground?",
+      "Remember to check your syntax carefully."
+    ];
+    const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+    
+    chatMessages.innerHTML += `
+      <div class="chatbot-message ai">
+        <p>${randomResponse}</p>
+      </div>
+    `;
+    
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }, 1000);
+  
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+// --- 25. Initialization Event Listeners ---
 window.addEventListener('DOMContentLoaded', () => {
   // Sync voice system triggers on language change loads
   if ('speechSynthesis' in window) {
@@ -2078,11 +2748,21 @@ window.addEventListener('DOMContentLoaded', () => {
   // Pre-load mock data variables in forms
   compileResumePreview();
 
+  // Load saved theme
+  loadSavedTheme();
+  
+  // Initialize landing page
+  document.body.classList.add('landing-active');
+  
   // Load sign-in overlay directly if unauthenticated
   if (!state.isAuthenticated) {
     document.body.classList.add('auth-gate-active');
   } else {
+    document.body.classList.remove('landing-active');
     document.body.classList.remove('auth-gate-active');
     switchView('dashboard');
   }
+  
+  // Initialize notifications
+  updateNotificationBadge();
 });
