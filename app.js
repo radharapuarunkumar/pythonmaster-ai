@@ -6948,7 +6948,9 @@ function logError(errorInfo) {
   }
   
   // Log to console in development
-  if (process.env.NODE_ENV === 'development') {
+  if (typeof process !== 'undefined' && process.env && process.env.NODE_ENV === 'development') {
+    console.error('Error logged:', errorInfo);
+  } else {
     console.error('Error logged:', errorInfo);
   }
   
@@ -9604,14 +9606,15 @@ function requestCodeExplanation() {
   const explanation = aiTutorSystem.explainCode(code);
   const container = document.getElementById('ai-tutor-messages');
   
-  container.innerHTML += `
-    <div class="ai-tutor-message ai">
-      <div class="message-avatar">AI</div>
-      <p><strong>Code Explanation:</strong> ${explanation}</p>
-    </div>
-  `;
-  
-  container.scrollTop = container.scrollHeight;
+  if (container) {
+    container.innerHTML += `
+      <div class="ai-tutor-message ai">
+        <div class="message-avatar">AI</div>
+        <p><strong>Code Explanation:</strong> ${explanation}</p>
+      </div>
+    `;
+    container.scrollTop = container.scrollHeight;
+  }
 }
 
 function requestCodeImprovement() {
@@ -9624,14 +9627,15 @@ function requestCodeImprovement() {
   const suggestion = aiTutorSystem.suggestImprovement(code);
   const container = document.getElementById('ai-tutor-messages');
   
-  container.innerHTML += `
-    <div class="ai-tutor-message ai">
-      <div class="message-avatar">AI</div>
-      <p><strong>💡 Improvement Suggestion:</strong> ${suggestion}</p>
-    </div>
-  `;
-  
-  container.scrollTop = container.scrollHeight;
+  if (container) {
+    container.innerHTML += `
+      <div class="ai-tutor-message ai">
+        <div class="message-avatar">AI</div>
+        <p><strong>💡 Improvement Suggestion:</strong> ${suggestion}</p>
+      </div>
+    `;
+    container.scrollTop = container.scrollHeight;
+  }
 }
 
 // --- Real-world Portfolio Projects System ---
@@ -10675,7 +10679,10 @@ window.addEventListener('DOMContentLoaded', () => {
   if (editor) {
     editor.addEventListener('input', updateLineNumberGutter);
     editor.addEventListener('scroll', () => {
-      document.getElementById('editor-gutter').scrollTop = editor.scrollTop;
+      const gutter = document.getElementById('editor-gutter');
+      if (gutter) {
+        gutter.scrollTop = editor.scrollTop;
+      }
     });
     
     editor.addEventListener('keydown', (e) => {

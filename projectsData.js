@@ -255,9 +255,9 @@ def add_expense(expenses):
 
 def view_expenses(expenses):
     total = sum(e['amount'] for e in expenses)
-    print(f"\\n=== All Expenses (Total: ${total:.2f}) ===")
+    print(f"\\n=== All Expenses (Total: \${total:.2f}) ===")
     for e in expenses:
-        print(f"{e['date']} - {e['description']}: ${e['amount']:.2f} ({e['category']})")
+        print(f"{e['date']} - {e['description']}: \${e['amount']:.2f} ({e['category']})")
 
 def main():
     expenses = load_expenses()
