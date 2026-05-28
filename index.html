@@ -24,13 +24,13 @@
        ========================================== -->
   <div id="landing-page" class="landing-overlay">
     <div class="landing-container">
-      <nav class="landing-nav">
+      <nav class="landing-nav sticky-nav">
         <div class="landing-logo">
           <span class="material-symbols-rounded neon-icon">smart_toy</span>
           <span class="logo-text">Python Master AI</span>
         </div>
         <div class="landing-nav-buttons">
-          <button class="btn-landing-outline" onclick="showFeatures()">Features</button>
+          <button class="btn-landing-outline" onclick="scrollToFeatures()">Features</button>
           <button class="btn-landing-primary" onclick="showAuthGate()">Get Started</button>
         </div>
       </nav>
@@ -70,14 +70,16 @@
             <div class="code-preview-header">
               <span class="material-symbols-rounded">code</span>
               <span>AI Tutor Active</span>
+              <span class="typing-indicator">
+                <span class="dot"></span>
+                <span class="dot"></span>
+                <span class="dot"></span>
+              </span>
             </div>
-            <div class="code-preview-body">
-              <div class="code-line"><span class="code-keyword">def</span> <span class="code-function">calculate_salary</span>(hours, rate):</div>
-              <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">return</span> hours * rate</div>
-              <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;</div>
-              <div class="code-line"><span class="code-comment"># AI explains: This function multiplies...</span>
-              <div class="ai-bubble">✨ Perfect! You're learning functions!</div>
+            <div class="code-preview-body" id="typing-code-container">
+              <!-- Code will be typed here by JavaScript -->
             </div>
+            <div class="ai-bubble" id="ai-bubble">✨ Perfect! You're learning functions!</div>
           </div>
         </div>
       </div>
@@ -174,7 +176,222 @@
               <span class="material-symbols-filled">star</span>
             </div>
           </div>
+          <div class="testimonial-card glass-card">
+            <div class="testimonial-header">
+              <div class="testimonial-avatar">AK</div>
+              <div class="testimonial-info">
+                <h4>Anjali Kapoor</h4>
+                <span class="testimonial-role">ML Engineer at Flipkart</span>
+              </div>
+            </div>
+            <p>"The AI tutor's voice explanations in Hindi made complex topics so easy to understand. Got placed at my dream company!"</p>
+            <div class="testimonial-rating">
+              <span class="material-symbols-filled">star</span>
+              <span class="material-symbols-filled">star</span>
+              <span class="material-symbols-filled">star</span>
+              <span class="material-symbols-filled">star</span>
+              <span class="material-symbols-filled">star</span>
+            </div>
+          </div>
+          <div class="testimonial-card glass-card">
+            <div class="testimonial-header">
+              <div class="testimonial-avatar">VN</div>
+              <div class="testimonial-info">
+                <h4>Vikram Nair</h4>
+                <span class="testimonial-role">Backend Developer at Zomato</span>
+              </div>
+            </div>
+            <p>"The 14 production-level projects gave me hands-on experience. My portfolio impressed every interviewer I met."</p>
+            <div class="testimonial-rating">
+              <span class="material-symbols-filled">star</span>
+              <span class="material-symbols-filled">star</span>
+              <span class="material-symbols-filled">star</span>
+              <span class="material-symbols-filled">star</span>
+              <span class="material-symbols-filled">star</span>
+            </div>
+          </div>
+          <div class="testimonial-card glass-card">
+            <div class="testimonial-header">
+              <div class="testimonial-avatar">MR</div>
+              <div class="testimonial-info">
+                <h4>Meera Reddy</h4>
+                <span class="testimonial-role">Data Analyst at Deloitte</span>
+              </div>
+            </div>
+            <p>"From zero coding knowledge to landing a data analyst job in 3 months. The structured curriculum is perfect for beginners."</p>
+            <div class="testimonial-rating">
+              <span class="material-symbols-filled">star</span>
+              <span class="material-symbols-filled">star</span>
+              <span class="material-symbols-filled">star</span>
+              <span class="material-symbols-filled">star</span>
+              <span class="material-symbols-filled">star</span>
+            </div>
+          </div>
         </div>
+      </div>
+
+      <!-- Certificate & Placement Stats Section -->
+      <div class="landing-stats-section">
+        <h2 class="section-title">Our Impact</h2>
+        <div class="stats-grid">
+          <div class="stat-card glass-card">
+            <div class="stat-icon-wrapper">
+              <span class="material-symbols-rounded text-emerald">workspace_premium</span>
+            </div>
+            <div class="stat-value">5,000+</div>
+            <div class="stat-label">Certificates Issued</div>
+          </div>
+          <div class="stat-card glass-card">
+            <div class="stat-icon-wrapper">
+              <span class="material-symbols-rounded text-cyan">work</span>
+            </div>
+            <div class="stat-value">85%</div>
+            <div class="stat-label">Placement Rate</div>
+          </div>
+          <div class="stat-card glass-card">
+            <div class="stat-icon-wrapper">
+              <span class="material-symbols-rounded text-purple">trending_up</span>
+            </div>
+            <div class="stat-value">₹8-15 LPA</div>
+            <div class="stat-label">Average Package</div>
+          </div>
+          <div class="stat-card glass-card">
+            <div class="stat-icon-wrapper">
+              <span class="material-symbols-rounded text-orange">groups</span>
+            </div>
+            <div class="stat-value">10,000+</div>
+            <div class="stat-label">Active Learners</div>
+          </div>
+        </div>
+        <div class="certificate-preview-mini">
+          <div class="mini-cert-card">
+            <div class="mini-cert-header">
+              <span class="material-symbols-rounded">verified</span>
+              <span>Sample Certificate</span>
+            </div>
+            <div class="mini-cert-body">
+              <h4>Python Master AI Certification</h4>
+              <p>Industry-recognized credential verified by QR code</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AI Tutor Preview Section -->
+      <div class="landing-ai-tutor-section">
+        <h2 class="section-title">Meet Your AI Tutor</h2>
+        <p class="section-subtitle">Premium ChatGPT-style conversational AI with voice support</p>
+        <div class="ai-tutor-preview-grid">
+          <div class="ai-tutor-demo glass-card neon-border-purple">
+            <div class="ai-tutor-demo-header">
+              <div class="tutor-avatar-demo">
+                <span class="material-symbols-rounded">smart_toy</span>
+              </div>
+              <div class="tutor-info-demo">
+                <h4>AI Python Tutor</h4>
+                <span class="status-dot online"></span>
+                <span>Online</span>
+              </div>
+            </div>
+            <div class="ai-tutor-demo-messages">
+              <div class="demo-msg ai">
+                <span class="material-symbols-rounded">smart_toy</span>
+                <p>Hello! I'm your AI Python tutor. I can help you with code debugging, explain concepts, and guide you through projects. Try asking me something!</p>
+              </div>
+              <div class="demo-msg user">
+                <span class="material-symbols-rounded">person</span>
+                <p>How do I create a function in Python?</p>
+              </div>
+              <div class="demo-msg ai">
+                <span class="material-symbols-rounded">smart_toy</span>
+                <p>To create a function in Python, use the <code>def</code> keyword followed by the function name and parentheses. Example: <code>def my_function():</code></p>
+              </div>
+            </div>
+            <div class="ai-tutor-demo-input">
+              <input type="text" placeholder="Ask me anything about Python..." disabled>
+              <button class="btn-send-chat" disabled>
+                <span class="material-symbols-rounded">send</span>
+              </button>
+            </div>
+          </div>
+          <div class="ai-features-list">
+            <div class="ai-feature-item">
+              <span class="material-symbols-rounded text-purple">psychology</span>
+              <div>
+                <h4>Conversational AI</h4>
+                <p class="text-secondary">ChatGPT-style natural conversations about Python</p>
+              </div>
+            </div>
+            <div class="ai-feature-item">
+              <span class="material-symbols-rounded text-cyan">record_voice_over</span>
+              <div>
+                <h4>Voice Explanations</h4>
+                <p class="text-secondary">Listen to explanations in English, Hindi, or Telugu</p>
+              </div>
+            </div>
+            <div class="ai-feature-item">
+              <span class="material-symbols-rounded text-emerald">bug_report</span>
+              <div>
+                <h4>Code Debugging</h4>
+                <p class="text-secondary">Get detailed error explanations and solutions</p>
+              </div>
+            </div>
+            <div class="ai-feature-item">
+              <span class="material-symbols-rounded text-orange">mic</span>
+              <div>
+                <h4>Voice Input</h4>
+                <p class="text-secondary">Ask questions using voice commands</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Project Showcase Section -->
+      <div class="landing-projects-section">
+        <h2 class="section-title">Build Real Projects</h2>
+        <p class="section-subtitle">14 production-level projects to add to your portfolio</p>
+        <div class="projects-showcase-grid">
+          <div class="project-showcase-card glass-card">
+            <div class="project-showcase-icon text-purple">calculate</div>
+            <h4>Interactive Calculator</h4>
+            <p class="text-secondary">Learn operators and user input handling</p>
+            <span class="project-level beginner">Beginner</span>
+          </div>
+          <div class="project-showcase-card glass-card">
+            <div class="project-showcase-icon text-cyan">thermostat</div>
+            <h4>Weather Forecaster</h4>
+            <p class="text-secondary">API integration and data parsing</p>
+            <span class="project-level beginner">Beginner</span>
+          </div>
+          <div class="project-showcase-card glass-card">
+            <div class="project-showcase-icon text-emerald">forum</div>
+            <h4>AI Chatbot</h4>
+            <p class="text-secondary">Dictionary mapping and text processing</p>
+            <span class="project-level intermediate">Intermediate</span>
+          </div>
+          <div class="project-showcase-card glass-card">
+            <div class="project-showcase-icon text-orange">shopping_cart</div>
+            <h4>E-commerce Cart</h4>
+            <p class="text-secondary">CRUD operations and data management</p>
+            <span class="project-level intermediate">Intermediate</span>
+          </div>
+          <div class="project-showcase-card glass-card">
+            <div class="project-showcase-icon text-purple">api</div>
+            <h4>REST API Server</h4>
+            <p class="text-secondary">Backend development with Flask/FastAPI</p>
+            <span class="project-level advanced">Advanced</span>
+          </div>
+          <div class="project-showcase-card glass-card">
+            <div class="project-showcase-icon text-cyan">psychology</div>
+            <h4>Sentiment Analyzer</h4>
+            <p class="text-secondary">NLP and machine learning basics</p>
+            <span class="project-level ai">AI & ML</span>
+          </div>
+        </div>
+        <button class="btn-primary btn-large" onclick="showAuthGate()">
+          <span class="material-symbols-rounded">rocket_launch</span> Start Building Projects
+        </button>
       </div>
 
       <!-- FAQ Section -->
@@ -272,41 +489,88 @@
         <p class="neon-text-blue">Job-Ready Python Certification &amp; AI Tutor</p>
       </div>
       <div class="gateway-form-card">
-        <h3>Sign in with Google</h3>
-        <p class="text-secondary text-center">Your Gmail is verified by Google. Progress saved automatically to the cloud.</p>
+        <div class="auth-tabs">
+          <button class="auth-tab active" id="tab-signin" onclick="switchAuthTab('signin')">Sign In</button>
+          <button class="auth-tab" id="tab-signup" onclick="switchAuthTab('signup')">Sign Up</button>
+        </div>
+        
+        <!-- Sign In Form -->
+        <div id="signin-form">
+          <h3>Sign in with Google</h3>
+          <p class="text-secondary text-center">Your Gmail is verified by Google. Progress saved automatically to the cloud.</p>
 
-        <!-- Firebase Google Sign-In Button -->
-        <div style="display:flex;justify-content:center;margin:24px 0;">
-          <button class="btn-google-signin" id="btn-firebase-google-signin" onclick="signInWithGoogle()">
-            <svg class="google-svg" viewBox="0 0 24 24" width="20" height="20">
-              <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-              <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-              <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l3.66-2.85z"/>
-              <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.85c.87-2.6 3.3-4.53 6.16-4.53z"/>
-            </svg>
-            <span>Sign in with Google</span>
-          </button>
+          <!-- Firebase Google Sign-In Button -->
+          <div style="display:flex;justify-content:center;margin:24px 0;">
+            <button class="btn-google-signin" id="btn-firebase-google-signin" onclick="signInWithGoogle()">
+              <svg class="google-svg" viewBox="0 0 24 24" width="20" height="20">
+                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l3.66-2.85z"/>
+                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.85c.87-2.6 3.3-4.53 6.16-4.53z"/>
+              </svg>
+              <span>Sign in with Google</span>
+            </button>
+          </div>
+
+          <!-- Manual Sign-in fallback -->
+          <div id="manual-signin-fallback">
+            <div class="divider-or"><span>or sign in manually</span></div>
+            <div class="input-group" style="margin-top:14px;">
+              <label for="txt-signin-email">Email Address</label>
+              <input type="email" id="txt-signin-email" placeholder="yourname@gmail.com">
+            </div>
+            <div class="input-group">
+              <label for="txt-signin-password">Password</label>
+              <input type="password" id="txt-signin-password" placeholder="Enter your password">
+            </div>
+            <button class="btn-google-signin" id="btn-manual-signin" onclick="manualGmailSignIn()">
+              <svg class="google-svg" viewBox="0 0 24 24" width="20" height="20">
+                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l3.66-2.85z"/>
+                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.85c.87-2.6 3.3-4.53 6.16-4.53z"/>
+              </svg>
+              <span>Sign In</span>
+            </button>
+          </div>
         </div>
 
-        <!-- Manual Sign-in fallback (works without Firebase setup) -->
-        <div id="manual-signin-fallback">
-          <div class="divider-or"><span>or sign in manually</span></div>
+        <!-- Sign Up Form -->
+        <div id="signup-form" style="display:none;">
+          <h3>Create Account</h3>
+          <p class="text-secondary text-center">Start your Python learning journey today.</p>
+
           <div class="input-group" style="margin-top:14px;">
-            <label for="txt-signin-name">Full Name</label>
-            <input type="text" id="txt-signin-name" placeholder="Enter your full name">
+            <label for="txt-signup-name">Full Name</label>
+            <input type="text" id="txt-signup-name" placeholder="Enter your full name">
           </div>
           <div class="input-group">
-            <label for="txt-signin-email">Gmail Address</label>
-            <input type="email" id="txt-signin-email" placeholder="yourname@gmail.com">
+            <label for="txt-signup-email">Email Address</label>
+            <input type="email" id="txt-signup-email" placeholder="yourname@gmail.com">
           </div>
-          <button class="btn-google-signin" id="btn-manual-signin" onclick="manualGmailSignIn()">
+          <div class="input-group">
+            <label for="txt-signup-password">Password</label>
+            <input type="password" id="txt-signup-password" placeholder="Create a password">
+          </div>
+          <div class="input-group">
+            <label for="txt-signup-confirm">Confirm Password</label>
+            <input type="password" id="txt-signup-confirm" placeholder="Confirm your password">
+          </div>
+          <div class="input-group">
+            <label for="txt-signup-avatar">Profile Avatar (Optional)</label>
+            <input type="file" id="txt-signup-avatar" accept="image/*" onchange="previewAvatar(this)">
+            <div id="avatar-preview" style="margin-top:8px;display:none;">
+              <img id="avatar-preview-img" style="width:64px;height:64px;border-radius:50%;object-fit:cover;border:2px solid var(--neon-cyan);">
+            </div>
+          </div>
+          <button class="btn-google-signin" id="btn-signup" onclick="manualSignUp()">
             <svg class="google-svg" viewBox="0 0 24 24" width="20" height="20">
               <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
               <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
               <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l3.66-2.85z"/>
               <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.85c.87-2.6 3.3-4.53 6.16-4.53z"/>
             </svg>
-            <span>Continue with Gmail</span>
+            <span>Create Account</span>
           </button>
         </div>
 
@@ -493,9 +757,14 @@
               <span class="chatbot-status">Online</span>
             </div>
           </div>
-          <button class="btn-icon" onclick="toggleAIChatbot()">
-            <span class="material-symbols-rounded">close</span>
-          </button>
+          <div class="chatbot-header-actions">
+            <button class="btn-icon" onclick="startVideoCall()" title="Video Call">
+              <span class="material-symbols-rounded">videocam</span>
+            </button>
+            <button class="btn-icon" onclick="toggleAIChatbot()">
+              <span class="material-symbols-rounded">close</span>
+            </button>
+          </div>
         </div>
         <div class="chatbot-messages" id="chatbot-messages">
           <div class="chatbot-message ai">
@@ -507,6 +776,75 @@
           <button class="btn-send" onclick="sendChatbotMessage()">
             <span class="material-symbols-rounded">send</span>
           </button>
+        </div>
+      </div>
+
+      <!-- AI Video Call Interface -->
+      <div class="ai-video-call-overlay" id="ai-video-call-overlay">
+        <div class="video-call-container">
+          <div class="video-call-header">
+            <div class="video-call-info">
+              <div class="video-avatar">
+                <span class="material-symbols-rounded">smart_toy</span>
+              </div>
+              <div>
+                <h4>AI Python Tutor</h4>
+                <span class="call-status">Connected</span>
+              </div>
+            </div>
+            <button class="btn-icon" onclick="endVideoCall()">
+              <span class="material-symbols-rounded">call_end</span>
+            </button>
+          </div>
+          <div class="video-call-main">
+            <div class="video-feed ai-feed">
+              <div class="video-placeholder">
+                <span class="material-symbols-rounded">smart_toy</span>
+                <p>AI Tutor Video Feed</p>
+              </div>
+              <div class="video-overlay-text">
+                <span class="material-symbols-rounded">mic</span>
+                <span>AI is speaking...</span>
+              </div>
+            </div>
+            <div class="video-feed user-feed">
+              <div class="video-placeholder">
+                <span class="material-symbols-rounded">person</span>
+                <p>Your Video Feed</p>
+              </div>
+            </div>
+          </div>
+          <div class="video-call-controls">
+            <button class="video-control-btn" onclick="toggleMute()" id="btn-mute">
+              <span class="material-symbols-rounded">mic</span>
+            </button>
+            <button class="video-control-btn" onclick="toggleCamera()" id="btn-camera">
+              <span class="material-symbols-rounded">videocam</span>
+            </button>
+            <button class="video-control-btn" onclick="toggleScreenShare()" id="btn-screen-share">
+              <span class="material-symbols-rounded">screen_share</span>
+            </button>
+            <button class="video-control-btn" onclick="toggleChat()" id="btn-chat">
+              <span class="material-symbols-rounded">chat</span>
+            </button>
+            <button class="video-control-btn end-call" onclick="endVideoCall()">
+              <span class="material-symbols-rounded">call_end</span>
+            </button>
+          </div>
+          <div class="video-call-chat" id="video-call-chat">
+            <div class="video-chat-messages" id="video-chat-messages">
+              <div class="video-chat-message ai">
+                <span class="material-symbols-rounded">smart_toy</span>
+                <p>Hello! I'm ready to help you with Python. What would you like to learn today?</p>
+              </div>
+            </div>
+            <div class="video-chat-input">
+              <input type="text" id="video-chat-input" placeholder="Type a message..." onkeypress="if(event.key === 'Enter') sendVideoChatMessage()">
+              <button class="btn-send" onclick="sendVideoChatMessage()">
+                <span class="material-symbols-rounded">send</span>
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -652,33 +990,71 @@
               </div>
             </div>
 
-            <!-- Multilingual AI Motherly Tutor -->
+            <!-- Premium AI Tutor -->
             <div class="card ai-chat-card neon-border-purple">
               <div class="ai-chat-header">
                 <div class="tutor-profile">
-                  <span class="material-symbols-rounded text-purple">smart_toy</span>
-                  <div>
-                    <h3>AI Motherly Tutor</h3>
-                    <p class="tutor-subtitle">Guiding you step-by-step through bugs with voice explains</p>
+                  <div class="tutor-avatar">
+                    <span class="material-symbols-rounded">smart_toy</span>
+                  </div>
+                  <div class="tutor-info">
+                    <h3>AI Python Tutor</h3>
+                    <p class="tutor-subtitle">Premium conversational AI with voice support</p>
+                    <div class="tutor-status">
+                      <span class="status-dot online"></span>
+                      <span>Online</span>
+                    </div>
                   </div>
                 </div>
                 <div class="tutor-controls">
+                  <!-- Voice toggle -->
+                  <button class="btn-tutor-control" id="btn-voice-toggle" onclick="toggleVoiceMode()" title="Toggle Voice Mode">
+                    <span class="material-symbols-rounded">mic</span>
+                  </button>
                   <!-- Audio select -->
-                  <button class="btn-audio-speak" id="btn-tts-speak" onclick="speakCurrentAITutorExplanation()" title="Explain in Motherly Audio Accent">
-                    <span class="material-symbols-rounded">volume_up</span> Explain via Audio
+                  <button class="btn-tutor-control" id="btn-tts-speak" onclick="speakCurrentAITutorExplanation()" title="Explain via Audio">
+                    <span class="material-symbols-rounded">volume_up</span>
+                  </button>
+                  <!-- Clear chat -->
+                  <button class="btn-tutor-control" onclick="clearAIChat()" title="Clear Chat">
+                    <span class="material-symbols-rounded">delete</span>
                   </button>
                 </div>
               </div>
               <div class="ai-chat-messages" id="ai-chat-box">
-                <div class="chat-msg system">
-                  <p><strong>AI Tutor:</strong> Namaste beta! I am your AI Python tutor. I will explain your syntax errors and output details just like a mother's voice guides you. Write code on the right and ask me any doubt!</p>
+                <div class="chat-msg ai">
+                  <div class="chat-avatar">
+                    <span class="material-symbols-rounded">smart_toy</span>
+                  </div>
+                  <div class="chat-content">
+                    <p><strong>AI Tutor:</strong> Hello! I'm your premium AI Python tutor. I can help you with:</p>
+                    <ul>
+                      <li>Explaining Python concepts in simple terms</li>
+                      <li>Debugging your code with detailed explanations</li>
+                      <li>Providing voice explanations in multiple languages</li>
+                      <li>Guiding you through coding challenges</li>
+                      <li>Answering any Python-related questions</li>
+                    </ul>
+                    <p>Just ask me anything or share your code!</p>
+                  </div>
                 </div>
               </div>
               <div class="ai-chat-input-row">
-                <input type="text" id="txt-ai-chat-input" placeholder="Ask a doubt (e.g. 'explain print statements in hindi')..." onkeypress="if(event.key==='Enter') sendChatMessageToAI()">
-                <button class="btn-send-chat" onclick="sendChatMessageToAI()">
-                  <span class="material-symbols-rounded">send</span>
-                </button>
+                <div class="chat-input-container">
+                  <button class="btn-voice-input" id="btn-voice-input" onclick="startVoiceInput()" title="Voice Input">
+                    <span class="material-symbols-rounded">mic</span>
+                  </button>
+                  <input type="text" id="txt-ai-chat-input" placeholder="Ask me anything about Python..." onkeypress="if(event.key==='Enter') sendChatMessageToAI()">
+                  <button class="btn-send-chat" onclick="sendChatMessageToAI()">
+                    <span class="material-symbols-rounded">send</span>
+                  </button>
+                </div>
+              </div>
+              <div class="ai-chat-suggestions">
+                <button class="chat-suggestion" onclick="askSuggestion('Explain variables in Python')">Explain variables</button>
+                <button class="chat-suggestion" onclick="askSuggestion('How do I debug my code?')">Debug help</button>
+                <button class="chat-suggestion" onclick="askSuggestion('What are loops in Python?')">Explain loops</button>
+                <button class="chat-suggestion" onclick="askSuggestion('Help with my current challenge')">Challenge help</button>
               </div>
             </div>
 
@@ -695,16 +1071,23 @@
             </div>
           </div>
 
-          <!-- Right Column: Line-numbered editor, goals checker, and terminal -->
+          <!-- Right Column: Professional Coding Lab with Monaco Editor & Terminal -->
           <div class="editor-flow-wrapper">
-            <!-- Active coding editor -->
-            <div class="card editor-card">
+            <!-- Professional Coding Editor -->
+            <div class="card editor-card neon-border-cyan">
               <div class="editor-header">
                 <div class="tab-info">
                   <span class="material-symbols-rounded icon-python">description</span>
                   <span>main.py</span>
+                  <span class="file-status-dot" style="background:var(--neon-emerald);"></span>
                 </div>
                 <div class="editor-actions">
+                  <button class="btn-icon btn-small" onclick="toggleEditorTheme()" title="Toggle Theme">
+                    <span class="material-symbols-rounded">dark_mode</span>
+                  </button>
+                  <button class="btn-icon btn-small" onclick="formatCode()" title="Format Code">
+                    <span class="material-symbols-rounded">format_align_left</span>
+                  </button>
                   <button class="btn-secondary btn-small" onclick="resetEditor()">
                     <span class="material-symbols-rounded">restart_alt</span> Reset
                   </button>
@@ -717,7 +1100,19 @@
                 <div class="editor-gutter" id="editor-gutter">
                   <span>1</span>
                 </div>
-                <textarea class="editor-textarea" id="code-editor" spellcheck="false" placeholder="# Write your Python code here..."></textarea>
+                <textarea class="editor-textarea" id="code-editor" spellcheck="false" placeholder="# Write your Python code here..." oninput="updateLineNumbers()"></textarea>
+                <div class="editor-autocomplete" id="editor-autocomplete" style="display:none;">
+                  <!-- Autocomplete suggestions -->
+                </div>
+              </div>
+              <div class="editor-footer">
+                <div class="editor-stats">
+                  <span id="editor-line-count">Lines: 0</span>
+                  <span id="editor-char-count">Chars: 0</span>
+                </div>
+                <div class="editor-mode">
+                  <span class="mode-indicator">Python 3.x</span>
+                </div>
               </div>
             </div>
 
@@ -743,16 +1138,38 @@
               </div>
             </div>
 
-            <!-- Terminal output screen -->
-            <div class="card terminal-card">
+            <!-- Professional Terminal Console -->
+            <div class="card terminal-card neon-border-purple">
               <div class="terminal-header">
-                <span>Terminal Console Logs</span>
-                <button class="btn-icon btn-small" onclick="clearTerminal()">
-                  <span class="material-symbols-rounded">delete_sweep</span>
-                </button>
+                <div class="terminal-title">
+                  <span class="material-symbols-rounded">terminal</span>
+                  <span>Python Terminal</span>
+                  <span class="terminal-status-dot" style="background:var(--neon-emerald);"></span>
+                </div>
+                <div class="terminal-actions">
+                  <button class="btn-icon btn-small" onclick="clearTerminal()" title="Clear Terminal">
+                    <span class="material-symbols-rounded">delete_sweep</span>
+                  </button>
+                  <button class="btn-icon btn-small" onclick="toggleTerminalSize()" title="Expand/Collapse">
+                    <span class="material-symbols-rounded">open_in_full</span>
+                  </button>
+                </div>
               </div>
               <div class="terminal-body" id="terminal-output">
-                <div class="terminal-welcome">Python Master AI Terminal Ready...</div>
+                <div class="terminal-welcome">
+                  <span class="terminal-prompt">Python Master AI Terminal v2.0</span>
+                  <span class="terminal-info">Ready for code execution...</span>
+                </div>
+                <div class="terminal-line">
+                  <span class="terminal-prompt">>>></span>
+                  <span class="terminal-input-cursor"></span>
+                </div>
+              </div>
+              <div class="terminal-footer">
+                <div class="terminal-stats">
+                  <span id="terminal-exec-time">Exec time: 0ms</span>
+                  <span id="terminal-memory">Memory: 0KB</span>
+                </div>
               </div>
             </div>
 
@@ -760,11 +1177,11 @@
             <div class="card reviewer-card neon-border-cyan">
               <div class="card-header-row">
                 <span class="material-symbols-rounded text-cyan">rate_review</span>
-                <h3>AI Project & Code Reviewer</h3>
+                <h3>AI Code Reviewer</h3>
               </div>
-              <p class="text-secondary font-sm">Upload your playground file to get AI code quality ratings and bug checks.</p>
+              <p class="text-secondary font-sm">Get AI-powered code quality analysis, bug detection, and optimization suggestions.</p>
               <button class="btn-cyan w-full font-sm" onclick="triggerAICodeReview()">
-                Analyze Sandbox Code Quality
+                <span class="material-symbols-rounded">psychology</span> Analyze Code Quality
               </button>
               <div class="review-output-box" id="ai-reviewer-feedback" style="display:none;"></div>
             </div>
@@ -781,41 +1198,172 @@
           <p class="text-secondary">Develop standard, functional software modules to showcase in interviews.</p>
         </div>
 
-        <div class="projects-grid">
-          <!-- Card 1: Calculator -->
-          <div class="card project-item-card">
+        <!-- Project Category Tabs -->
+        <div class="project-tabs">
+          <button class="project-tab active" onclick="filterProjects('all')">All Projects</button>
+          <button class="project-tab" onclick="filterProjects('beginner')">Beginner</button>
+          <button class="project-tab" onclick="filterProjects('intermediate')">Intermediate</button>
+          <button class="project-tab" onclick="filterProjects('advanced')">Advanced</button>
+          <button class="project-tab" onclick="filterProjects('ai')">AI & ML</button>
+        </div>
+
+        <div class="projects-grid" id="projects-grid-container">
+          <!-- Beginner Projects -->
+          <div class="card project-item-card" data-category="beginner">
             <span class="material-symbols-rounded icon-proj text-purple">calculate</span>
             <h3>1. Interactive Calculator</h3>
             <p class="text-secondary card-desc">Learn loops, operators, and inputs by parsing user-defined sums.</p>
+            <div class="project-tags">
+              <span class="tag beginner">Beginner</span>
+              <span class="tag">30 min</span>
+            </div>
             <button class="btn-primary btn-small" onclick="openProjectSandbox('calculator')">Build & Preview</button>
           </div>
-          <!-- Card 2: Weather App -->
-          <div class="card project-item-card">
+          
+          <div class="card project-item-card" data-category="beginner">
             <span class="material-symbols-rounded icon-proj text-cyan">thermostat</span>
             <h3>2. Weather Forecaster</h3>
             <p class="text-secondary card-desc">Understand dictionaries, functions, and JSON parsing by creating a mock API lookup.</p>
+            <div class="project-tags">
+              <span class="tag beginner">Beginner</span>
+              <span class="tag">45 min</span>
+            </div>
             <button class="btn-primary btn-small" onclick="openProjectSandbox('weather')">Build & Preview</button>
           </div>
-          <!-- Card 3: Quiz App -->
-          <div class="card project-item-card">
+          
+          <div class="card project-item-card" data-category="beginner">
             <span class="material-symbols-rounded icon-proj text-emerald">quiz</span>
             <h3>3. Dynamic Quiz App</h3>
             <p class="text-secondary card-desc">Organize lists, arrays, and trackers inside custom Python classes.</p>
+            <div class="project-tags">
+              <span class="tag beginner">Beginner</span>
+              <span class="tag">1 hour</span>
+            </div>
             <button class="btn-primary btn-small" onclick="openProjectSandbox('quiz')">Build & Preview</button>
           </div>
-          <!-- Card 4: AI Chatbot -->
-          <div class="card project-item-card">
+
+          <!-- Intermediate Projects -->
+          <div class="card project-item-card" data-category="intermediate">
             <span class="material-symbols-rounded icon-proj text-orange">forum</span>
             <h3>4. Conversational Chatbot</h3>
             <p class="text-secondary card-desc">Formulate dictionary map structures, text loops, and custom keyword replies.</p>
+            <div class="project-tags">
+              <span class="tag intermediate">Intermediate</span>
+              <span class="tag">2 hours</span>
+            </div>
             <button class="btn-primary btn-small" onclick="openProjectSandbox('chatbot')">Build & Preview</button>
           </div>
-          <!-- Card 5: Portfolio Website -->
-          <div class="card project-item-card">
+          
+          <div class="card project-item-card" data-category="intermediate">
             <span class="material-symbols-rounded icon-proj text-blue">public</span>
             <h3>5. Dev Portfolio Page</h3>
             <p class="text-secondary card-desc">Compile your skills, projects, and certifications into a beautiful layout.</p>
+            <div class="project-tags">
+              <span class="tag intermediate">Intermediate</span>
+              <span class="tag">2 hours</span>
+            </div>
             <button class="btn-primary btn-small" onclick="openProjectSandbox('portfolio')">Build & Preview</button>
+          </div>
+          
+          <div class="card project-item-card" data-category="intermediate">
+            <span class="material-symbols-rounded icon-proj text-purple">shopping_cart</span>
+            <h3>6. E-commerce Cart System</h3>
+            <p class="text-secondary card-desc">Build a shopping cart with add, remove, and total calculation features.</p>
+            <div class="project-tags">
+              <span class="tag intermediate">Intermediate</span>
+              <span class="tag">3 hours</span>
+            </div>
+            <button class="btn-primary btn-small" onclick="openProjectSandbox('ecommerce')">Build & Preview</button>
+          </div>
+          
+          <div class="card project-item-card" data-category="intermediate">
+            <span class="material-symbols-rounded icon-proj text-cyan">event_note</span>
+            <h3>7. Task Manager App</h3>
+            <p class="text-secondary card-desc">Create a CRUD application for managing tasks with deadlines and priorities.</p>
+            <div class="project-tags">
+              <span class="tag intermediate">Intermediate</span>
+              <span class="tag">3 hours</span>
+            </div>
+            <button class="btn-primary btn-small" onclick="openProjectSandbox('taskmanager')">Build & Preview</button>
+          </div>
+
+          <!-- Advanced Projects -->
+          <div class="card project-item-card" data-category="advanced">
+            <span class="material-symbols-rounded icon-proj text-emerald">api</span>
+            <h3>8. REST API Server</h3>
+            <p class="text-secondary card-desc">Build a complete REST API with Flask/FastAPI for a blog platform.</p>
+            <div class="project-tags">
+              <span class="tag advanced">Advanced</span>
+              <span class="tag">5 hours</span>
+            </div>
+            <button class="btn-primary btn-small" onclick="openProjectSandbox('restapi')">Build & Preview</button>
+          </div>
+          
+          <div class="card project-item-card" data-category="advanced">
+            <span class="material-symbols-rounded icon-proj text-orange">database</span>
+            <h3>9. Database Manager</h3>
+            <p class="text-secondary card-desc">Create a database management system with SQLite for data persistence.</p>
+            <div class="project-tags">
+              <span class="tag advanced">Advanced</span>
+              <span class="tag">4 hours</span>
+            </div>
+            <button class="btn-primary btn-small" onclick="openProjectSandbox('database')">Build & Preview</button>
+          </div>
+          
+          <div class="card project-item-card" data-category="advanced">
+            <span class="material-symbols-rounded icon-proj text-blue">lock</span>
+            <h3>10. Authentication System</h3>
+            <p class="text-secondary card-desc">Implement secure login, registration, and password hashing with JWT tokens.</p>
+            <div class="project-tags">
+              <span class="tag advanced">Advanced</span>
+              <span class="tag">6 hours</span>
+            </div>
+            <button class="btn-primary btn-small" onclick="openProjectSandbox('auth')">Build & Preview</button>
+          </div>
+
+          <!-- AI & ML Projects -->
+          <div class="card project-item-card" data-category="ai">
+            <span class="material-symbols-rounded icon-proj text-purple">psychology</span>
+            <h3>11. Sentiment Analyzer</h3>
+            <p class="text-secondary card-desc">Build an AI-powered sentiment analysis tool using NLP libraries.</p>
+            <div class="project-tags">
+              <span class="tag ai">AI & ML</span>
+              <span class="tag">4 hours</span>
+            </div>
+            <button class="btn-primary btn-small" onclick="openProjectSandbox('sentiment')">Build & Preview</button>
+          </div>
+          
+          <div class="card project-item-card" data-category="ai">
+            <span class="material-symbols-rounded icon-proj text-cyan">image</span>
+            <h3>12. Image Classifier</h3>
+            <p class="text-secondary card-desc">Create a machine learning model to classify images using TensorFlow/Keras.</p>
+            <div class="project-tags">
+              <span class="tag ai">AI & ML</span>
+              <span class="tag">6 hours</span>
+            </div>
+            <button class="btn-primary btn-small" onclick="openProjectSandbox('classifier')">Build & Preview</button>
+          </div>
+          
+          <div class="card project-item-card" data-category="ai">
+            <span class="material-symbols-rounded icon-proj text-emerald">smart_toy</span>
+            <h3>13. AI Chatbot with NLP</h3>
+            <p class="text-secondary card-desc">Build an intelligent chatbot using natural language processing and transformers.</p>
+            <div class="project-tags">
+              <span class="tag ai">AI & ML</span>
+              <span class="tag">8 hours</span>
+            </div>
+            <button class="btn-primary btn-small" onclick="openProjectSandbox('aichatbot')">Build & Preview</button>
+          </div>
+          
+          <div class="card project-item-card" data-category="ai">
+            <span class="material-symbols-rounded icon-proj text-orange">auto_awesome</span>
+            <h3>14. Recommendation Engine</h3>
+            <p class="text-secondary card-desc">Create a movie/product recommendation system using collaborative filtering.</p>
+            <div class="project-tags">
+              <span class="tag ai">AI & ML</span>
+              <span class="tag">5 hours</span>
+            </div>
+            <button class="btn-primary btn-small" onclick="openProjectSandbox('recommendation')">Build & Preview</button>
           </div>
         </div>
 
@@ -850,16 +1398,82 @@
            ========================================== -->
       <section id="view-bookmarks" class="content-view">
         <div class="view-header-intro">
-          <h2>Your Bookmark Archive & Personal Study Notes</h2>
-          <p class="text-secondary">Review save points and compile personal logs to review core Python topics.</p>
+          <h2>Smart Notes & Bookmarks</h2>
+          <p class="text-secondary">Rich text editor with AI-powered note generation and chapter bookmarks.</p>
         </div>
 
         <div class="notes-layout-grid">
-          <!-- Notes Editor -->
-          <div class="card notes-editor-card">
-            <h3>Compile Custom Notes</h3>
-            <textarea id="txt-personal-notes" placeholder="Type your personal programming study notes, code blocks, or reminders here..."></textarea>
-            <button class="btn-primary btn-small mt-1" onclick="savePersonalNotes()">Save Notes</button>
+          <!-- Rich Text Notes Editor -->
+          <div class="card notes-editor-card neon-border-purple">
+            <div class="notes-editor-header">
+              <h3>Rich Text Notes Editor</h3>
+              <div class="editor-toolbar">
+                <button class="toolbar-btn" onclick="formatText('bold')" title="Bold">
+                  <span class="material-symbols-rounded">format_bold</span>
+                </button>
+                <button class="toolbar-btn" onclick="formatText('italic')" title="Italic">
+                  <span class="material-symbols-rounded">format_italic</span>
+                </button>
+                <button class="toolbar-btn" onclick="formatText('underline')" title="Underline">
+                  <span class="material-symbols-rounded">format_underlined</span>
+                </button>
+                <button class="toolbar-btn" onclick="formatText('insertUnorderedList')" title="Bullet List">
+                  <span class="material-symbols-rounded">format_list_bulleted</span>
+                </button>
+                <button class="toolbar-btn" onclick="formatText('insertOrderedList')" title="Numbered List">
+                  <span class="material-symbols-rounded">format_list_numbered</span>
+                </button>
+                <button class="toolbar-btn" onclick="formatText('formatBlock', 'h1')" title="Heading">
+                  <span class="material-symbols-rounded">title</span>
+                </button>
+                <button class="toolbar-btn" onclick="formatText('formatBlock', 'code')" title="Code Block">
+                  <span class="material-symbols-rounded">code</span>
+                </button>
+                <button class="toolbar-btn" onclick="formatText('createLink')" title="Link">
+                  <span class="material-symbols-rounded">link</span>
+                </button>
+              </div>
+            </div>
+            <div class="rich-text-editor" id="rich-text-editor" contenteditable="true" placeholder="Start typing your notes here..."></div>
+            <div class="notes-editor-actions">
+              <button class="btn-primary btn-small" onclick="savePersonalNotes()">
+                <span class="material-symbols-rounded">save</span> Save Notes
+              </button>
+              <button class="btn-cyan btn-small" onclick="generateAINotes()">
+                <span class="material-symbols-rounded">auto_awesome</span> AI Generate Notes
+              </button>
+              <button class="btn-secondary btn-small" onclick="clearNotes()">
+                <span class="material-symbols-rounded">delete</span> Clear
+              </button>
+            </div>
+          </div>
+
+          <!-- AI Notes Generator Panel -->
+          <div class="card ai-notes-card neon-border-cyan">
+            <div class="card-header-row">
+              <span class="material-symbols-rounded text-cyan">psychology</span>
+              <h3>AI Notes Generator</h3>
+            </div>
+            <p class="text-secondary card-desc">Generate comprehensive study notes from your learning progress and completed chapters.</p>
+            
+            <div class="ai-notes-options">
+              <label class="checkbox-label">
+                <input type="checkbox" id="ai-include-code" checked>
+                <span>Include code examples</span>
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" id="ai-include-quiz" checked>
+                <span>Include quiz summaries</span>
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" id="ai-include-tips" checked>
+                <span>Include best practices</span>
+              </label>
+            </div>
+            
+            <button class="btn-cyan w-full mt-1" onclick="generateAINotes()">
+              <span class="material-symbols-rounded">auto_awesome</span> Generate AI Study Notes
+            </button>
           </div>
 
           <!-- Saved Chapters & Bookmarks -->
@@ -873,116 +1487,134 @@
       </section>
 
       <!-- ==========================================
-           VIEW 5: INTERVIEW PREPARATION MODULE
+           VIEW 5: AI CAREER SYSTEM
            ========================================== -->
       <section id="view-interview" class="content-view">
         <div class="view-header-intro">
-          <h2>Job Interview Preparation Suite</h2>
-          <p class="text-secondary">Navigate custom technical challenges, mock loops, and structural resume advice.</p>
+          <h2>AI Career System</h2>
+          <p class="text-secondary">Job readiness assessment, AI interview simulators, and career guidance powered by AI.</p>
         </div>
 
-        <div class="tabs-control-header">
-          <button class="btn-tab-link active" onclick="switchInterviewSubTab('hr')">HR Questions</button>
-          <button class="btn-tab-link" onclick="switchInterviewSubTab('coding')">Coding Rounds</button>
-          <button class="btn-tab-link" onclick="switchInterviewSubTab('mock')">Simulated AI Interview</button>
-          <button class="btn-tab-link" onclick="switchInterviewSubTab('tips')">Resume Builder Tips</button>
-        </div>
-
-        <!-- HR Subtab -->
-        <div id="subtab-hr" class="interview-subtab active-subtab">
-          <div class="card">
-            <h3>Top Python HR Questions</h3>
-            <p class="text-secondary mb-1">Standard structural behavioral and basic operational questions.</p>
+        <div class="career-grid">
+          <!-- Job Readiness Assessment Card -->
+          <div class="card career-assessment-card neon-border-purple">
+            <div class="card-header-row">
+              <span class="material-symbols-rounded text-purple">assessment</span>
+              <h3>Job Readiness Assessment</h3>
+            </div>
+            <p class="text-secondary card-desc">AI evaluates your skills, projects, and learning progress to determine your job readiness score.</p>
             
-            <div class="collapsible-qa-list">
-              <div class="qa-item">
-                <button class="qa-toggle" onclick="this.nextElementSibling.classList.toggle('active')">
-                  Q1. Tell me about yourself and your Python project experience?
-                </button>
-                <div class="qa-content">
-                  <p><strong>Answer Blueprint:</strong> Start with your name, educational status, and focus on the real projects you built under Python Master AI (like the calculator and AI chatbot). Mention that you code daily, maintain streaks, and focus on structured, clean Python scripts.</p>
+            <div class="readiness-metrics">
+              <div class="metric-item">
+                <span class="metric-label">Technical Skills</span>
+                <div class="metric-bar">
+                  <div class="metric-fill" style="width: 75%;"></div>
+                </div>
+                <span class="metric-value">75%</span>
+              </div>
+              <div class="metric-item">
+                <span class="metric-label">Project Portfolio</span>
+                <div class="metric-bar">
+                  <div class="metric-fill" style="width: 60%;"></div>
+                </div>
+                <span class="metric-value">60%</span>
+              </div>
+              <div class="metric-item">
+                <span class="metric-label">Interview Prep</span>
+                <div class="metric-bar">
+                  <div class="metric-fill" style="width: 45%;"></div>
+                </div>
+                <span class="metric-value">45%</span>
+              </div>
+            </div>
+            
+            <div class="readiness-score">
+              <div class="score-circle">
+                <div class="score-value">67%</div>
+                <div class="score-label">READY</div>
+              </div>
+              <p class="score-desc">You're making good progress! Complete more projects and practice interviews to improve.</p>
+            </div>
+            
+            <button class="btn-purple w-full mt-1" onclick="runJobReadinessAssessment()">
+              <span class="material-symbols-rounded">refresh</span> Re-Assess Readiness
+            </button>
+          </div>
+
+          <!-- AI Interview Simulator Card -->
+          <div class="card interview-simulator-card neon-border-cyan">
+            <div class="card-header-row">
+              <span class="material-symbols-rounded text-cyan">psychology</span>
+              <h3>AI Interview Simulator</h3>
+            </div>
+            <p class="text-secondary card-desc">Practice with AI-powered mock interviews that adapt to your skill level and target roles.</p>
+            
+            <div class="interview-types">
+              <button class="interview-type-btn active" onclick="selectInterviewType('technical')">
+                <span class="material-symbols-rounded">code</span>
+                <span>Technical</span>
+              </button>
+              <button class="interview-type-btn" onclick="selectInterviewType('behavioral')">
+                <span class="material-symbols-rounded">person</span>
+                <span>Behavioral</span>
+              </button>
+              <button class="interview-type-btn" onclick="selectInterviewType('system')">
+                <span class="material-symbols-rounded">settings</span>
+                <span>System Design</span>
+              </button>
+            </div>
+            
+            <div class="interview-preview">
+              <div class="interview-question">
+                <span class="question-badge">Question 1/10</span>
+                <p>Explain the difference between list and tuple in Python. When would you use each?</p>
+              </div>
+              <div class="interview-tips">
+                <span class="material-symbols-rounded text-orange">lightbulb</span>
+                <span>Tip: Focus on mutability, performance, and use cases.</span>
+              </div>
+            </div>
+            
+            <button class="btn-cyan w-full mt-1" onclick="startAIInterview()">
+              <span class="material-symbols-rounded">play_arrow</span> Start AI Interview
+            </button>
+          </div>
+
+          <!-- Career Guidance Card -->
+          <div class="card career-guidance-card neon-border-emerald">
+            <div class="card-header-row">
+              <span class="material-symbols-rounded text-emerald">trending_up</span>
+              <h3>AI Career Guidance</h3>
+            </div>
+            <p class="text-secondary card-desc">Personalized career path recommendations based on your skills and market trends.</p>
+            
+            <div class="career-recommendations">
+              <div class="recommendation-item">
+                <span class="material-symbols-rounded text-purple">work</span>
+                <div>
+                  <h4>Python Developer</h4>
+                  <p class="text-secondary">85% match based on your skills</p>
                 </div>
               </div>
-              <div class="qa-item">
-                <button class="qa-toggle" onclick="this.nextElementSibling.classList.toggle('active')">
-                  Q2. Why did you choose Python over other programming languages?
-                </button>
-                <div class="qa-content">
-                  <p><strong>Answer Blueprint:</strong> Detail that Python has clean, highly readable syntax which allows quick prototyping, features rich frameworks, and is the core language for building modern artificial intelligence, automation systems, and backend APIs.</p>
+              <div class="recommendation-item">
+                <span class="material-symbols-rounded text-cyan">analytics</span>
+                <div>
+                  <h4>Data Analyst</h4>
+                  <p class="text-secondary">72% match based on your skills</p>
                 </div>
               </div>
-              <div class="qa-item">
-                <button class="qa-toggle" onclick="this.nextElementSibling.classList.toggle('active')">
-                  Q3. How do you debug errors when your code fails?
-                </button>
-                <div class="qa-content">
-                  <p><strong>Answer Blueprint:</strong> Explain that you parse terminal tracebacks line-by-line, utilize print logs to track active variable assignments, reference Python Master AI's interactive tutor explanations, and test boundary edge cases in separate sandboxes.</p>
+              <div class="recommendation-item">
+                <span class="material-symbols-rounded text-orange">smart_toy</span>
+                <div>
+                  <h4>ML Engineer</h4>
+                  <p class="text-secondary">58% match based on your skills</p>
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-
-        <!-- Coding Rounds Subtab -->
-        <div id="subtab-coding" class="interview-subtab">
-          <div class="card">
-            <h3>Python Interview Coding Challenges</h3>
-            <p class="text-secondary mb-1">Standard coding challenges tested in tech screens.</p>
             
-            <div class="coding-challenges-grid">
-              <div class="challenge-item-card">
-                <h4>1. String Reversal</h4>
-                <p class="text-secondary font-sm">Write a function to reverse a string without using built-in methods.</p>
-                <button class="btn-cyan btn-small" onclick="loadInterviewChallengeToPlayground(0)">Load in Sandbox</button>
-              </div>
-              <div class="challenge-item-card">
-                <h4>2. FizzBuzz Classic</h4>
-                <p class="text-secondary font-sm">Print integers 1 to 15. Print 'Fizz' for multiples of 3, 'Buzz' for 5, 'FizzBuzz' for both.</p>
-                <button class="btn-cyan btn-small" onclick="loadInterviewChallengeToPlayground(1)">Load in Sandbox</button>
-              </div>
-              <div class="challenge-item-card">
-                <h4>3. List Max Finder</h4>
-                <p class="text-secondary font-sm">Identify the maximum value inside a numerical array without utilizing max().</p>
-                <button class="btn-cyan btn-small" onclick="loadInterviewChallengeToPlayground(2)">Load in Sandbox</button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Mock Interview Subtab -->
-        <div id="subtab-mock" class="interview-subtab">
-          <div class="card neon-border-orange">
-            <h3>AI Mock Interview Board</h3>
-            <p class="text-secondary">Simulate live technical interview loops. Respond to the AI recruiter's questions.</p>
-            
-            <div class="mock-interview-wrapper">
-              <div class="mock-ai-avatar">
-                <span class="material-symbols-rounded">support_agent</span>
-                <span>Interviewer AI</span>
-              </div>
-              <div class="mock-chat-bubble" id="lbl-mock-question">
-                "Hello, Arun Kumar! Let's start. Can you explain the difference between a Python List and a Tuple?"
-              </div>
-              <div class="mock-input-row">
-                <input type="text" id="txt-mock-answer" placeholder="Type your technical answer here...">
-                <button class="btn-orange" onclick="submitMockInterviewAnswer()">Submit Answer</button>
-              </div>
-              <div class="mock-evaluation-box" id="lbl-mock-feedback" style="display:none;"></div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Tips Subtab -->
-        <div id="subtab-tips" class="interview-subtab">
-          <div class="card">
-            <h3>ATS-Friendly Python Resume Tips</h3>
-            <p class="text-secondary mb-1">Follow these structured checklist strategies to pass automated filters.</p>
-            <ul class="tips-checked-list">
-              <li><strong>Focus on Products:</strong> List practical repositories and dynamic projects instead of listing dry tutorials.</li>
-              <li><strong>Detail Dynamic Skills:</strong> Highlight Python variables, object-oriented concepts, loops, API parameters, and JSON storage.</li>
-              <li><strong>Incorporate Metrics:</strong> Detail active learning parameters: e.g. "Completed comprehensive Python Master AI track with consecutive streak metrics."</li>
-              <li><strong>Branding details:</strong> Keep it clean and presentable. Export as PDF from our Generator page.</li>
-            </ul>
+            <button class="btn-success w-full mt-1" onclick="generateCareerPath()">
+              <span class="material-symbols-rounded">route</span> Generate Career Path
+            </button>
           </div>
         </div>
       </section>
@@ -992,8 +1624,8 @@
            ========================================== -->
       <section id="view-resume" class="content-view">
         <div class="view-header-intro">
-          <h2>Dynamic Resume Generator</h2>
-          <p class="text-secondary">Automate compiling your python credentials and export an ATS-compliant PDF resume.</p>
+          <h2>ATS-Powered AI Resume Builder</h2>
+          <p class="text-secondary">AI-optimized resume generation with ATS keyword matching and professional templates.</p>
         </div>
 
         <div class="resume-generator-grid">
@@ -1027,18 +1659,83 @@
                 <label for="res-certifications">Certifications</label>
                 <input type="text" id="res-certifications" value="Python Master AI Certification (Radharapu Arun Kumar)">
               </div>
+              <div class="input-group">
+                <label for="res-summary">Professional Summary</label>
+                <textarea id="res-summary" placeholder="AI will generate this automatically if left blank..."></textarea>
+              </div>
             </div>
             
             <button class="btn-primary w-full mt-1" onclick="compileResumePreview()">
-              Compile & Refresh Resume
+              <span class="material-symbols-rounded">auto_awesome</span> AI Compile & Refresh
+            </button>
+            <button class="btn-cyan w-full mt-1" onclick="optimizeResumeWithAI()">
+              <span class="material-symbols-rounded">psychology</span> AI Optimize for ATS
             </button>
             <button class="btn-success w-full mt-1" onclick="window.print()">
-              Print / Export to PDF
+              <span class="material-symbols-rounded">print</span> Print / Export to PDF
+            </button>
+          </div>
+
+          <!-- AI Analysis Card -->
+          <div class="card ai-resume-analysis-card neon-border-purple">
+            <h3>🤖 AI Resume Analysis</h3>
+            <p class="text-secondary card-desc">ATS keyword matching and optimization suggestions.</p>
+            
+            <div class="ats-score-display">
+              <div class="ats-score-circle">
+                <div class="ats-score-value" id="ats-score">85</div>
+                <div class="ats-score-label">ATS Score</div>
+              </div>
+              <div class="ats-score-details">
+                <div class="ats-metric">
+                  <span class="metric-label">Keywords Matched:</span>
+                  <span class="metric-value" id="ats-keywords">12/15</span>
+                </div>
+                <div class="ats-metric">
+                  <span class="metric-label">Format Score:</span>
+                  <span class="metric-value" id="ats-format">90%</span>
+                </div>
+                <div class="ats-metric">
+                  <span class="metric-label">Content Quality:</span>
+                  <span class="metric-value" id="ats-content">82%</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="ai-suggestions-list" id="ai-suggestions">
+              <h4>AI Suggestions:</h4>
+              <div class="suggestion-item">
+                <span class="material-symbols-rounded text-emerald">check_circle</span>
+                <span>Add more quantifiable achievements (e.g., "Built 5+ projects")</span>
+              </div>
+              <div class="suggestion-item">
+                <span class="material-symbols-rounded text-orange">warning</span>
+                <span>Include more industry-standard Python keywords</span>
+              </div>
+              <div class="suggestion-item">
+                <span class="material-symbols-rounded text-cyan">lightbulb</span>
+                <span>Add project links or GitHub repository URLs</span>
+              </div>
+            </div>
+
+            <button class="btn-purple w-full mt-1" onclick="generateAISummary()">
+              <span class="material-symbols-rounded">auto_awesome</span> Generate AI Summary
             </button>
           </div>
 
           <!-- Live Resume Preview Sheet -->
           <div class="card resume-preview-card neon-border-cyan">
+            <div class="resume-preview-header">
+              <h3>Live Preview</h3>
+              <div class="template-selector">
+                <label>Template:</label>
+                <select id="resume-template" onchange="changeResumeTemplate()">
+                  <option value="modern">Modern</option>
+                  <option value="professional">Professional</option>
+                  <option value="minimal">Minimal</option>
+                </select>
+              </div>
+            </div>
             <div class="resume-a4-sheet" id="resume-sheet">
               <!-- Rendered dynamically -->
             </div>
@@ -1065,16 +1762,57 @@
            ========================================== -->
       <section id="view-community" class="content-view">
         <div class="view-header-intro">
-          <h2>Community Coding Forum</h2>
-          <p class="text-secondary">Interact with peer programmers, post coding doubts, and publish your project repos.</p>
+          <h2>Community Hub</h2>
+          <p class="text-secondary">Connect with learners, share projects, ask questions, and collaborate on code.</p>
         </div>
 
         <div class="community-grid">
-          <!-- Input card -->
-          <div class="card community-post-card">
-            <h3>Publish a Post</h3>
-            <textarea id="txt-community-post" placeholder="Ask a doubt or share some Python code you completed..."></textarea>
-            <button class="btn-primary btn-small mt-1" onclick="publishCommunityPost()">Publish Post</button>
+          <!-- Create Post Card -->
+          <div class="card community-post-card neon-border-purple">
+            <h3>Create Post</h3>
+            <div class="post-type-selector">
+              <button class="post-type-btn active" onclick="selectPostType('question')">
+                <span class="material-symbols-rounded">help</span>
+                <span>Question</span>
+              </button>
+              <button class="post-type-btn" onclick="selectPostType('project')">
+                <span class="material-symbols-rounded">code</span>
+                <span>Project Share</span>
+              </button>
+              <button class="post-type-btn" onclick="selectPostType('discussion')">
+                <span class="material-symbols-rounded">forum</span>
+                <span>Discussion</span>
+              </button>
+            </div>
+            <input type="text" id="txt-community-title" placeholder="Post title..." class="post-title-input">
+            <textarea id="txt-community-post" placeholder="Share your thoughts, ask a question, or showcase your project..."></textarea>
+            <div class="post-tags-input">
+              <input type="text" id="txt-community-tags" placeholder="Add tags (comma separated)...">
+            </div>
+            <button class="btn-primary btn-small mt-1" onclick="publishCommunityPost()">
+              <span class="material-symbols-rounded">send</span> Publish Post
+            </button>
+          </div>
+
+          <!-- Feed Filters -->
+          <div class="card feed-filters-card">
+            <h3>Filter Feed</h3>
+            <div class="filter-buttons">
+              <button class="filter-btn active" onclick="filterFeed('all')">All Posts</button>
+              <button class="filter-btn" onclick="filterFeed('questions')">Questions</button>
+              <button class="filter-btn" onclick="filterFeed('projects')">Projects</button>
+              <button class="filter-btn" onclick="filterFeed('discussions')">Discussions</button>
+            </div>
+            <div class="trending-topics">
+              <h4>Trending Topics</h4>
+              <div class="topic-tags">
+                <span class="topic-tag">#python</span>
+                <span class="topic-tag">#ai</span>
+                <span class="topic-tag">#webdev</span>
+                <span class="topic-tag">#datascience</span>
+                <span class="topic-tag">#ml</span>
+              </div>
+            </div>
           </div>
 
           <!-- Feed lists -->
@@ -1085,29 +1823,387 @@
       </section>
 
       <!-- ==========================================
-           VIEW 9: LEADERBOARD
+           VIEW 9: LEADERBOARD & ACHIEVEMENTS
            ========================================== -->
       <section id="view-leaderboard" class="content-view">
         <div class="view-header-intro">
-          <h2>Weekly XP Leaderboard</h2>
-          <p class="text-secondary">Compare your daily coding streak metrics and total experience counts with global users.</p>
+          <h2>Gamification Hub</h2>
+          <p class="text-secondary">Track your progress, earn achievements, and compete with other learners.</p>
         </div>
 
-        <div class="card leaderboard-table-card">
-          <div class="leaderboard-table-header">
-            <span>Rank</span>
-            <span>Learner Profile</span>
-            <span>Status / Streak</span>
-            <span>Total XP</span>
+        <div class="gamification-grid">
+          <!-- User Stats Card -->
+          <div class="card user-stats-card neon-border-purple">
+            <div class="user-level-display">
+              <div class="level-circle">
+                <div class="level-number" id="user-level">5</div>
+                <div class="level-label">LEVEL</div>
+              </div>
+              <div class="level-progress">
+                <div class="progress-bar">
+                  <div class="progress-fill" id="xp-progress" style="width: 65%;"></div>
+                </div>
+                <div class="progress-text">
+                  <span id="current-xp">650</span> / <span id="next-level-xp">1000</span> XP
+                </div>
+              </div>
+            </div>
+            <div class="stats-grid-mini">
+              <div class="stat-mini">
+                <span class="material-symbols-rounded text-orange">local_fire_department</span>
+                <div>
+                  <div class="stat-value" id="user-streak">7</div>
+                  <div class="stat-label">Day Streak</div>
+                </div>
+              </div>
+              <div class="stat-mini">
+                <span class="material-symbols-rounded text-cyan">emoji_events</span>
+                <div>
+                  <div class="stat-value" id="user-rank">12</div>
+                  <div class="stat-label">Global Rank</div>
+                </div>
+              </div>
+              <div class="stat-mini">
+                <span class="material-symbols-rounded text-emerald">military_tech</span>
+                <div>
+                  <div class="stat-value" id="user-achievements">8</div>
+                  <div class="stat-label">Achievements</div>
+                </div>
+              </div>
+            </div>
           </div>
-          <div class="leaderboard-flow" id="leaderboard-container">
-            <!-- Rendered dynamically in app.js -->
+
+          <!-- Achievements Card -->
+          <div class="card achievements-card neon-border-gold">
+            <div class="card-header-row">
+              <span class="material-symbols-rounded text-gold">workspace_premium</span>
+              <h3>Achievements</h3>
+            </div>
+            <div class="achievements-grid" id="achievements-grid">
+              <div class="achievement-badge unlocked">
+                <span class="material-symbols-rounded">rocket_launch</span>
+                <span class="badge-name">First Steps</span>
+                <span class="badge-desc">Complete first lesson</span>
+              </div>
+              <div class="achievement-badge unlocked">
+                <span class="material-symbols-rounded">local_fire_department</span>
+                <span class="badge-name">7-Day Streak</span>
+                <span class="badge-desc">7 consecutive days</span>
+              </div>
+              <div class="achievement-badge unlocked">
+                <span class="material-symbols-rounded">code</span>
+                <span class="badge-name">Code Warrior</span>
+                <span class="badge-desc">Complete 5 projects</span>
+              </div>
+              <div class="achievement-badge locked">
+                <span class="material-symbols-rounded">psychology</span>
+                <span class="badge-name">AI Master</span>
+                <span class="badge-desc">Complete AI module</span>
+              </div>
+              <div class="achievement-badge locked">
+                <span class="material-symbols-rounded">school</span>
+                <span class="badge-name">Quiz Champion</span>
+                <span class="badge-desc">100% on all quizzes</span>
+              </div>
+              <div class="achievement-badge locked">
+                <span class="material-symbols-rounded">stars</span>
+                <span class="badge-name">Python Expert</span>
+                <span class="badge-desc">Complete all modules</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Leaderboard Card -->
+          <div class="card leaderboard-table-card neon-border-cyan">
+            <div class="leaderboard-tabs">
+              <button class="leaderboard-tab active" onclick="switchLeaderboardTab('weekly')">Weekly</button>
+              <button class="leaderboard-tab" onclick="switchLeaderboardTab('monthly')">Monthly</button>
+              <button class="leaderboard-tab" onclick="switchLeaderboardTab('alltime')">All Time</button>
+            </div>
+            <div class="leaderboard-table-header">
+              <span>Rank</span>
+              <span>Learner Profile</span>
+              <span>Level</span>
+              <span>Streak</span>
+              <span>Total XP</span>
+            </div>
+            <div class="leaderboard-flow" id="leaderboard-container">
+              <!-- Rendered dynamically in app.js -->
+            </div>
           </div>
         </div>
       </section>
 
       <!-- ==========================================
-           VIEW 10: PREMIUM ₹2 UPGRADE PLATFORM
+           VIEW 10: SUPPORT & HELPDESK
+           ========================================== -->
+      <section id="view-support" class="content-view">
+        <div class="view-header-intro">
+          <h2>Support & Helpdesk</h2>
+          <p class="text-secondary">Get help with your learning journey through our ticket-based support system.</p>
+        </div>
+
+        <div class="support-grid">
+          <!-- Create Ticket Card -->
+          <div class="card support-create-card neon-border-purple">
+            <div class="card-header-row">
+              <span class="material-symbols-rounded text-purple">add_ticket</span>
+              <h3>Create Support Ticket</h3>
+            </div>
+            <p class="text-secondary card-desc">Submit a new support request and track its progress.</p>
+            
+            <div class="ticket-form">
+              <div class="input-group">
+                <label for="ticket-subject">Subject</label>
+                <input type="text" id="ticket-subject" placeholder="Brief description of your issue...">
+              </div>
+              <div class="input-group">
+                <label for="ticket-category">Category</label>
+                <select id="ticket-category">
+                  <option value="technical">Technical Issue</option>
+                  <option value="billing">Billing & Payment</option>
+                  <option value="content">Course Content</option>
+                  <option value="account">Account & Profile</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+              <div class="input-group">
+                <label for="ticket-priority">Priority</label>
+                <select id="ticket-priority">
+                  <option value="low">Low</option>
+                  <option value="medium">Medium</option>
+                  <option value="high">High</option>
+                  <option value="urgent">Urgent</option>
+                </select>
+              </div>
+              <div class="input-group">
+                <label for="ticket-description">Description</label>
+                <textarea id="ticket-description" rows="4" placeholder="Describe your issue in detail..."></textarea>
+              </div>
+              <button class="btn-purple w-full mt-1" onclick="createSupportTicket()">
+                <span class="material-symbols-rounded">send</span> Submit Ticket
+              </button>
+            </div>
+          </div>
+
+          <!-- My Tickets Card -->
+          <div class="card support-tickets-card neon-border-cyan">
+            <div class="card-header-row">
+              <span class="material-symbols-rounded text-cyan">confirmation_number</span>
+              <h3>My Tickets</h3>
+            </div>
+            <p class="text-secondary card-desc">Track the status of your support requests.</p>
+            
+            <div class="tickets-list" id="my-tickets-list">
+              <div class="ticket-item">
+                <div class="ticket-header">
+                  <span class="ticket-id">#TKT-001</span>
+                  <span class="ticket-status open">Open</span>
+                </div>
+                <h4>Login issue with Google OAuth</h4>
+                <p class="text-secondary">Unable to sign in with Google account...</p>
+                <div class="ticket-meta">
+                  <span class="ticket-priority high">High Priority</span>
+                  <span class="ticket-date">2 days ago</span>
+                </div>
+              </div>
+              <div class="ticket-item">
+                <div class="ticket-header">
+                  <span class="ticket-id">#TKT-002</span>
+                  <span class="ticket-status resolved">Resolved</span>
+                </div>
+                <h4>Payment not reflected</h4>
+                <p class="text-secondary">Premium upgrade payment completed but...</p>
+                <div class="ticket-meta">
+                  <span class="ticket-priority medium">Medium Priority</span>
+                  <span class="ticket-date">5 days ago</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Contact Info Card -->
+          <div class="card support-contact-card neon-border-emerald">
+            <div class="card-header-row">
+              <span class="material-symbols-rounded text-emerald">contact_support</span>
+              <h3>Contact Information</h3>
+            </div>
+            <p class="text-secondary card-desc">Reach out to us directly for urgent matters.</p>
+            
+            <div class="contact-info-list">
+              <div class="contact-item">
+                <span class="material-symbols-rounded">phone</span>
+                <div>
+                  <h4>Phone</h4>
+                  <p>9052672335</p>
+                </div>
+              </div>
+              <div class="contact-item">
+                <span class="material-symbols-rounded">email</span>
+                <div>
+                  <h4>Email</h4>
+                  <p>radharapuarunkumar01@gmail.com</p>
+                </div>
+              </div>
+              <div class="contact-item">
+                <span class="material-symbols-rounded">schedule</span>
+                <div>
+                  <h4>Response Time</h4>
+                  <p>Within 24 hours</p>
+                </div>
+              </div>
+            </div>
+            
+            <div class="faq-quick-links">
+              <h4>Quick Help</h4>
+              <a href="#" onclick="switchView('faq')">View FAQ</a>
+              <a href="#" onclick="switchView('community')">Ask Community</a>
+              <a href="#" onclick="toggleAIChatbot()">Chat with AI Tutor</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           VIEW 12: ADMIN DASHBOARD
+           ========================================== -->
+      <section id="view-admin" class="content-view">
+        <div class="view-header-intro">
+          <h2>Admin Dashboard</h2>
+          <p class="text-secondary">Manage users, content, and platform analytics.</p>
+        </div>
+
+        <div class="admin-grid">
+          <!-- Analytics Overview Card -->
+          <div class="card admin-analytics-card neon-border-purple">
+            <div class="card-header-row">
+              <span class="material-symbols-rounded text-purple">analytics</span>
+              <h3>Platform Analytics</h3>
+            </div>
+            <div class="analytics-stats">
+              <div class="analytics-stat">
+                <span class="stat-icon text-cyan">people</span>
+                <div>
+                  <div class="stat-value">1,234</div>
+                  <div class="stat-label">Total Users</div>
+                </div>
+              </div>
+              <div class="analytics-stat">
+                <span class="stat-icon text-emerald">school</span>
+                <div>
+                  <div class="stat-value">856</div>
+                  <div class="stat-label">Active Learners</div>
+                </div>
+              </div>
+              <div class="analytics-stat">
+                <span class="stat-icon text-orange">workspace_premium</span>
+                <div>
+                  <div class="stat-value">234</div>
+                  <div class="stat-label">Premium Users</div>
+                </div>
+              </div>
+              <div class="analytics-stat">
+                <span class="stat-icon text-purple">code</span>
+                <div>
+                  <div class="stat-value">5,678</div>
+                  <div class="stat-label">Projects Completed</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- User Management Card -->
+          <div class="card admin-users-card neon-border-cyan">
+            <div class="card-header-row">
+              <span class="material-symbols-rounded text-cyan">manage_accounts</span>
+              <h3>User Management</h3>
+            </div>
+            <div class="admin-search">
+              <input type="text" placeholder="Search users..." class="admin-search-input">
+            </div>
+            <div class="users-list">
+              <div class="user-row">
+                <div class="user-avatar">SK</div>
+                <div class="user-info">
+                  <h4>Srinivas K.</h4>
+                  <p class="text-secondary">srinivas.k@email.com</p>
+                </div>
+                <div class="user-actions">
+                  <button class="btn-icon btn-small" title="Edit"><span class="material-symbols-rounded">edit</span></button>
+                  <button class="btn-icon btn-small" title="Delete"><span class="material-symbols-rounded">delete</span></button>
+                </div>
+              </div>
+              <div class="user-row">
+                <div class="user-avatar">PS</div>
+                <div class="user-info">
+                  <h4>Priya S.</h4>
+                  <p class="text-secondary">priya.s@email.com</p>
+                </div>
+                <div class="user-actions">
+                  <button class="btn-icon btn-small" title="Edit"><span class="material-symbols-rounded">edit</span></button>
+                  <button class="btn-icon btn-small" title="Delete"><span class="material-symbols-rounded">delete</span></button>
+                </div>
+              </div>
+              <div class="user-row">
+                <div class="user-avatar">RV</div>
+                <div class="user-info">
+                  <h4>Rahul V.</h4>
+                  <p class="text-secondary">rahul.v@email.com</p>
+                </div>
+                <div class="user-actions">
+                  <button class="btn-icon btn-small" title="Edit"><span class="material-symbols-rounded">edit</span></button>
+                  <button class="btn-icon btn-small" title="Delete"><span class="material-symbols-rounded">delete</span></button>
+                </div>
+              </div>
+            </div>
+            <button class="btn-cyan w-full mt-1">
+              <span class="material-symbols-rounded">add</span> Add New User
+            </button>
+          </div>
+
+          <!-- Content Management Card -->
+          <div class="card admin-content-card neon-border-emerald">
+            <div class="card-header-row">
+              <span class="material-symbols-rounded text-emerald">article</span>
+              <h3>Content Management</h3>
+            </div>
+            <div class="content-stats">
+              <div class="content-stat-item">
+                <span class="material-symbols-rounded text-purple">book</span>
+                <div>
+                  <div class="stat-value">45</div>
+                  <div class="stat-label">Chapters</div>
+                </div>
+              </div>
+              <div class="content-stat-item">
+                <span class="material-symbols-rounded text-cyan">quiz</span>
+                <div>
+                  <div class="stat-value">120</div>
+                  <div class="stat-label">Quizzes</div>
+                </div>
+              </div>
+              <div class="content-stat-item">
+                <span class="material-symbols-rounded text-orange">construction</span>
+                <div>
+                  <div class="stat-value">14</div>
+                  <div class="stat-label">Projects</div>
+                </div>
+              </div>
+            </div>
+            <div class="content-actions">
+              <button class="btn-secondary btn-small w-full">
+                <span class="material-symbols-rounded">edit_note</span> Edit Curriculum
+              </button>
+              <button class="btn-success btn-small w-full">
+                <span class="material-symbols-rounded">add_circle</span> Add Content
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           VIEW 13: PREMIUM ₹2 UPGRADE PLATFORM
            ========================================== -->
       <section id="view-premium" class="content-view">
         <div class="premium-layout-container">
@@ -1422,13 +2518,66 @@
               </div>
               <div class="profile-stat-item">
                 <span class="stat-icon" style="color:var(--neon-purple);"><span class="material-symbols-rounded">school</span></span>
-                <div class="stat-value" id="profile-level-display">1</div>
-                <div class="stat-label">Level</div>
+                <div class="stat-value" id="profile-level-display">Beginner</div>
+                <div class="stat-label">Skill Level</div>
               </div>
               <div class="profile-stat-item">
                 <span class="stat-icon" style="color:var(--neon-emerald);"><span class="material-symbols-rounded">check_circle</span></span>
                 <div class="stat-value" id="profile-chapters-display">0/9</div>
                 <div class="stat-label">Chapters</div>
+              </div>
+            </div>
+            <!-- XP Progress Bar -->
+            <div class="xp-progress-section">
+              <div class="xp-progress-header">
+                <span>XP Progress to Next Level</span>
+                <span id="xp-progress-text">0 / 1000 XP</span>
+              </div>
+              <div class="xp-progress-bar-container">
+                <div class="xp-progress-bar" id="xp-progress-bar" style="width: 0%;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Skill Levels Card -->
+          <div class="card skill-levels-card neon-border-purple">
+            <h3>🎯 Skill Levels</h3>
+            <div class="skill-levels-grid" id="skill-levels-container">
+              <!-- Dynamic skill levels -->
+              <div class="skill-level-item">
+                <div class="skill-name">Python Basics</div>
+                <div class="skill-progress">
+                  <div class="skill-bar" style="width: 0%;"></div>
+                </div>
+                <div class="skill-percentage">0%</div>
+              </div>
+              <div class="skill-level-item">
+                <div class="skill-name">OOP & Advanced</div>
+                <div class="skill-progress">
+                  <div class="skill-bar" style="width: 0%;"></div>
+                </div>
+                <div class="skill-percentage">0%</div>
+              </div>
+              <div class="skill-level-item">
+                <div class="skill-name">APIs & Databases</div>
+                <div class="skill-progress">
+                  <div class="skill-bar" style="width: 0%;"></div>
+                </div>
+                <div class="skill-percentage">0%</div>
+              </div>
+              <div class="skill-level-item">
+                <div class="skill-name">AI & Automation</div>
+                <div class="skill-progress">
+                  <div class="skill-bar" style="width: 0%;"></div>
+                </div>
+                <div class="skill-percentage">0%</div>
+              </div>
+              <div class="skill-level-item">
+                <div class="skill-name">Project Building</div>
+                <div class="skill-progress">
+                  <div class="skill-bar" style="width: 0%;"></div>
+                </div>
+                <div class="skill-percentage">0%</div>
               </div>
             </div>
           </div>
@@ -1438,6 +2587,30 @@
             <h3>🏆 Achievements</h3>
             <div class="achievements-full-grid" id="profile-achievements-grid">
               <!-- Dynamic achievements -->
+              <div class="achievement-badge locked">
+                <span class="material-symbols-rounded">emoji_events</span>
+                <span>First Steps</span>
+              </div>
+              <div class="achievement-badge locked">
+                <span class="material-symbols-rounded">local_fire_department</span>
+                <span>7-Day Streak</span>
+              </div>
+              <div class="achievement-badge locked">
+                <span class="material-symbols-rounded">code</span>
+                <span>Code Master</span>
+              </div>
+              <div class="achievement-badge locked">
+                <span class="material-symbols-rounded">psychology</span>
+                <span>AI Builder</span>
+              </div>
+              <div class="achievement-badge locked">
+                <span class="material-symbols-rounded">rocket_launch</span>
+                <span>Project Pro</span>
+              </div>
+              <div class="achievement-badge locked">
+                <span class="material-symbols-rounded">workspace_premium</span>
+                <span>Premium User</span>
+              </div>
             </div>
           </div>
         </div>
@@ -1456,6 +2629,22 @@
             <div class="roadmap-progress-list" id="profile-chapter-progress">
               <!-- Dynamic chapter progress -->
             </div>
+          </div>
+        </div>
+
+        <!-- Account Settings -->
+        <div class="card account-settings-card" style="margin-top:24px;">
+          <h3>⚙️ Account Settings</h3>
+          <div class="settings-grid">
+            <div class="setting-item">
+              <label for="profile-name-input">Display Name</label>
+              <input type="text" id="profile-name-input" placeholder="Enter your name">
+            </div>
+            <div class="setting-item">
+              <label for="profile-avatar-input">Profile Avatar</label>
+              <input type="file" id="profile-avatar-input" accept="image/*" onchange="updateProfileAvatar(this)">
+            </div>
+            <button class="btn-primary" onclick="saveProfileSettings()">Save Changes</button>
           </div>
         </div>
       </section>
@@ -1608,8 +2797,8 @@
                       <span class="sign-title">Authorized Committee Signature</span>
                     </div>
                     <div class="cert-verification-col">
-                      <div class="qr-mock-box">
-                        <!-- Simulated QR Code SVG -->
+                      <div class="qr-mock-box" id="certificate-qr-code">
+                        <!-- QR Code will be generated dynamically -->
                         <svg viewBox="0 0 100 100" width="60" height="60">
                           <rect width="100" height="100" fill="#fff"/>
                           <rect x="10" y="10" width="30" height="30" fill="#000"/>
@@ -1623,7 +2812,7 @@
                           <rect x="50" y="80" width="10" height="10" fill="#000"/>
                         </svg>
                       </div>
-                      <span class="qr-title">Scan to Verify ID</span>
+                      <span class="qr-title">Scan to Verify</span>
                     </div>
                   </div>
 

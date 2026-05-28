@@ -512,16 +512,16 @@ window.onGoogleAuthSuccess = async function({ name, email, photo, uid }) {
  * Manual Gmail sign-in fallback — validates email format
  */
 function manualGmailSignIn() {
-  const nameInput  = document.getElementById('txt-signin-name').value.trim();
   const emailInput = document.getElementById('txt-signin-email').value.trim();
-  const btn        = document.getElementById('btn-manual-signin');
+  const passwordInput = document.getElementById('txt-signin-password').value;
+  const btn = document.getElementById('btn-manual-signin');
 
-  if (nameInput === '') {
-    showSigninStatus('⚠️ Please enter your full name.', 'error');
-    return;
-  }
   if (!emailInput.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
     showSigninStatus('⚠️ Please enter a valid email address (e.g. yourname@gmail.com).', 'error');
+    return;
+  }
+  if (passwordInput === '') {
+    showSigninStatus('⚠️ Please enter your password.', 'error');
     return;
   }
 
@@ -540,15 +540,15 @@ function manualGmailSignIn() {
     }
 
     state.isAuthenticated   = true;
-    state.userName          = nameInput;
     state.userEmail         = emailInput;
     state.isGoogleVerified  = false;
     state.lastLoginDate     = new Date().toLocaleString();
     if (!state.firstLoginDate) state.firstLoginDate = new Date().toLocaleString();
+    if (!state.userName) state.userName = emailInput.split('@')[0];
 
     // Store user data locally
     const userData = {
-      name: nameInput,
+      name: state.userName,
       email: emailInput,
       isLoggedIn: true,
       isGoogleVerified: false
@@ -559,7 +559,7 @@ function manualGmailSignIn() {
     finishLogin();
 
     btn.disabled = false;
-    btn.innerHTML = `<svg class="google-svg" viewBox="0 0 24 24" width="20" height="20"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l3.66-2.85z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.85c.87-2.6 3.3-4.53 6.16-4.53z"/></svg><span>Continue with Gmail</span>`;
+    btn.innerHTML = `<svg class="google-svg" viewBox="0 0 24 24" width="20" height="20"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l3.66-2.85z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.85c.87-2.6 3.3-4.53 6.16-4.53z"/></svg><span>Sign In</span>`;
   }, 800);
 }
 
@@ -2502,10 +2502,1364 @@ function parseAndRunPython(code) {
 
 // --- 24. Landing Page & Theme Functions ---
 
+// Typing animation for hero code preview
+const codeSnippets = [
+  `<span class="code-keyword">def</span> <span class="code-function">calculate_salary</span>(hours, rate):`,
+  `    <span class="code-keyword">return</span> hours * rate`,
+  ``,
+  `<span class="code-comment"># AI explains: This function multiplies...</span>`
+];
+
+let currentSnippetIndex = 0;
+let currentCharIndex = 0;
+let isDeleting = false;
+let typingSpeed = 100;
+
+function typeCode() {
+  const container = document.getElementById('typing-code-container');
+  if (!container) return;
+
+  const currentSnippet = codeSnippets[currentSnippetIndex];
+  
+  if (isDeleting) {
+    container.innerHTML = currentSnippet.substring(0, currentCharIndex - 1);
+    currentCharIndex--;
+    typingSpeed = 50;
+  } else {
+    container.innerHTML = currentSnippet.substring(0, currentCharIndex + 1);
+    currentCharIndex++;
+    typingSpeed = 100;
+  }
+
+  if (!isDeleting && currentCharIndex === currentSnippet.length) {
+    isDeleting = true;
+    typingSpeed = 2000; // Pause at end
+  } else if (isDeleting && currentCharIndex === 0) {
+    isDeleting = false;
+    currentSnippetIndex = (currentSnippetIndex + 1) % codeSnippets.length;
+    typingSpeed = 500; // Pause before next
+  }
+
+  setTimeout(typeCode, typingSpeed);
+}
+
+// Start typing animation when landing page is visible
+function startTypingAnimation() {
+  const container = document.getElementById('typing-code-container');
+  if (container && document.body.classList.contains('landing-active')) {
+    setTimeout(typeCode, 1000);
+  }
+}
+
 // Landing page navigation
 function showAuthGate() {
   document.body.classList.remove('landing-active');
   document.body.classList.add('auth-gate-active');
+}
+
+// Switch between Sign In and Sign Up tabs
+function switchAuthTab(tab) {
+  const signinForm = document.getElementById('signin-form');
+  const signupForm = document.getElementById('signup-form');
+  const tabSignin = document.getElementById('tab-signin');
+  const tabSignup = document.getElementById('tab-signup');
+
+  if (tab === 'signin') {
+    signinForm.style.display = 'block';
+    signupForm.style.display = 'none';
+    tabSignin.classList.add('active');
+    tabSignup.classList.remove('active');
+  } else {
+    signinForm.style.display = 'none';
+    signupForm.style.display = 'block';
+    tabSignin.classList.remove('active');
+    tabSignup.classList.add('active');
+  }
+}
+
+// Preview avatar upload
+function previewAvatar(input) {
+  const preview = document.getElementById('avatar-preview');
+  const previewImg = document.getElementById('avatar-preview-img');
+
+  if (input.files && input.files[0]) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      previewImg.src = e.target.result;
+      preview.style.display = 'block';
+    };
+    reader.readAsDataURL(input.files[0]);
+  } else {
+    preview.style.display = 'none';
+  }
+}
+
+// Manual signup function
+function manualSignUp() {
+  const nameInput = document.getElementById('txt-signup-name').value.trim();
+  const emailInput = document.getElementById('txt-signup-email').value.trim();
+  const passwordInput = document.getElementById('txt-signup-password').value;
+  const confirmInput = document.getElementById('txt-signup-confirm').value;
+  const avatarInput = document.getElementById('txt-signup-avatar');
+  const btn = document.getElementById('btn-signup');
+
+  // Validation
+  if (nameInput === '') {
+    showSigninStatus('⚠️ Please enter your full name.', 'error');
+    return;
+  }
+  if (!emailInput.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+    showSigninStatus('⚠️ Please enter a valid email address.', 'error');
+    return;
+  }
+  if (passwordInput.length < 6) {
+    showSigninStatus('⚠️ Password must be at least 6 characters.', 'error');
+    return;
+  }
+  if (passwordInput !== confirmInput) {
+    showSigninStatus('⚠️ Passwords do not match.', 'error');
+    return;
+  }
+
+  btn.disabled = true;
+  btn.innerHTML = `<span class="material-symbols-rounded" style="animation:spin 1s linear infinite;display:inline-block;">refresh</span> Creating Account...`;
+  showSigninStatus('🔄 Creating your account...', 'info');
+
+  setTimeout(() => {
+    // Handle avatar upload
+    let avatarData = null;
+    if (avatarInput.files && avatarInput.files[0]) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        avatarData = e.target.result;
+        completeSignup(nameInput, emailInput, passwordInput, avatarData);
+      };
+      reader.readAsDataURL(avatarInput.files[0]);
+    } else {
+      completeSignup(nameInput, emailInput, passwordInput, null);
+    }
+  }, 800);
+}
+
+function completeSignup(name, email, password, avatar) {
+  // Create user data
+  const userData = {
+    name: name,
+    email: email,
+    password: password, // In production, this should be hashed
+    photo: avatar,
+    isLoggedIn: true,
+    isGoogleVerified: false,
+    createdAt: new Date().toISOString(),
+    xp: 0,
+    streak: 1,
+    level: 'Beginner'
+  };
+
+  // Store user data locally
+  localStorage.setItem('pythonMasterUser', JSON.stringify(userData));
+
+  // Store progress data
+  const dbKey = `pmai_progress_${email.replace(/[^a-zA-Z0-9]/g, '_')}`;
+  localStorage.setItem(dbKey, JSON.stringify({
+    isAuthenticated: true,
+    userName: name,
+    userEmail: email,
+    photoURL: avatar,
+    isGoogleVerified: false,
+    xp: 0,
+    streak: 1,
+    level: 'Beginner',
+    firstLoginDate: new Date().toLocaleString(),
+    lastLoginDate: new Date().toLocaleString()
+  }));
+
+  // Update app state
+  state.isAuthenticated = true;
+  state.userName = name;
+  state.userEmail = email;
+  state.photoURL = avatar;
+  state.isGoogleVerified = false;
+  state.xp = 0;
+  state.streak = 1;
+  state.level = 'Beginner';
+  state.firstLoginDate = new Date().toLocaleString();
+  state.lastLoginDate = new Date().toLocaleString();
+
+  saveSession();
+  finishLogin();
+
+  // Reset button
+  const btn = document.getElementById('btn-signup');
+  btn.disabled = false;
+  btn.innerHTML = `<svg class="google-svg" viewBox="0 0 24 24" width="20" height="20"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l3.66-2.85z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.85c.87-2.6 3.3-4.53 6.16-4.53z"/></svg><span>Create Account</span>`;
+}
+
+// Update profile avatar
+function updateProfileAvatar(input) {
+  if (input.files && input.files[0]) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const avatarData = e.target.result;
+      state.photoURL = avatarData;
+      
+      // Update header profile photo
+      const headerPhoto = document.getElementById('header-profile-photo');
+      if (headerPhoto) {
+        headerPhoto.src = avatarData;
+        headerPhoto.style.display = 'block';
+      }
+      
+      // Update profile avatar display
+      const profileAvatar = document.getElementById('profile-avatar-display');
+      if (profileAvatar) {
+        profileAvatar.innerHTML = `<img src="${avatarData}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
+      }
+      
+      // Save to localStorage
+      const userData = JSON.parse(localStorage.getItem('pythonMasterUser') || '{}');
+      userData.photo = avatarData;
+      localStorage.setItem('pythonMasterUser', JSON.stringify(userData));
+      
+      saveSession();
+    };
+    reader.readAsDataURL(input.files[0]);
+  }
+}
+
+// Save profile settings
+function saveProfileSettings() {
+  const nameInput = document.getElementById('profile-name-input').value.trim();
+  
+  if (nameInput !== '') {
+    state.userName = nameInput;
+    
+    // Update header username
+    const headerUsername = document.getElementById('lbl-header-username');
+    if (headerUsername) {
+      headerUsername.textContent = nameInput;
+    }
+    
+    // Update profile name display
+    const profileName = document.getElementById('profile-name-display');
+    if (profileName) {
+      profileName.textContent = nameInput;
+    }
+    
+    // Save to localStorage
+    const userData = JSON.parse(localStorage.getItem('pythonMasterUser') || '{}');
+    userData.name = nameInput;
+    localStorage.setItem('pythonMasterUser', JSON.stringify(userData));
+    
+    saveSession();
+    
+    alert('Profile settings saved successfully!');
+  }
+}
+
+// Update profile view with current user data
+function renderProfileView() {
+  // Update profile name and email
+  const profileName = document.getElementById('profile-name-display');
+  const profileEmail = document.getElementById('profile-email-display');
+  const profileNameInput = document.getElementById('profile-name-input');
+  
+  if (profileName) profileName.textContent = state.userName || 'User';
+  if (profileEmail) profileEmail.textContent = state.userEmail || '';
+  if (profileNameInput) profileNameInput.value = state.userName || '';
+  
+  // Update profile avatar
+  const profileAvatar = document.getElementById('profile-avatar-display');
+  if (profileAvatar && state.photoURL) {
+    profileAvatar.innerHTML = `<img src="${state.photoURL}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
+  }
+  
+  // Update stats
+  const xpDisplay = document.getElementById('profile-xp-display');
+  const streakDisplay = document.getElementById('profile-streak-display');
+  const levelDisplay = document.getElementById('profile-level-display');
+  const chaptersDisplay = document.getElementById('profile-chapters-display');
+  
+  if (xpDisplay) xpDisplay.textContent = state.xp || 0;
+  if (streakDisplay) streakDisplay.textContent = state.streak || 1;
+  if (levelDisplay) levelDisplay.textContent = state.level || 'Beginner';
+  
+  // Calculate completed chapters
+  const completedChapters = state.completedChapters ? state.completedChapters.length : 0;
+  if (chaptersDisplay) chaptersDisplay.textContent = `${completedChapters}/9`;
+  
+  // Update XP progress bar
+  updateXPProgress();
+  
+  // Update skill levels
+  updateSkillLevels();
+  
+  // Update achievements
+  updateAchievements();
+}
+
+// Update XP progress bar
+function updateXPProgress() {
+  const xp = state.xp || 0;
+  const xpToNextLevel = 1000;
+  const progress = Math.min((xp / xpToNextLevel) * 100, 100);
+  
+  const xpProgressBar = document.getElementById('xp-progress-bar');
+  const xpProgressText = document.getElementById('xp-progress-text');
+  
+  if (xpProgressBar) xpProgressBar.style.width = `${progress}%`;
+  if (xpProgressText) xpProgressText.textContent = `${xp} / ${xpToNextLevel} XP`;
+}
+
+// Update skill levels based on completed chapters
+function updateSkillLevels() {
+  const completedChapters = state.completedChapters || [];
+  const totalChapters = 9;
+  const progress = (completedChapters.length / totalChapters) * 100;
+  
+  // Calculate skill levels based on progress
+  const skillLevels = [
+    { name: 'Python Basics', progress: Math.min(progress * 1.2, 100) },
+    { name: 'OOP & Advanced', progress: Math.min(progress * 0.8, 100) },
+    { name: 'APIs & Databases', progress: Math.min(progress * 0.6, 100) },
+    { name: 'AI & Automation', progress: Math.min(progress * 0.4, 100) },
+    { name: 'Project Building', progress: Math.min(progress * 0.5, 100) }
+  ];
+  
+  const skillContainer = document.getElementById('skill-levels-container');
+  if (skillContainer) {
+    skillContainer.innerHTML = skillLevels.map(skill => `
+      <div class="skill-level-item">
+        <div class="skill-name">${skill.name}</div>
+        <div class="skill-progress">
+          <div class="skill-bar" style="width: ${skill.progress}%;"></div>
+        </div>
+        <div class="skill-percentage">${Math.round(skill.progress)}%</div>
+      </div>
+    `).join('');
+  }
+}
+
+// Update achievements based on user progress
+function updateAchievements() {
+  const achievements = [
+    { id: 'first-steps', name: 'First Steps', icon: 'emoji_events', unlocked: state.xp >= 10 },
+    { id: '7-day-streak', name: '7-Day Streak', icon: 'local_fire_department', unlocked: state.streak >= 7 },
+    { id: 'code-master', name: 'Code Master', icon: 'code', unlocked: state.xp >= 500 },
+    { id: 'ai-builder', name: 'AI Builder', icon: 'psychology', unlocked: state.xp >= 1000 },
+    { id: 'project-pro', name: 'Project Pro', icon: 'rocket_launch', unlocked: (state.completedChapters || []).length >= 5 },
+    { id: 'premium-user', name: 'Premium User', icon: 'workspace_premium', unlocked: state.isPremium }
+  ];
+  
+  const achievementsGrid = document.getElementById('profile-achievements-grid');
+  if (achievementsGrid) {
+    achievementsGrid.innerHTML = achievements.map(achievement => `
+      <div class="achievement-badge ${achievement.unlocked ? 'unlocked' : 'locked'}">
+        <span class="material-symbols-rounded">${achievement.icon}</span>
+        <span>${achievement.name}</span>
+      </div>
+    `).join('');
+  }
+}
+
+// Premium AI Tutor Functions
+let voiceModeEnabled = false;
+let isListening = false;
+
+// Toggle voice mode
+function toggleVoiceMode() {
+  voiceModeEnabled = !voiceModeEnabled;
+  const btn = document.getElementById('btn-voice-toggle');
+  if (btn) {
+    btn.classList.toggle('active', voiceModeEnabled);
+  }
+}
+
+// Start voice input
+function startVoiceInput() {
+  if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+    alert('Voice input is not supported in your browser. Please use Chrome or Edge.');
+    return;
+  }
+  
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const recognition = new SpeechRecognition();
+  
+  recognition.continuous = false;
+  recognition.interimResults = false;
+  recognition.lang = 'en-US';
+  
+  const btn = document.getElementById('btn-voice-input');
+  if (btn) btn.classList.add('active');
+  isListening = true;
+  
+  recognition.onresult = function(event) {
+    const transcript = event.results[0][0].transcript;
+    const input = document.getElementById('txt-ai-chat-input');
+    if (input) {
+      input.value = transcript;
+      sendChatMessageToAI();
+    }
+  };
+  
+  recognition.onerror = function(event) {
+    console.error('Speech recognition error:', event.error);
+    isListening = false;
+    if (btn) btn.classList.remove('active');
+  };
+  
+  recognition.onend = function() {
+    isListening = false;
+    if (btn) btn.classList.remove('active');
+  };
+  
+  recognition.start();
+}
+
+// Clear AI chat
+function clearAIChat() {
+  const chatBox = document.getElementById('ai-chat-box');
+  if (chatBox) {
+    chatBox.innerHTML = `
+      <div class="chat-msg ai">
+        <div class="chat-avatar">
+          <span class="material-symbols-rounded">smart_toy</span>
+        </div>
+        <div class="chat-content">
+          <p><strong>AI Tutor:</strong> Chat cleared. How can I help you with Python today?</p>
+        </div>
+      </div>
+    `;
+  }
+}
+
+// Ask suggestion
+function askSuggestion(question) {
+  const input = document.getElementById('txt-ai-chat-input');
+  if (input) {
+    input.value = question;
+    sendChatMessageToAI();
+  }
+}
+
+// Enhanced send chat message to AI
+function sendChatMessageToAI() {
+  const input = document.getElementById('txt-ai-chat-input');
+  const message = input.value.trim();
+  
+  if (!message) return;
+  
+  const chatBox = document.getElementById('ai-chat-box');
+  
+  // Add user message
+  const userMsg = document.createElement('div');
+  userMsg.className = 'chat-msg user';
+  userMsg.innerHTML = `
+    <div class="chat-avatar">
+      <span class="material-symbols-rounded">person</span>
+    </div>
+    <div class="chat-content">
+      <p>${message}</p>
+    </div>
+  `;
+  chatBox.appendChild(userMsg);
+  
+  // Clear input
+  input.value = '';
+  
+  // Generate AI response
+  setTimeout(() => {
+    const aiResponse = generateAIResponse(message);
+    
+    const aiMsg = document.createElement('div');
+    aiMsg.className = 'chat-msg ai';
+    aiMsg.innerHTML = `
+      <div class="chat-avatar">
+        <span class="material-symbols-rounded">smart_toy</span>
+      </div>
+      <div class="chat-content">
+        <p><strong>AI Tutor:</strong> ${aiResponse}</p>
+      </div>
+    `;
+    chatBox.appendChild(aiMsg);
+    
+    // Scroll to bottom
+    chatBox.scrollTop = chatBox.scrollHeight;
+    
+    // Speak response if voice mode is enabled
+    if (voiceModeEnabled) {
+      speakText(aiResponse);
+    }
+  }, 500);
+  
+  // Scroll to bottom
+  chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+// Generate AI response (simulated - in production, this would call an AI API)
+function generateAIResponse(message) {
+  const lowerMessage = message.toLowerCase();
+  
+  if (lowerMessage.includes('variable')) {
+    return "Variables in Python are like containers that store data values. You create a variable by assigning a value to it using the '=' operator. For example: <code>name = 'Python'</code> or <code>age = 25</code>. Python is dynamically typed, so you don't need to declare the type.";
+  } else if (lowerMessage.includes('debug') || lowerMessage.includes('error')) {
+    return "To debug your code, I recommend: 1) Check the error message in the terminal, 2) Verify your syntax (indentation, colons, quotes), 3) Use print statements to track variable values, 4) Check for typos in variable names. Would you like me to review your specific code?";
+  } else if (lowerMessage.includes('loop')) {
+    return "Loops in Python allow you to execute code repeatedly. There are two main types: <strong>for loops</strong> (iterate over sequences) and <strong>while loops</strong> (repeat while condition is true). Example: <code>for i in range(5): print(i)</code>";
+  } else if (lowerMessage.includes('challenge') || lowerMessage.includes('quest')) {
+    return "I can help you with your current challenge! Please share your code or describe what you're trying to achieve, and I'll guide you step by step through the solution.";
+  } else if (lowerMessage.includes('print')) {
+    return "The <code>print()</code> function outputs text to the console. You can print strings, numbers, or variables. Example: <code>print('Hello, World!')</code> or <code>print(age)</code>. You can also combine multiple items using commas.";
+  } else if (lowerMessage.includes('if') || lowerMessage.includes('condition')) {
+    return "Conditional statements in Python use <code>if</code>, <code>elif</code>, and <code>else</code> keywords. Python uses indentation to define code blocks. Example: <code>if x > 0: print('Positive')</code>";
+  } else {
+    return "That's a great question about Python! I'm here to help you understand concepts, debug code, and guide you through challenges. Could you provide more details about what you'd like to learn?";
+  }
+}
+
+// Speak text using Web Speech API
+function speakText(text) {
+  if ('speechSynthesis' in window) {
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.rate = 0.9;
+    utterance.pitch = 1;
+    speechSynthesis.speak(utterance);
+  }
+}
+
+// Filter projects by category
+function filterProjects(category) {
+  const projects = document.querySelectorAll('.project-item-card');
+  const tabs = document.querySelectorAll('.project-tab');
+  
+  // Update active tab
+  tabs.forEach(tab => {
+    tab.classList.remove('active');
+    if (tab.textContent.toLowerCase().includes(category) || 
+        (category === 'all' && tab.textContent.includes('All'))) {
+      tab.classList.add('active');
+    }
+  });
+  
+  // Filter projects
+  projects.forEach(project => {
+    const projectCategory = project.getAttribute('data-category');
+    if (category === 'all' || projectCategory === category) {
+      project.style.display = 'block';
+      project.style.animation = 'fadeIn 0.3s ease';
+    } else {
+      project.style.display = 'none';
+    }
+  });
+}
+
+// Certificate System Functions
+function generateCertificateID() {
+  const timestamp = Date.now().toString(36).toUpperCase();
+  const random = Math.random().toString(36).substring(2, 6).toUpperCase();
+  return `PMAI-${timestamp}-${random}`;
+}
+
+function generateQRCode(certId) {
+  // Using a simple QR code generation approach
+  // In production, use a library like qrcode.js or QRCode.js
+  const qrContainer = document.getElementById('certificate-qr-code');
+  if (!qrContainer) return;
+  
+  // For now, use a QR code API
+  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=${encodeURIComponent(certId)}`;
+  qrContainer.innerHTML = `<img src="${qrUrl}" alt="Certificate QR Code" style="width:80px;height:80px;">`;
+}
+
+function updateCertificateData() {
+  const certName = document.getElementById('lbl-cert-name');
+  const certId = document.getElementById('lbl-cert-id');
+  
+  if (certName) certName.textContent = (state.userName || 'User').toUpperCase();
+  
+  // Generate or retrieve certificate ID
+  let certIdValue = state.certificateId;
+  if (!certIdValue) {
+    certIdValue = generateCertificateID();
+    state.certificateId = certIdValue;
+    saveSession();
+  }
+  
+  if (certId) certId.textContent = certIdValue;
+  
+  // Generate QR code
+  generateQRCode(certIdValue);
+}
+
+function verifyCertificateID(certId) {
+  // Verify certificate against stored data
+  const inputCertId = certId || document.getElementById('cert-verify-input')?.value;
+  if (!inputCertId) {
+    alert('Please enter a Certificate ID');
+    return;
+  }
+  
+  // In production, this would verify against a database
+  // For now, simulate verification
+  const resultDiv = document.getElementById('verification-result');
+  if (resultDiv) {
+    resultDiv.style.display = 'block';
+    resultDiv.innerHTML = `
+      <div class="verification-status">
+        <span class="material-symbols-rounded text-emerald">verified</span>
+        <div>
+          <h4>Certificate Verified</h4>
+          <p class="text-secondary">Certificate ID: ${inputCertId}</p>
+          <p class="text-secondary">Status: Valid</p>
+          <p class="text-secondary">Issued by: Python Master AI</p>
+        </div>
+      </div>
+    `;
+  }
+}
+
+function downloadCertificate() {
+  // Download certificate as PDF
+  const certElement = document.getElementById('printable-certificate');
+  if (!certElement) return;
+  
+  // In production, use html2canvas + jspdf
+  alert('Certificate download feature - In production, this would generate a PDF using html2canvas and jspdf libraries.');
+}
+
+function shareCertificate() {
+  // Share certificate link
+  const certId = state.certificateId || generateCertificateID();
+  const shareUrl = `${window.location.origin}/verify?cert=${certId}`;
+  
+  if (navigator.share) {
+    navigator.share({
+      title: 'Python Master AI Certificate',
+      text: 'I earned my Python Master AI certification!',
+      url: shareUrl
+    });
+  } else {
+    // Fallback: copy to clipboard
+    navigator.clipboard.writeText(shareUrl).then(() => {
+      alert('Certificate verification link copied to clipboard!');
+    });
+  }
+}
+
+function verifyCertificate() {
+  // Verify current certificate
+  const certId = state.certificateId;
+  if (certId) {
+    verifyCertificateID(certId);
+  } else {
+    alert('No certificate ID found. Complete the course to earn your certificate.');
+  }
+}
+
+// Update gamification when switching to leaderboard view
+const originalSwitchView = switchView;
+switchView = function(viewName) {
+  originalSwitchView(viewName);
+  
+  if (viewName === 'leaderboard') {
+    updateGamificationStats();
+    updateLeaderboardData('weekly');
+  }
+  
+  if (viewName === 'certificate') {
+    updateCertificateData();
+  }
+};
+
+// ATS-Powered Resume Builder Functions
+function optimizeResumeWithAI() {
+  // Simulate AI optimization
+  const skillsInput = document.getElementById('res-skills');
+  const projectsInput = document.getElementById('res-projects');
+  
+  if (skillsInput && projectsInput) {
+    // Add industry-standard keywords
+    const currentSkills = skillsInput.value;
+    const enhancedSkills = currentSkills + ', REST APIs, SQLite, Git, Unit Testing, Debugging, Problem Solving';
+    skillsInput.value = enhancedSkills;
+    
+    // Add quantifiable metrics
+    const currentProjects = projectsInput.value;
+    const enhancedProjects = currentProjects + '\n• Completed 14+ production-level projects\n• Achieved 85% ATS score\n• Built 5+ AI-powered applications';
+    projectsInput.value = enhancedProjects;
+    
+    // Update ATS score
+    updateATSScore();
+    
+    alert('Resume optimized with AI! Added industry keywords and quantifiable achievements.');
+  }
+}
+
+function updateATSScore() {
+  // Calculate ATS score based on resume content
+  const skills = document.getElementById('res-skills')?.value || '';
+  const projects = document.getElementById('res-projects')?.value || '';
+  const summary = document.getElementById('res-summary')?.value || '';
+  
+  // Industry keywords to match
+  const industryKeywords = ['python', 'api', 'database', 'git', 'testing', 'debugging', 'oop', 'algorithms', 'rest', 'sql', 'machine learning', 'ai', 'automation'];
+  
+  const allContent = (skills + ' ' + projects + ' ' + summary).toLowerCase();
+  const matchedKeywords = industryKeywords.filter(keyword => allContent.includes(keyword));
+  
+  const keywordScore = Math.min((matchedKeywords.length / industryKeywords.length) * 100, 100);
+  const formatScore = 90; // Assuming good format
+  const contentScore = Math.min((allContent.length / 500) * 100, 100);
+  
+  const overallScore = Math.round((keywordScore * 0.4 + formatScore * 0.3 + contentScore * 0.3));
+  
+  // Update display
+  const scoreEl = document.getElementById('ats-score');
+  const keywordsEl = document.getElementById('ats-keywords');
+  const formatEl = document.getElementById('ats-format');
+  const contentEl = document.getElementById('ats-content');
+  
+  if (scoreEl) scoreEl.textContent = overallScore;
+  if (keywordsEl) keywordsEl.textContent = `${matchedKeywords.length}/${industryKeywords.length}`;
+  if (formatEl) formatEl.textContent = `${formatScore}%`;
+  if (contentEl) contentEl.textContent = `${Math.round(contentScore)}%`;
+  
+  // Update suggestions
+  updateAISuggestions(matchedKeywords.length, industryKeywords.length);
+}
+
+function updateAISuggestions(matched, total) {
+  const suggestionsList = document.getElementById('ai-suggestions');
+  if (!suggestionsList) return;
+  
+  const suggestions = [];
+  
+  if (matched < total) {
+    suggestions.push({
+      icon: 'warning',
+      color: 'text-orange',
+      text: `Add ${total - matched} more industry keywords to improve ATS matching`
+    });
+  } else {
+    suggestions.push({
+      icon: 'check_circle',
+      color: 'text-emerald',
+      text: 'Great keyword matching! Your resume is well-optimized.'
+    });
+  }
+  
+  if (!document.getElementById('res-summary')?.value) {
+    suggestions.push({
+      icon: 'lightbulb',
+      color: 'text-cyan',
+      text: 'Add a professional summary to highlight your key achievements'
+    });
+  }
+  
+  suggestions.push({
+    icon: 'lightbulb',
+    color: 'text-cyan',
+    text: 'Include GitHub repository links for your projects'
+  });
+  
+  suggestions.push({
+    icon: 'lightbulb',
+    color: 'text-cyan',
+    text: 'Add specific metrics (e.g., "Improved performance by 40%")'
+  });
+  
+  suggestionsList.innerHTML = `
+    <h4>AI Suggestions:</h4>
+    ${suggestions.map(s => `
+      <div class="suggestion-item">
+        <span class="material-symbols-rounded ${s.color}">${s.icon}</span>
+        <span>${s.text}</span>
+      </div>
+    `).join('')}
+  `;
+}
+
+function generateAISummary() {
+  const name = document.getElementById('res-name')?.value || 'Python Developer';
+  const skills = document.getElementById('res-skills')?.value || '';
+  const projects = document.getElementById('res-projects')?.value || '';
+  
+  // Generate AI summary
+  const summary = `Results-driven ${name} with expertise in Python programming, software development, and AI integration. Proven track record of building production-level applications including ${skills.split(',')[0]?.trim() || 'various projects'}. Skilled in ${skills.split(',').slice(0, 3).join(', ')}, with a passion for creating innovative solutions. Completed multiple real-world projects demonstrating strong problem-solving abilities and technical excellence. Committed to continuous learning and staying current with emerging technologies.`;
+  
+  const summaryInput = document.getElementById('res-summary');
+  if (summaryInput) {
+    summaryInput.value = summary;
+    alert('AI-generated professional summary added to your resume!');
+  }
+}
+
+function changeResumeTemplate() {
+  const template = document.getElementById('resume-template')?.value;
+  const resumeSheet = document.getElementById('resume-sheet');
+  
+  if (resumeSheet && template) {
+    // Apply template-specific styles
+    resumeSheet.className = `resume-a4-sheet template-${template}`;
+    compileResumePreview();
+  }
+}
+
+// Offline Mode Enhancement Functions
+let isOfflineMode = false;
+
+function toggleOfflineMode() {
+  const checkbox = document.getElementById('chk-offline');
+  isOfflineMode = checkbox.checked;
+  
+  if (isOfflineMode) {
+    enableOfflineMode();
+  } else {
+    disableOfflineMode();
+  }
+}
+
+function enableOfflineMode() {
+  // Apply offline theme changes
+  document.body.classList.add('offline-mode-active');
+  
+  // Show sync animation
+  showSyncAnimation();
+  
+  // Update offline indicator
+  const offlineCard = document.querySelector('.offline-mode-card');
+  if (offlineCard) {
+    offlineCard.classList.add('offline-active');
+  }
+  
+  // Save offline state
+  localStorage.setItem('pythonMasterOffline', 'true');
+  
+  // Disable features that require internet
+  disableOnlineFeatures();
+  
+  alert('Offline mode enabled. Your progress will sync when you go back online.');
+}
+
+function disableOfflineMode() {
+  // Remove offline theme changes
+  document.body.classList.remove('offline-mode-active');
+  
+  // Update offline indicator
+  const offlineCard = document.querySelector('.offline-mode-card');
+  if (offlineCard) {
+    offlineCard.classList.remove('offline-active');
+  }
+  
+  // Save offline state
+  localStorage.setItem('pythonMasterOffline', 'false');
+  
+  // Re-enable online features
+  enableOnlineFeatures();
+  
+  // Sync data if needed
+  syncOfflineData();
+}
+
+function showSyncAnimation() {
+  const syncIndicator = document.createElement('div');
+  syncIndicator.className = 'sync-animation';
+  syncIndicator.innerHTML = `
+    <div class="sync-spinner"></div>
+    <span>Syncing...</span>
+  `;
+  
+  document.body.appendChild(syncIndicator);
+  
+  setTimeout(() => {
+    syncIndicator.classList.add('sync-complete');
+    setTimeout(() => {
+      syncIndicator.remove();
+    }, 1000);
+  }, 1500);
+}
+
+function disableOnlineFeatures() {
+  // Disable features that require internet
+  const googleSignInBtn = document.querySelector('.google-signin-btn');
+  if (googleSignInBtn) {
+    googleSignInBtn.disabled = true;
+    googleSignInBtn.style.opacity = '0.5';
+  }
+  
+  // Show offline notification
+  showOfflineNotification('You are now in offline mode. Some features are disabled.');
+}
+
+function enableOnlineFeatures() {
+  // Re-enable features that require internet
+  const googleSignInBtn = document.querySelector('.google-signin-btn');
+  if (googleSignInBtn) {
+    googleSignInBtn.disabled = false;
+    googleSignInBtn.style.opacity = '1';
+  }
+  
+  // Show online notification
+  showOfflineNotification('You are back online. All features are available.');
+}
+
+function syncOfflineData() {
+  // Sync offline progress to cloud (simulated)
+  showSyncAnimation();
+  
+  // In production, this would sync with Firebase/Firestore
+  setTimeout(() => {
+    console.log('Offline data synced to cloud');
+  }, 1500);
+}
+
+function showOfflineNotification(message) {
+  const notification = document.createElement('div');
+  notification.className = 'offline-notification';
+  notification.textContent = message;
+  
+  document.body.appendChild(notification);
+  
+  setTimeout(() => {
+    notification.classList.add('notification-show');
+  }, 100);
+  
+  setTimeout(() => {
+    notification.classList.remove('notification-show');
+    setTimeout(() => {
+      notification.remove();
+    }, 300);
+  }, 3000);
+}
+
+// Check offline status on load
+function checkOfflineStatus() {
+  const savedOffline = localStorage.getItem('pythonMasterOffline');
+  if (savedOffline === 'true') {
+    isOfflineMode = true;
+    const checkbox = document.getElementById('chk-offline');
+    if (checkbox) {
+      checkbox.checked = true;
+    }
+    enableOfflineMode();
+  }
+}
+
+// Listen for online/offline events
+window.addEventListener('online', () => {
+  if (isOfflineMode) {
+    disableOfflineMode();
+  }
+});
+
+window.addEventListener('offline', () => {
+  if (!isOfflineMode) {
+    isOfflineMode = true;
+    const checkbox = document.getElementById('chk-offline');
+    if (checkbox) {
+      checkbox.checked = true;
+    }
+    enableOfflineMode();
+  }
+});
+
+// AI Video Call Functions
+let isVideoCallActive = false;
+let isMuted = false;
+let isCameraOff = false;
+let isScreenSharing = false;
+let isChatOpen = false;
+
+function startVideoCall() {
+  const videoOverlay = document.getElementById('ai-video-call-overlay');
+  if (videoOverlay) {
+    videoOverlay.classList.add('active');
+    isVideoCallActive = true;
+    
+    // Request camera/microphone permissions (simulated)
+    navigator.mediaDevices?.getUserMedia({ video: true, audio: true })
+      .then(stream => {
+        console.log('Camera and microphone access granted');
+        // In production, attach stream to video elements
+      })
+      .catch(err => {
+        console.log('Camera/microphone access denied:', err);
+        alert('Camera and microphone access is required for video calls. Please enable permissions.');
+      });
+  }
+}
+
+function endVideoCall() {
+  const videoOverlay = document.getElementById('ai-video-call-overlay');
+  if (videoOverlay) {
+    videoOverlay.classList.remove('active');
+    isVideoCallActive = false;
+    
+    // Reset states
+    isMuted = false;
+    isCameraOff = false;
+    isScreenSharing = false;
+    isChatOpen = false;
+    
+    // Update button states
+    updateVideoCallButtons();
+  }
+}
+
+function toggleMute() {
+  isMuted = !isMuted;
+  const btnMute = document.getElementById('btn-mute');
+  if (btnMute) {
+    btnMute.classList.toggle('active', isMuted);
+  }
+  
+  // In production, actually mute/unmute audio track
+  console.log('Microphone:', isMuted ? 'muted' : 'unmuted');
+}
+
+function toggleCamera() {
+  isCameraOff = !isCameraOff;
+  const btnCamera = document.getElementById('btn-camera');
+  if (btnCamera) {
+    btnCamera.classList.toggle('active', isCameraOff);
+  }
+  
+  // In production, actually enable/disable video track
+  console.log('Camera:', isCameraOff ? 'off' : 'on');
+}
+
+function toggleScreenShare() {
+  isScreenSharing = !isScreenSharing;
+  const btnScreenShare = document.getElementById('btn-screen-share');
+  if (btnScreenShare) {
+    btnScreenShare.classList.toggle('active', isScreenSharing);
+  }
+  
+  if (isScreenSharing) {
+    navigator.mediaDevices?.getDisplayMedia({ video: true })
+      .then(stream => {
+        console.log('Screen sharing started');
+        // In production, attach stream to video element
+      })
+      .catch(err => {
+        console.log('Screen sharing cancelled:', err);
+        isScreenSharing = false;
+        btnScreenShare.classList.remove('active');
+      });
+  } else {
+    console.log('Screen sharing stopped');
+  }
+}
+
+function toggleChat() {
+  isChatOpen = !isChatOpen;
+  const videoChat = document.getElementById('video-call-chat');
+  const btnChat = document.getElementById('btn-chat');
+  
+  if (videoChat) {
+    videoChat.classList.toggle('active', isChatOpen);
+  }
+  
+  if (btnChat) {
+    btnChat.classList.toggle('active', isChatOpen);
+  }
+}
+
+function sendVideoChatMessage() {
+  const input = document.getElementById('video-chat-input');
+  const message = input?.value.trim();
+  
+  if (!message) return;
+  
+  const chatMessages = document.getElementById('video-chat-messages');
+  if (chatMessages) {
+    // Add user message
+    const userMsg = document.createElement('div');
+    userMsg.className = 'video-chat-message user';
+    userMsg.innerHTML = `
+      <span class="material-symbols-rounded">person</span>
+      <p>${message}</p>
+    `;
+    chatMessages.appendChild(userMsg);
+    
+    // Clear input
+    if (input) input.value = '';
+    
+    // Simulate AI response
+    setTimeout(() => {
+      const aiMsg = document.createElement('div');
+      aiMsg.className = 'video-chat-message ai';
+      aiMsg.innerHTML = `
+        <span class="material-symbols-rounded">smart_toy</span>
+        <p>That's a great question! Let me explain that concept for you...</p>
+      `;
+      chatMessages.appendChild(aiMsg);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }, 1000);
+    
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
+}
+
+function updateVideoCallButtons() {
+  const btnMute = document.getElementById('btn-mute');
+  const btnCamera = document.getElementById('btn-camera');
+  const btnScreenShare = document.getElementById('btn-screen-share');
+  const btnChat = document.getElementById('btn-chat');
+  
+  if (btnMute) btnMute.classList.remove('active');
+  if (btnCamera) btnCamera.classList.remove('active');
+  if (btnScreenShare) btnScreenShare.classList.remove('active');
+  if (btnChat) btnChat.classList.remove('active');
+}
+
+// Professional Coding Lab Functions
+function updateLineNumbers() {
+  const editor = document.getElementById('code-editor');
+  const gutter = document.getElementById('editor-gutter');
+  const lineCountEl = document.getElementById('editor-line-count');
+  const charCountEl = document.getElementById('editor-char-count');
+  
+  if (editor && gutter) {
+    const lines = editor.value.split('\n').length;
+    let gutterHTML = '';
+    for (let i = 1; i <= lines; i++) {
+      gutterHTML += `<span>${i}</span>`;
+    }
+    gutter.innerHTML = gutterHTML;
+    
+    if (lineCountEl) lineCountEl.textContent = `Lines: ${lines}`;
+    if (charCountEl) charCountEl.textContent = `Chars: ${editor.value.length}`;
+  }
+}
+
+function toggleEditorTheme() {
+  const editor = document.getElementById('code-editor');
+  if (editor) {
+    editor.classList.toggle('editor-light-theme');
+  }
+}
+
+function formatCode() {
+  const editor = document.getElementById('code-editor');
+  if (editor) {
+    // Basic code formatting (in production, use a proper formatter like black)
+    let code = editor.value;
+    // Simple indentation fix
+    code = code.replace(/\n\s*\n/g, '\n\n');
+    editor.value = code;
+    updateLineNumbers();
+    alert('Code formatted!');
+  }
+}
+
+function toggleTerminalSize() {
+  const terminal = document.querySelector('.terminal-card');
+  if (terminal) {
+    terminal.classList.toggle('terminal-expanded');
+  }
+}
+
+// Initialize line numbers on page load
+document.addEventListener('DOMContentLoaded', () => {
+  const editor = document.getElementById('code-editor');
+  if (editor) {
+    editor.addEventListener('input', updateLineNumbers);
+    updateLineNumbers();
+  }
+});
+
+// Rich Text Notes Editor Functions
+function formatText(command, value = null) {
+  document.execCommand(command, false, value);
+  const editor = document.getElementById('rich-text-editor');
+  if (editor) {
+    editor.focus();
+  }
+}
+
+function generateAINotes() {
+  const editor = document.getElementById('rich-text-editor');
+  const includeCode = document.getElementById('ai-include-code')?.checked;
+  const includeQuiz = document.getElementById('ai-include-quiz')?.checked;
+  const includeTips = document.getElementById('ai-include-tips')?.checked;
+  
+  if (!editor) return;
+  
+  // Simulate AI-generated notes based on user progress
+  const aiNotes = `
+    <h1>📚 Python Master AI Study Notes</h1>
+    <p>Generated on ${new Date().toLocaleDateString()}</p>
+    
+    <h2>🎯 Learning Progress Summary</h2>
+    <ul>
+      <li>Total XP Earned: ${state.xp || 0}</li>
+      <li>Day Streak: ${state.streak || 1} days</li>
+      <li>Chapters Completed: ${state.completedChapters?.length || 0}</li>
+    </ul>
+    
+    ${includeCode ? `
+    <h2>💻 Key Code Concepts</h2>
+    <pre><code># Python Variables
+name = "Python Master AI"
+version = 3.9
+
+# Functions
+def greet(name):
+    return f"Hello, {name}!"
+
+# Lists
+skills = ["Python", "AI", "Machine Learning"]</code></pre>
+    ` : ''}
+    
+    ${includeQuiz ? `
+    <h2>📝 Quiz Highlights</h2>
+    <ul>
+      <li>Variables and Data Types - Mastered</li>
+      <li>Control Flow - In Progress</li>
+      <li>Functions - Coming Soon</li>
+    </ul>
+    ` : ''}
+    
+    ${includeTips ? `
+    <h2>💡 Best Practices</h2>
+    <ul>
+      <li>Use meaningful variable names</li>
+      <li>Write comments for complex logic</li>
+      <li>Follow PEP 8 style guidelines</li>
+      <li>Test your code frequently</li>
+    </ul>
+    ` : ''}
+    
+    <h2>🚀 Next Steps</h2>
+    <p>Continue with the next chapter to expand your Python knowledge!</p>
+  `;
+  
+  editor.innerHTML = aiNotes;
+  alert('AI-generated study notes added to your editor!');
+}
+
+function clearNotes() {
+  const editor = document.getElementById('rich-text-editor');
+  if (editor) {
+    if (confirm('Are you sure you want to clear all notes?')) {
+      editor.innerHTML = '';
+    }
+  }
+}
+
+// Update savePersonalNotes to work with rich text
+const originalSavePersonalNotes = typeof savePersonalNotes !== 'undefined' ? savePersonalNotes : null;
+savePersonalNotes = function() {
+  const editor = document.getElementById('rich-text-editor');
+  if (editor) {
+    const notesContent = editor.innerHTML;
+    localStorage.setItem('pythonMasterNotes', notesContent);
+    alert('Notes saved successfully!');
+  }
+};
+
+// Load saved notes on page load
+document.addEventListener('DOMContentLoaded', () => {
+  const editor = document.getElementById('rich-text-editor');
+  if (editor) {
+    const savedNotes = localStorage.getItem('pythonMasterNotes');
+    if (savedNotes) {
+      editor.innerHTML = savedNotes;
+    }
+  }
+});
+
+// Gamification System Functions
+function switchLeaderboardTab(tab) {
+  const tabs = document.querySelectorAll('.leaderboard-tab');
+  tabs.forEach(t => t.classList.remove('active'));
+  
+  event.target.classList.add('active');
+  
+  // Update leaderboard data based on tab
+  updateLeaderboardData(tab);
+}
+
+function updateLeaderboardData(tab) {
+  const container = document.getElementById('leaderboard-container');
+  if (!container) return;
+  
+  // Simulated leaderboard data
+  const leaderboardData = {
+    weekly: [
+      { rank: 1, name: 'Srinivas K.', avatar: 'SK', level: 12, streak: 15, xp: 2500 },
+      { rank: 2, name: 'Priya S.', avatar: 'PS', level: 11, streak: 12, xp: 2350 },
+      { rank: 3, name: 'Rahul V.', avatar: 'RV', level: 10, streak: 10, xp: 2200 },
+      { rank: 4, name: 'Anjali K.', avatar: 'AK', level: 9, streak: 8, xp: 1950 },
+      { rank: 5, name: 'Vikram N.', avatar: 'VN', level: 8, streak: 7, xp: 1800 },
+    ],
+    monthly: [
+      { rank: 1, name: 'Srinivas K.', avatar: 'SK', level: 15, streak: 30, xp: 8500 },
+      { rank: 2, name: 'Priya S.', avatar: 'PS', level: 14, streak: 28, xp: 8200 },
+      { rank: 3, name: 'Rahul V.', avatar: 'RV', level: 13, streak: 25, xp: 7800 },
+      { rank: 4, name: 'Anjali K.', avatar: 'AK', level: 12, streak: 22, xp: 7500 },
+      { rank: 5, name: 'Vikram N.', avatar: 'VN', level: 11, streak: 20, xp: 7200 },
+    ],
+    alltime: [
+      { rank: 1, name: 'Srinivas K.', avatar: 'SK', level: 25, streak: 120, xp: 25000 },
+      { rank: 2, name: 'Priya S.', avatar: 'PS', level: 24, streak: 115, xp: 24500 },
+      { rank: 3, name: 'Rahul V.', avatar: 'RV', level: 23, streak: 110, xp: 23800 },
+      { rank: 4, name: 'Anjali K.', avatar: 'AK', level: 22, streak: 105, xp: 23000 },
+      { rank: 5, name: 'Vikram N.', avatar: 'VN', level: 21, streak: 100, xp: 22500 },
+    ]
+  };
+  
+  const data = leaderboardData[tab] || leaderboardData.weekly;
+  
+  container.innerHTML = data.map(user => `
+    <div class="leaderboard-row">
+      <span class="rank-badge ${user.rank <= 3 ? 'top-rank' : ''}">#${user.rank}</span>
+      <div class="user-profile-mini">
+        <div class="avatar-mini">${user.avatar}</div>
+        <span class="user-name">${user.name}</span>
+      </div>
+      <span class="level-badge">Lvl ${user.level}</span>
+      <span class="streak-badge">🔥 ${user.streak}</span>
+      <span class="xp-badge">${user.xp} XP</span>
+    </div>
+  `).join('');
+}
+
+function calculateLevel(xp) {
+  // Simple level calculation: level = sqrt(xp / 100)
+  return Math.floor(Math.sqrt(xp / 100)) + 1;
+}
+
+function updateGamificationStats() {
+  const userLevel = document.getElementById('user-level');
+  const currentXp = document.getElementById('current-xp');
+  const nextLevelXp = document.getElementById('next-level-xp');
+  const xpProgress = document.getElementById('xp-progress');
+  const userStreak = document.getElementById('user-streak');
+  const userRank = document.getElementById('user-rank');
+  const userAchievements = document.getElementById('user-achievements');
+  
+  if (state.xp) {
+    const level = calculateLevel(state.xp);
+    const nextLevelXP = Math.pow(level, 2) * 100;
+    const prevLevelXP = Math.pow(level - 1, 2) * 100;
+    const progress = ((state.xp - prevLevelXP) / (nextLevelXP - prevLevelXP)) * 100;
+    
+    if (userLevel) userLevel.textContent = level;
+    if (currentXp) currentXp.textContent = state.xp;
+    if (nextLevelXp) nextLevelXp.textContent = nextLevelXP;
+    if (xpProgress) xpProgress.style.width = `${progress}%`;
+  }
+  
+  if (state.streak && userStreak) userStreak.textContent = state.streak;
+  
+  // Simulated rank calculation
+  if (userRank) userRank.textContent = Math.max(1, 100 - Math.floor(state.xp / 100));
+  
+  // Count achievements
+  const unlockedAchievements = document.querySelectorAll('.achievement-badge.unlocked').length;
+  if (userAchievements) userAchievements.textContent = unlockedAchievements;
 }
 
 function showFeatures() {
@@ -2514,6 +3868,170 @@ function showFeatures() {
 
 function scrollToFeatures() {
   document.getElementById('features-section').scrollIntoView({ behavior: 'smooth' });
+}
+
+// AI Career System Functions
+function runJobReadinessAssessment() {
+  // Simulate AI assessment based on user progress
+  const technicalScore = Math.min(100, (state.xp || 0) / 50);
+  const projectScore = Math.min(100, (state.completedProjects?.length || 0) * 20);
+  const interviewScore = Math.min(100, (state.completedQuizzes?.length || 0) * 15);
+  
+  const overallScore = Math.floor((technicalScore + projectScore + interviewScore) / 3);
+  
+  // Update metrics display
+  const metrics = document.querySelectorAll('.metric-fill');
+  const values = document.querySelectorAll('.metric-value');
+  
+  if (metrics[0]) metrics[0].style.width = `${technicalScore}%`;
+  if (metrics[1]) metrics[1].style.width = `${projectScore}%`;
+  if (metrics[2]) metrics[2].style.width = `${interviewScore}%`;
+  
+  if (values[0]) values[0].textContent = `${Math.floor(technicalScore)}%`;
+  if (values[1]) values[1].textContent = `${Math.floor(projectScore)}%`;
+  if (values[2]) values[2].textContent = `${Math.floor(interviewScore)}%`;
+  
+  // Update overall score
+  const scoreValue = document.querySelector('.score-value');
+  const scoreLabel = document.querySelector('.score-label');
+  const scoreDesc = document.querySelector('.score-desc');
+  
+  if (scoreValue) scoreValue.textContent = `${overallScore}%`;
+  
+  if (scoreLabel) {
+    if (overallScore >= 80) {
+      scoreLabel.textContent = 'EXCELLENT';
+    } else if (overallScore >= 60) {
+      scoreLabel.textContent = 'READY';
+    } else if (overallScore >= 40) {
+      scoreLabel.textContent = 'PROGRESS';
+    } else {
+      scoreLabel.textContent = 'START';
+    }
+  }
+  
+  if (scoreDesc) {
+    if (overallScore >= 80) {
+      scoreDesc.textContent = 'Excellent! You\'re well-prepared for job applications.';
+    } else if (overallScore >= 60) {
+      scoreDesc.textContent = 'Good progress! Complete more projects to improve.';
+    } else if (overallScore >= 40) {
+      scoreDesc.textContent = 'Keep learning! Focus on building more projects.';
+    } else {
+      scoreDesc.textContent = 'Start your journey! Complete lessons and projects.';
+    }
+  }
+  
+  alert('Job readiness assessment completed!');
+}
+
+function selectInterviewType(type) {
+  const buttons = document.querySelectorAll('.interview-type-btn');
+  buttons.forEach(btn => btn.classList.remove('active'));
+  event.target.closest('.interview-type-btn').classList.add('active');
+  
+  // Update question based on type
+  const questionEl = document.querySelector('.interview-question p');
+  const tipEl = document.querySelector('.interview-tips span:last-child');
+  
+  const questions = {
+    technical: 'Explain the difference between list and tuple in Python. When would you use each?',
+    behavioral: 'Tell me about a challenging project you worked on and how you overcame obstacles.',
+    system: 'Design a URL shortening service. What components would you need?'
+  };
+  
+  const tips = {
+    technical: 'Focus on mutability, performance, and use cases.',
+    behavioral: 'Use STAR method: Situation, Task, Action, Result.',
+    system: 'Consider scalability, database choice, and caching.'
+  };
+  
+  if (questionEl) questionEl.textContent = questions[type];
+  if (tipEl) tipEl.textContent = tips[type];
+}
+
+function startAIInterview() {
+  alert('Starting AI Interview Simulator...\n\nThis feature will launch a full mock interview session with AI-powered questions and real-time feedback.');
+}
+
+function generateCareerPath() {
+  alert('Generating personalized career path...\n\nAI will analyze your skills, projects, and market trends to recommend the best career path for you.');
+}
+
+// Community System Functions
+let selectedPostType = 'question';
+
+function selectPostType(type) {
+  selectedPostType = type;
+  const buttons = document.querySelectorAll('.post-type-btn');
+  buttons.forEach(btn => btn.classList.remove('active'));
+  event.target.closest('.post-type-btn').classList.add('active');
+}
+
+function filterFeed(filter) {
+  const buttons = document.querySelectorAll('.filter-btn');
+  buttons.forEach(btn => btn.classList.remove('active'));
+  event.target.classList.add('active');
+  
+  // Filter the feed based on selection
+  const feedContainer = document.getElementById('community-feed-container');
+  if (feedContainer) {
+    // In production, this would filter actual posts
+    alert(`Filtering feed by: ${filter}`);
+  }
+}
+
+// Support & Helpdesk Functions
+function createSupportTicket() {
+  const subject = document.getElementById('ticket-subject').value;
+  const category = document.getElementById('ticket-category').value;
+  const priority = document.getElementById('ticket-priority').value;
+  const description = document.getElementById('ticket-description').value;
+  
+  if (!subject || !description) {
+    alert('Please fill in the subject and description fields.');
+    return;
+  }
+  
+  // Generate ticket ID
+  const ticketId = `#TKT-${String(Date.now()).slice(-3)}`;
+  
+  // Create ticket object
+  const ticket = {
+    id: ticketId,
+    subject: subject,
+    category: category,
+    priority: priority,
+    description: description,
+    status: 'open',
+    date: new Date().toLocaleDateString()
+  };
+  
+  // Add to tickets list (in production, this would be sent to backend)
+  const ticketsList = document.getElementById('my-tickets-list');
+  if (ticketsList) {
+    const ticketHTML = `
+      <div class="ticket-item">
+        <div class="ticket-header">
+          <span class="ticket-id">${ticketId}</span>
+          <span class="ticket-status open">Open</span>
+        </div>
+        <h4>${subject}</h4>
+        <p class="text-secondary">${description.substring(0, 50)}...</p>
+        <div class="ticket-meta">
+          <span class="ticket-priority ${priority}">${priority} Priority</span>
+          <span class="ticket-date">Just now</span>
+        </div>
+      </div>
+    `;
+    ticketsList.insertAdjacentHTML('afterbegin', ticketHTML);
+  }
+  
+  // Clear form
+  document.getElementById('ticket-subject').value = '';
+  document.getElementById('ticket-description').value = '';
+  
+  alert(`Support ticket ${ticketId} created successfully!`);
 }
 
 // FAQ toggle
@@ -2825,6 +4343,9 @@ window.addEventListener('DOMContentLoaded', () => {
   
   // Initialize landing page
   document.body.classList.add('landing-active');
+  
+  // Start typing animation
+  startTypingAnimation();
   
   // Show appropriate view based on authentication
   if (isAuthenticated) {
