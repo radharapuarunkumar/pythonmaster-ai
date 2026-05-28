@@ -5058,6 +5058,328 @@ function sendChatbotMessage() {
 // Universal CTA Handler with loading animations and effects
 const buttonState = new Map(); // Track button states to prevent duplicate clicks
 
+// Authentication State Management
+let currentUser = null;
+let authProvider = null;
+
+// Modal Functions
+function openSignInModal() {
+  const modal = document.getElementById('signin-modal');
+  if (modal) {
+    modal.style.display = 'flex';
+    setTimeout(() => {
+      modal.classList.add('show');
+    }, 10);
+  }
+}
+
+function closeSignInModal() {
+  const modal = document.getElementById('signin-modal');
+  if (modal) {
+    modal.classList.remove('show');
+    setTimeout(() => {
+      modal.style.display = 'none';
+    }, 300);
+  }
+}
+
+function openSignUpModal() {
+  const modal = document.getElementById('signup-modal');
+  if (modal) {
+    modal.style.display = 'flex';
+    setTimeout(() => {
+      modal.classList.add('show');
+    }, 10);
+  }
+}
+
+function closeSignUpModal() {
+  const modal = document.getElementById('signup-modal');
+  if (modal) {
+    modal.classList.remove('show');
+    setTimeout(() => {
+      modal.style.display = 'none';
+    }, 300);
+  }
+}
+
+function openForgotPasswordModal() {
+  closeSignInModal();
+  const modal = document.getElementById('forgot-password-modal');
+  if (modal) {
+    modal.style.display = 'flex';
+    setTimeout(() => {
+      modal.classList.add('show');
+    }, 10);
+  }
+}
+
+function closeForgotPasswordModal() {
+  const modal = document.getElementById('forgot-password-modal');
+  if (modal) {
+    modal.classList.remove('show');
+    setTimeout(() => {
+      modal.style.display = 'none';
+    }, 300);
+  }
+}
+
+function toggleProfileDropdown() {
+  const dropdown = document.getElementById('profile-dropdown');
+  if (dropdown) {
+    dropdown.classList.toggle('show');
+  }
+}
+
+// Close dropdown when clicking outside
+document.addEventListener('click', (e) => {
+  const dropdown = document.getElementById('profile-dropdown');
+  const profileTrigger = document.querySelector('.profile-trigger');
+  
+  if (dropdown && !dropdown.contains(e.target) && !profileTrigger.contains(e.target)) {
+    dropdown.classList.remove('show');
+  }
+  
+  // Close modals when clicking outside
+  const modals = document.querySelectorAll('.auth-modal-overlay');
+  modals.forEach(modal => {
+    if (e.target === modal) {
+      modal.classList.remove('show');
+      setTimeout(() => {
+        modal.style.display = 'none';
+      }, 300);
+    }
+  });
+});
+
+// Authentication Handlers
+function handleSignIn(event) {
+  event.preventDefault();
+  
+  const email = document.getElementById('signin-email').value;
+  const password = document.getElementById('signin-password').value;
+  const remember = document.getElementById('signin-remember').checked;
+  
+  // Validate inputs
+  if (!email || !password) {
+    showToast('Please fill in all fields', 'error');
+    return;
+  }
+  
+  // Simulate authentication (replace with Firebase auth)
+  simulateAuthLogin(email, password, remember);
+}
+
+function handleSignUp(event) {
+  event.preventDefault();
+  
+  const name = document.getElementById('signup-name').value;
+  const email = document.getElementById('signup-email').value;
+  const password = document.getElementById('signup-password').value;
+  const confirm = document.getElementById('signup-confirm').value;
+  const terms = document.getElementById('signup-terms').checked;
+  
+  // Validate inputs
+  if (!name || !email || !password || !confirm) {
+    showToast('Please fill in all fields', 'error');
+    return;
+  }
+  
+  if (password !== confirm) {
+    showToast('Passwords do not match', 'error');
+    return;
+  }
+  
+  if (password.length < 6) {
+    showToast('Password must be at least 6 characters', 'error');
+    return;
+  }
+  
+  if (!terms) {
+    showToast('Please agree to the terms and conditions', 'error');
+    return;
+  }
+  
+  // Simulate sign up (replace with Firebase auth)
+  simulateAuthSignUp(name, email, password);
+}
+
+function handleForgotPassword(event) {
+  event.preventDefault();
+  
+  const email = document.getElementById('forgot-email').value;
+  
+  if (!email) {
+    showToast('Please enter your email address', 'error');
+    return;
+  }
+  
+  // Simulate password reset (replace with Firebase auth)
+  showToast('Password reset link sent to your email', 'success');
+  closeForgotPasswordModal();
+}
+
+function handleGoogleSignIn() {
+  // Simulate Google Sign In (replace with Firebase Google auth)
+  simulateGoogleAuth('signin');
+}
+
+function handleGoogleSignUp() {
+  // Simulate Google Sign Up (replace with Firebase Google auth)
+  simulateGoogleAuth('signup');
+}
+
+function handleLogout() {
+  // Clear user session
+  currentUser = null;
+  localStorage.removeItem('currentUser');
+  
+  // Update UI
+  updateAuthUI(false);
+  
+  // Close dropdown
+  const dropdown = document.getElementById('profile-dropdown');
+  if (dropdown) {
+    dropdown.classList.remove('show');
+  }
+  
+  // Show landing page
+  const landingPage = document.getElementById('landing-page');
+  const appContainer = document.querySelector('.app-container');
+  
+  if (landingPage) landingPage.style.display = 'block';
+  if (appContainer) appContainer.style.display = 'none';
+  
+  showToast('Signed out successfully', 'success');
+}
+
+// Simulated Authentication (Replace with Firebase)
+function simulateAuthLogin(email, password, remember) {
+  showToast('Signing in...', 'info');
+  
+  setTimeout(() => {
+    currentUser = {
+      email: email,
+      name: email.split('@')[0],
+      xp: 0,
+      streak: 1,
+      createdAt: new Date().toISOString()
+    };
+    
+    if (remember) {
+      localStorage.setItem('currentUser', JSON.stringify(currentUser));
+    }
+    
+    closeSignInModal();
+    updateAuthUI(true);
+    showToast('Welcome back!', 'success');
+    
+    // Navigate to dashboard
+    navigateToSection('dashboard');
+  }, 1500);
+}
+
+function simulateAuthSignUp(name, email, password) {
+  showToast('Creating account...', 'info');
+  
+  setTimeout(() => {
+    currentUser = {
+      email: email,
+      name: name,
+      xp: 0,
+      streak: 1,
+      createdAt: new Date().toISOString()
+    };
+    
+    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+    
+    closeSignUpModal();
+    updateAuthUI(true);
+    showToast('Account created successfully!', 'success');
+    
+    // Navigate to dashboard
+    navigateToSection('dashboard');
+  }, 1500);
+}
+
+function simulateGoogleAuth(type) {
+  showToast(`Connecting to Google ${type === 'signin' ? 'Sign In' : 'Sign Up'}...`, 'info');
+  
+  setTimeout(() => {
+    currentUser = {
+      email: 'user@gmail.com',
+      name: 'Google User',
+      xp: 0,
+      streak: 1,
+      createdAt: new Date().toISOString(),
+      provider: 'google'
+    };
+    
+    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+    
+    if (type === 'signin') {
+      closeSignInModal();
+    } else {
+      closeSignUpModal();
+    }
+    
+    updateAuthUI(true);
+    showToast(`Signed in with Google successfully!`, 'success');
+    
+    // Navigate to dashboard
+    navigateToSection('dashboard');
+  }, 1500);
+}
+
+// Update UI based on auth state
+function updateAuthUI(isLoggedIn) {
+  const authButtons = document.getElementById('nav-auth-buttons');
+  const profileSection = document.getElementById('nav-profile-section');
+  
+  if (isLoggedIn && currentUser) {
+    // Show profile section
+    if (authButtons) authButtons.style.display = 'none';
+    if (profileSection) profileSection.style.display = 'flex';
+    
+    // Update profile name
+    const profileName = document.getElementById('nav-profile-name');
+    if (profileName) {
+      profileName.textContent = currentUser.name || 'User';
+    }
+    
+    // Update profile dropdown
+    const dropdownName = document.getElementById('profile-name');
+    const dropdownEmail = document.getElementById('profile-email');
+    const dropdownXP = document.getElementById('profile-xp');
+    const dropdownStreak = document.getElementById('profile-streak');
+    
+    if (dropdownName) dropdownName.textContent = currentUser.name || 'User';
+    if (dropdownEmail) dropdownEmail.textContent = currentUser.email || '';
+    if (dropdownXP) dropdownXP.textContent = currentUser.xp || 0;
+    if (dropdownStreak) dropdownStreak.textContent = currentUser.streak || 1;
+  } else {
+    // Show auth buttons
+    if (authButtons) authButtons.style.display = 'flex';
+    if (profileSection) profileSection.style.display = 'none';
+  }
+}
+
+// Check auth on page load
+function checkAuthOnLoad() {
+  const savedUser = localStorage.getItem('currentUser');
+  if (savedUser) {
+    try {
+      currentUser = JSON.parse(savedUser);
+      updateAuthUI(true);
+    } catch (e) {
+      console.error('Error parsing saved user:', e);
+      localStorage.removeItem('currentUser');
+    }
+  }
+}
+
+// Universal CTA Handler with loading animations and effects
+
 function handleCTAClick(event, action) {
   event.preventDefault();
   event.stopPropagation();
@@ -6940,6 +7262,9 @@ window.addEventListener('DOMContentLoaded', () => {
   
   // Initialize notifications
   updateNotificationBadge();
+  
+  // Check authentication state on load
+  checkAuthOnLoad();
   
   // Test all landing page buttons
   setTimeout(() => {
