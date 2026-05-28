@@ -758,8 +758,7 @@ print(len(data))`,
           commonMistakes: ["Using mutable objects as keys", "Forgetting that keys are case-sensitive", "Confusing keys() and values()"],
           tips: ["Use get() method to avoid KeyError", "Remember keys must be unique and immutable", "Use items() to iterate over key-value pairs"]
         },
-        notes: "Dictionaries are unordered in Python versions before 3.7. From Python 3.7+, dictionaries maintain insertion order. Always use immutable objects (strings, numbers, tuples) as keys."
-      },
+        notes: "Dictionaries are unordered in Python versions before 3.7. From Python 3.7+, dictionaries maintain insertion order. Always use immutable objects (strings, numbers, tuples) as keys."   },
       {
         day: 6,
         title: "Conditions and If Statements",
