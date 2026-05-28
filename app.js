@@ -527,13 +527,44 @@ function loadProgress() {
 // --- Day-wise Roadmap UI Functions ---
 let currentPhase = 'beginner';
 
+// Get days data from roadmapData
+function getDaysByPhase(phase) {
+  if (typeof roadmapData !== 'undefined' && roadmapData[phase]) {
+    return roadmapData[phase].days;
+  }
+  return [];
+}
+
+// Get specific day content
+function getDayContent(dayNumber) {
+  // Determine which phase the day belongs to
+  if (dayNumber <= 30) {
+    const day = roadmapData.beginner.days.find(d => d.day === dayNumber);
+    return day || null;
+  } else if (dayNumber <= 60) {
+    const day = roadmapData.intermediate.days.find(d => d.day === dayNumber);
+    return day || null;
+  } else if (dayNumber <= 90) {
+    const day = roadmapData.advanced.days.find(d => d.day === dayNumber);
+    return day || null;
+  } else if (dayNumber <= 110) {
+    const day = roadmapData.expert.days.find(d => d.day === dayNumber);
+    return day || null;
+  } else {
+    const day = roadmapData.ai.days.find(d => d.day === dayNumber);
+    return day || null;
+  }
+}
+
 function selectPhase(phase) {
   currentPhase = phase;
   
   // Update phase buttons
   const buttons = document.querySelectorAll('.phase-btn');
   buttons.forEach(btn => btn.classList.remove('active'));
-  event.target.closest('.phase-btn').classList.add('active');
+  if (event && event.target) {
+    event.target.closest('.phase-btn').classList.add('active');
+  }
   
   // Update phase label
   const phaseLabel = document.getElementById('current-phase-label');
@@ -575,27 +606,54 @@ function renderDaysGrid(phase) {
   
   // Render day items
   container.innerHTML = '';
-  for (let i = range.start; i <= range.end; i++) {
-    const isCompleted = userProgress.completedDays.includes(i);
-    const isCurrent = userProgress.currentDay === i;
-    const isLocked = i > userProgress.currentDay;
-    
-    const dayItem = document.createElement('div');
-    dayItem.className = `day-item ${isCompleted ? 'completed' : ''} ${isCurrent ? 'current' : ''} ${isLocked ? 'locked' : ''}`;
-    dayItem.onclick = () => !isLocked && selectDay(i);
-    
-    dayItem.innerHTML = `
-      <span class="day-number">${i}</span>
-      <span class="day-status">${isCompleted ? '✓' : isCurrent ? 'Current' : isLocked ? '🔒' : ''}</span>
-    `;
-    
-    container.appendChild(dayItem);
+  
+  // If we have actual day data, use it
+  if (days.length > 0) {
+    days.forEach(dayData => {
+      const isCompleted = userProgress.completedDays.includes(dayData.day);
+      const isCurrent = userProgress.currentDay === dayData.day;
+      const isLocked = dayData.day > userProgress.currentDay;
+      
+      const dayItem = document.createElement('div');
+      dayItem.className = `day-item ${isCompleted ? 'completed' : ''} ${isCurrent ? 'current' : ''} ${isLocked ? 'locked' : ''}`;
+      dayItem.onclick = () => !isLocked && selectDay(dayData.day);
+      
+      dayItem.innerHTML = `
+        <span class="day-number">${dayData.day}</span>
+        <span class="day-title">${dayData.title}</span>
+        <span class="day-xp">+${dayData.xp} XP</span>
+        <span class="day-status">${isCompleted ? '✓' : isCurrent ? 'Current' : isLocked ? '🔒' : ''}</span>
+      `;
+      
+      container.appendChild(dayItem);
+    });
+  } else {
+    // Fallback: render all days in range
+    for (let i = range.start; i <= range.end; i++) {
+      const isCompleted = userProgress.completedDays.includes(i);
+      const isCurrent = userProgress.currentDay === i;
+      const isLocked = i > userProgress.currentDay;
+      
+      const dayItem = document.createElement('div');
+      dayItem.className = `day-item ${isCompleted ? 'completed' : ''} ${isCurrent ? 'current' : ''} ${isLocked ? 'locked' : ''}`;
+      dayItem.onclick = () => !isLocked && selectDay(i);
+      
+      dayItem.innerHTML = `
+        <span class="day-number">${i}</span>
+        <span class="day-status">${isCompleted ? '✓' : isCurrent ? 'Current' : isLocked ? '🔒' : ''}</span>
+      `;
+      
+      container.appendChild(dayItem);
+    }
   }
 }
 
 function selectDay(dayNumber) {
   const dayContent = getDayContent(dayNumber);
-  if (!dayContent) return;
+  if (!dayContent) {
+    showToast('Day content not available yet', 'info');
+    return;
+  }
   
   userProgress.currentDay = dayNumber;
   saveProgress();
@@ -606,9 +664,9 @@ function selectDay(dayNumber) {
   
   // Update day details
   document.getElementById('current-day-title').textContent = `Day ${dayNumber}: ${dayContent.title}`;
-  document.getElementById('current-day-difficulty').textContent = dayContent.difficulty;
-  document.getElementById('current-day-difficulty').className = `difficulty-badge ${dayContent.difficulty}`;
-  document.getElementById('current-day-time').textContent = dayContent.estimatedTime;
+  document.getElementById('current-day-topic').textContent = dayContent.topic;
+  document.getElementById('current-day-duration').textContent = dayContent.duration;
+  document.getElementById('current-day-xp').textContent = `+${dayContent.xp} XP`;
   
   // Render theory content by default
   renderDayTabContent('theory', dayContent);
@@ -617,7 +675,7 @@ function selectDay(dayNumber) {
   renderDaysGrid(currentPhase);
   
   // Scroll to day details
-  detailsCard.scrollIntoView({ behavior: 'smooth' });
+  if (detailsCard) detailsCard.scrollIntoView({ behavior: 'smooth' });
 }
 
 function renderDayTabContent(tab, dayContent) {
@@ -626,52 +684,147 @@ function renderDayTabContent(tab, dayContent) {
   
   switch (tab) {
     case 'theory':
-      container.innerHTML = dayContent.theory;
-      break;
-    case 'examples':
-      container.innerHTML = dayContent.examples.map(ex => `
-        <div class="example-block">
-          <h4>${ex.title}</h4>
-          <pre class="code-block">${ex.code}</pre>
+      container.innerHTML = `
+        <div class="theory-section">
+          <h3>Explanation</h3>
+          <p>${dayContent.theory.explanation}</p>
+          
+          <h3>Deep Dive</h3>
+          <p>${dayContent.theory.deepExplanation}</p>
+          
+          <h3>Beginner Explanation</h3>
+          <p>${dayContent.theory.beginnerExplanation}</p>
+          
+          <h3>Real-World Examples</h3>
+          <ul>
+            ${dayContent.theory.realWorldExamples.map(ex => `<li>${ex}</li>`).join('')}
+          </ul>
+          
+          <h3>Syntax</h3>
+          <p>${dayContent.theory.syntaxExplanation}</p>
+          
+          <h3>Code Examples</h3>
+          ${dayContent.theory.codeExamples.map(ex => `
+            <div class="example-block">
+              <h4>${ex.title}</h4>
+              <pre class="code-block"><code>${escapeHtml(ex.code)}</code></pre>
+              <p>${ex.explanation}</p>
+            </div>
+          `).join('')}
+          
+          <div class="notes-box">
+            <h4>💡 Notes</h4>
+            <p>${dayContent.notes}</p>
+          </div>
         </div>
-      `).join('');
+      `;
       break;
     case 'practice':
       container.innerHTML = `
-        <h4>Practice Problems</h4>
-        <ul>
-          ${dayContent.practiceProblems.map(p => `<li>${p}</li>`).join('')}
-        </ul>
-        <h4>Assignment</h4>
-        <p>${dayContent.assignment}</p>
+        <div class="practice-section">
+          <h3>Practice Problems</h3>
+          ${dayContent.practice.problems.map((p, i) => `
+            <div class="practice-problem">
+              <p><strong>Problem ${i + 1}:</strong> ${p.question}</p>
+              <details>
+                <summary>Show Solution</summary>
+                <pre class="code-block"><code>${escapeHtml(p.solution)}</code></pre>
+              </details>
+            </div>
+          `).join('')}
+          
+          <h3>Assignment</h3>
+          <div class="assignment-block">
+            <h4>${dayContent.assignment.title}</h4>
+            <p>${dayContent.assignment.description}</p>
+            <pre class="code-block"><code>${escapeHtml(dayContent.assignment.starterCode)}</code></pre>
+            <p><strong>Expected Output:</strong> ${dayContent.assignment.expectedOutput}</p>
+            <p><strong>XP Reward:</strong> +${dayContent.assignment.xpReward} XP</p>
+          </div>
+        </div>
       `;
       break;
     case 'quiz':
       container.innerHTML = `
-        <h4>Quiz (${dayContent.quiz.length} Questions)</h4>
-        ${dayContent.quiz.map((q, i) => `
-          <div class="quiz-question">
-            <p><strong>Q${i + 1}:</strong> ${q.question}</p>
-            <div class="quiz-options">
-              ${q.options.map((opt, j) => `
-                <label class="quiz-option">
-                  <input type="radio" name="q${i}" value="${j}">
-                  ${opt}
-                </label>
-              `).join('')}
-            </div>
-          </div>
-        `).join('')}
-        <button class="btn-primary mt-1" onclick="submitQuiz(${dayContent.day})">Submit Quiz</button>
+        <div class="quiz-section">
+          <h3>Quiz (${dayContent.quiz.length} Questions)</h3>
+          <form id="quiz-form">
+            ${dayContent.quiz.map((q, i) => `
+              <div class="quiz-question" data-correct="${q.correctAnswer}">
+                <p><strong>Q${i + 1}:</strong> ${q.question}</p>
+                <div class="quiz-options">
+                  ${q.options.map((opt, j) => `
+                    <label class="quiz-option">
+                      <input type="radio" name="q${i}" value="${j}">
+                      ${opt}
+                    </label>
+                  `).join('')}
+                </div>
+                <div class="quiz-explanation" style="display: none;">
+                  <p><strong>Explanation:</strong> ${q.explanation}</p>
+                </div>
+              </div>
+            `).join('')}
+          </form>
+          <button class="btn-primary mt-1" onclick="submitQuiz(${dayContent.day})">Submit Quiz</button>
+          <div id="quiz-result" class="quiz-result"></div>
+        </div>
       `;
       break;
-    case 'project':
+    case 'output':
       container.innerHTML = `
-        <h4>Mini Project</h4>
-        <p>${dayContent.miniProject}</p>
+        <div class="output-section">
+          <h3>Output Prediction Questions</h3>
+          ${dayContent.outputPrediction.map((q, i) => `
+            <div class="output-question" data-answer="${escapeHtml(q.correctAnswer)}">
+              <p><strong>Question ${i + 1}:</strong></p>
+              <pre class="code-block"><code>${escapeHtml(q.code)}</code></pre>
+              <p>What will be the output?</p>
+              <input type="text" class="output-input" placeholder="Your answer...">
+              <button class="btn-secondary" onclick="checkOutput(${i})">Check Answer</button>
+              <div class="output-feedback" style="display: none;">
+                <p><strong>Explanation:</strong> ${q.explanation}</p>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+      break;
+    case 'challenge':
+      container.innerHTML = `
+        <div class="challenge-section">
+          <h3>🎯 Challenge Task</h3>
+          <h4>${dayContent.challenge.title}</h4>
+          <p>${dayContent.challenge.description}</p>
+          <p><strong>Hint:</strong> ${dayContent.challenge.hint}</p>
+          <p><strong>XP Reward:</strong> +${dayContent.challenge.xpReward} XP</p>
+          
+          <h3>AI Explanation</h3>
+          <div class="ai-explanation">
+            <h4>Key Concepts</h4>
+            <ul>
+              ${dayContent.aiExplanation.keyConcepts.map(c => `<li>${c}</li>`).join('')}
+            </ul>
+            <h4>Common Mistakes</h4>
+            <ul>
+              ${dayContent.aiExplanation.commonMistakes.map(m => `<li>${m}</li>`).join('')}
+            </ul>
+            <h4>Tips</h4>
+            <ul>
+              ${dayContent.aiExplanation.tips.map(t => `<li>${t}</li>`).join('')}
+            </ul>
+          </div>
+        </div>
       `;
       break;
   }
+}
+
+// Helper function to escape HTML
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
 }
 
 function switchDayTab(tab) {
@@ -723,10 +876,25 @@ function submitQuiz(dayNumber) {
   if (!dayContent) return;
   
   let correct = 0;
-  dayContent.quiz.forEach((q, i) => {
-    const selected = document.querySelector(`input[name="q${i}"]:checked`);
-    if (selected && parseInt(selected.value) === q.correct) {
+  const questions = document.querySelectorAll('.quiz-question');
+  
+  questions.forEach((questionEl, i) => {
+    const selected = questionEl.querySelector(`input[name="q${i}"]:checked`);
+    const correctAnswer = parseInt(questionEl.dataset.correct);
+    const explanationEl = questionEl.querySelector('.quiz-explanation');
+    
+    // Show explanation
+    if (explanationEl) {
+      explanationEl.style.display = 'block';
+    }
+    
+    if (selected && parseInt(selected.value) === correctAnswer) {
       correct++;
+      questionEl.classList.add('correct');
+      questionEl.classList.remove('incorrect');
+    } else {
+      questionEl.classList.add('incorrect');
+      questionEl.classList.remove('correct');
     }
   });
   
@@ -740,7 +908,100 @@ function submitQuiz(dayNumber) {
     updateProgressDisplay();
   }
   
-  alert(`Quiz Score: ${score}% (${correct}/${dayContent.quiz.length} correct)\n${xpEarned > 0 ? `+${xpEarned} XP earned!` : 'Need 70% to earn XP'}`);
+  // Show result
+  const resultDiv = document.getElementById('quiz-result');
+  if (resultDiv) {
+    resultDiv.innerHTML = `
+      <div class="quiz-score ${score >= 70 ? 'pass' : 'fail'}">
+        <h4>Quiz Score: ${score}%</h4>
+        <p>${correct}/${dayContent.quiz.length} correct</p>
+        <p>${xpEarned > 0 ? `+${xpEarned} XP earned!` : 'Need 70% to earn XP'}</p>
+      </div>
+    `;
+  }
+  
+  showToast(`Quiz Score: ${score}% - ${xpEarned > 0 ? `+${xpEarned} XP earned!` : 'Keep trying!'}`, score >= 70 ? 'success' : 'info');
+}
+
+function checkOutput(questionIndex) {
+  const questionEl = document.querySelectorAll('.output-question')[questionIndex];
+  const inputEl = questionEl.querySelector('.output-input');
+  const feedbackEl = questionEl.querySelector('.output-feedback');
+  const correctAnswer = questionEl.dataset.answer;
+  
+  if (!inputEl || !feedbackEl) return;
+  
+  const userAnswer = inputEl.value.trim();
+  
+  // Show feedback
+  feedbackEl.style.display = 'block';
+  
+  // Check if answer is correct (case-insensitive, trim whitespace)
+  if (userAnswer.toLowerCase() === correctAnswer.toLowerCase()) {
+    feedbackEl.innerHTML = `
+      <p class="correct">✓ Correct!</p>
+      <p><strong>Explanation:</strong> ${feedbackEl.querySelector('p').textContent}</p>
+    `;
+    showToast('Correct answer!', 'success');
+  } else {
+    feedbackEl.innerHTML = `
+      <p class="incorrect">✗ Incorrect. The answer is: ${correctAnswer}</p>
+      <p><strong>Explanation:</strong> ${feedbackEl.querySelector('p').textContent}</p>
+    `;
+    showToast('Incorrect. Try again!', 'error');
+  }
+}
+
+function submitAssignment(dayNumber) {
+  const dayContent = getDayContent(dayNumber);
+  if (!dayContent) return;
+  
+  // Get user's code from textarea (if exists)
+  const codeInput = document.getElementById('assignment-code-input');
+  const userCode = codeInput ? codeInput.value : '';
+  
+  // Simple validation: check if code is not empty and contains key elements
+  const hasCode = userCode.trim().length > 0;
+  const hasRequiredElements = checkAssignmentRequirements(userCode, dayContent.assignment);
+  
+  if (hasCode && hasRequiredElements) {
+    // Award XP for completing assignment
+    const xpReward = dayContent.assignment.xpReward;
+    userProgress.xp += xpReward;
+    userProgress.totalXP += xpReward;
+    saveProgress();
+    updateProgressDisplay();
+    
+    showToast(`Assignment completed! +${xpReward} XP earned!`, 'success');
+    
+    // Mark day as completed if quiz also passed
+    if (!userProgress.completedDays.includes(dayNumber)) {
+      completeDay();
+    }
+  } else {
+    showToast('Please complete the assignment before submitting', 'error');
+  }
+}
+
+function checkAssignmentRequirements(userCode, assignment) {
+  // Basic validation - check if code has meaningful content
+  const codeLines = userCode.trim().split('\n').filter(line => line.trim() && !line.trim().startsWith('#'));
+  return codeLines.length >= 2; // At least 2 lines of actual code
+}
+
+function markDayComplete(dayNumber) {
+  if (!userProgress.completedDays.includes(dayNumber)) {
+    userProgress.completedDays.push(dayNumber);
+    const dayContent = getDayContent(dayNumber);
+    if (dayContent) {
+      userProgress.xp += dayContent.xp;
+      userProgress.totalXP += dayContent.xp;
+    }
+    saveProgress();
+    updateProgressDisplay();
+    renderDaysGrid(currentPhase);
+    showToast(`Day ${dayNumber} completed!`, 'success');
+  }
 }
 
 // Initialize progress on load
@@ -5015,6 +5276,14 @@ function toggleMobileMenu() {
   sidebar.classList.toggle('active');
 }
 
+// --- Premium AI Tutor System ---
+const aiTutorState = {
+  conversationHistory: [],
+  currentContext: null,
+  userLevel: 'beginner',
+  preferredLanguage: 'en'
+};
+
 function sendChatbotMessage() {
   const input = document.getElementById('chatbot-input');
   const message = input.value.trim();
@@ -5023,35 +5292,3220 @@ function sendChatbotMessage() {
   const chatMessages = document.getElementById('chatbot-messages');
   
   // Add user message
-  chatMessages.innerHTML += `
-    <div class="chatbot-message user">
-      <p>${message}</p>
-    </div>
-  `;
-  
+  addChatMessage('user', message);
   input.value = '';
   
-  // Simulate AI response
+  // Update conversation history
+  aiTutorState.conversationHistory.push({ role: 'user', content: message });
+  
+  // Show typing indicator
+  showTypingIndicator();
+  
+  // Simulate AI response with context awareness
   setTimeout(() => {
-    const responses = [
-      "I'm here to help you learn Python! What would you like to know?",
-      "That's a great question! Let me explain...",
-      "You're doing great! Keep practicing!",
-      "Have you tried running that code in the playground?",
-      "Remember to check your syntax carefully."
-    ];
-    const randomResponse = responses[Math.floor(Math.random() * responses.length)];
-    
-    chatMessages.innerHTML += `
-      <div class="chatbot-message ai">
-        <p>${randomResponse}</p>
-      </div>
-    `;
-    
-    chatMessages.scrollTop = chatMessages.scrollHeight;
+    const response = generateAIResponse(message);
+    addChatMessage('ai', response);
+    aiTutorState.conversationHistory.push({ role: 'assistant', content: response });
+    hideTypingIndicator();
   }, 1000);
   
   chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+function addChatMessage(role, content) {
+  const chatMessages = document.getElementById('chatbot-messages');
+  const messageDiv = document.createElement('div');
+  messageDiv.className = `chatbot-message ${role}`;
+  
+  // Format code blocks in the message
+  const formattedContent = formatMessage(content);
+  
+  messageDiv.innerHTML = `
+    <div class="message-content">${formattedContent}</div>
+    <div class="message-time">${new Date().toLocaleTimeString()}</div>
+  `;
+  
+  chatMessages.appendChild(messageDiv);
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+function formatMessage(content) {
+  // Convert code blocks (```code```) to formatted HTML
+  content = content.replace(/```(\w+)?\n([\s\S]*?)```/g, (match, lang, code) => {
+    return `<pre class="code-block"><code class="language-${lang || 'python'}">${escapeHtml(code.trim())}</code></pre>`;
+  });
+  
+  // Convert inline code (`code`) to formatted HTML
+  content = content.replace(/`([^`]+)`/g, '<code class="inline-code">$1</code>');
+  
+  // Convert bold (**text**) to formatted HTML
+  content = content.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+  
+  // Convert line breaks to <br>
+  content = content.replace(/\n/g, '<br>');
+  
+  return content;
+}
+
+function showTypingIndicator() {
+  const chatMessages = document.getElementById('chatbot-messages');
+  const typingDiv = document.createElement('div');
+  typingDiv.className = 'chatbot-message ai typing';
+  typingDiv.id = 'typing-indicator';
+  typingDiv.innerHTML = `
+    <div class="typing-dots">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+  `;
+  chatMessages.appendChild(typingDiv);
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+function hideTypingIndicator() {
+  const typingIndicator = document.getElementById('typing-indicator');
+  if (typingIndicator) {
+    typingIndicator.remove();
+  }
+}
+
+function generateAIResponse(userMessage) {
+  const lowerMessage = userMessage.toLowerCase();
+  
+  // Code explanation
+  if (lowerMessage.includes('explain') || lowerMessage.includes('what does') || lowerMessage.includes('how does')) {
+    return generateCodeExplanation(userMessage);
+  }
+  
+  // Debugging help
+  if (lowerMessage.includes('error') || lowerMessage.includes('bug') || lowerMessage.includes('debug') || lowerMessage.includes('not working')) {
+    return generateDebuggingHelp(userMessage);
+  }
+  
+  // Code improvement
+  if (lowerMessage.includes('improve') || lowerMessage.includes('better') || lowerMessage.includes('optimize')) {
+    return generateCodeImprovement(userMessage);
+  }
+  
+  // Concept explanation
+  if (lowerMessage.includes('what is') || lowerMessage.includes('explain') || lowerMessage.includes('tell me about')) {
+    return generateConceptExplanation(userMessage);
+  }
+  
+  // Default responses based on context
+  const contextualResponses = getContextualResponses();
+  return contextualResponses[Math.floor(Math.random() * contextualResponses.length)];
+}
+
+function generateCodeExplanation(message) {
+  return `I'd be happy to explain that code! Here's a breakdown:
+
+**Key Concepts:**
+- The code uses fundamental Python concepts
+- Each line serves a specific purpose
+- Understanding the flow is important
+
+**Step-by-Step:**
+1. First, the code initializes variables
+2. Then it processes the data
+3. Finally, it returns the result
+
+**Example:**
+\`\`\`python
+# Example code
+def example_function():
+    return "Hello, World!"
+\`\`\`
+
+Would you like me to explain any specific part in more detail?`;
+}
+
+function generateDebuggingHelp(message) {
+  return `I can help you debug that! Here are some common issues to check:
+
+**Common Errors:**
+1. **SyntaxError**: Check for missing parentheses, brackets, or quotes
+2. **IndentationError**: Python relies on proper indentation
+3. **NameError**: Variable might not be defined
+4. **TypeError**: Check if you're using the right data types
+
+**Debugging Tips:**
+- Use print() statements to track variable values
+- Check the line number in the error message
+- Try isolating the problematic code
+- Use a debugger or IDE with debugging features
+
+**Example Fix:**
+\`\`\`python
+# Before (with error)
+print("Hello World"  # Missing closing parenthesis
+
+# After (fixed)
+print("Hello World")  # Added closing parenthesis
+\`\`\`
+
+Can you share the specific error message you're seeing?`;
+}
+
+function generateCodeImprovement(message) {
+  return `Here are some suggestions to improve your code:
+
+**Best Practices:**
+1. Use meaningful variable names
+2. Add comments for complex logic
+3. Follow PEP 8 style guidelines
+4. Break down complex functions
+
+**Performance Tips:**
+- Use list comprehensions instead of loops when appropriate
+- Avoid unnecessary computations
+- Use built-in functions when possible
+- Consider using generators for large datasets
+
+**Example:**
+\`\`\`python
+# Before
+result = []
+for i in range(10):
+    result.append(i * 2)
+
+# After (using list comprehension)
+result = [i * 2 for i in range(10)]
+\`\`\`
+
+Would you like me to review your specific code?`;
+}
+
+function generateConceptExplanation(message) {
+  const concepts = {
+    'function': `**Functions in Python:**
+
+A function is a reusable block of code that performs a specific task.
+
+\`\`\`python
+def greet(name):
+    return f"Hello, {name}!"
+
+# Call the function
+message = greet("Alice")
+print(message)  # Output: Hello, Alice!
+\`\`\`
+
+**Key Points:**
+- Functions start with \`def\`
+- They can take parameters
+- They can return values
+- They help organize code`,
+    
+    'list': `**Lists in Python:**
+
+Lists are ordered, mutable collections of items.
+
+\`\`\`python
+# Create a list
+fruits = ["apple", "banana", "cherry"]
+
+# Access elements
+print(fruits[0])  # Output: apple
+
+# Add elements
+fruits.append("orange")
+
+# Remove elements
+fruits.remove("banana")
+\`\`\`
+
+**Key Points:**
+- Lists use square brackets \`[]\`
+- They can hold any data type
+- They are mutable (can be changed)
+- They maintain order`,
+    
+    'dictionary': `**Dictionaries in Python:**
+
+Dictionaries store key-value pairs.
+
+\`\`\`python
+# Create a dictionary
+person = {
+    "name": "Alice",
+    "age": 30,
+    "city": "New York"
+}
+
+# Access values
+print(person["name"])  # Output: Alice
+
+# Add key-value pairs
+person["email"] = "alice@example.com"
+\`\`\`
+
+**Key Points:**
+- Dictionaries use curly braces \`{}\`
+- Keys must be unique
+- Values can be any data type
+- Fast lookups by key`
+  };
+  
+  // Find matching concept
+  for (const [key, explanation] of Object.entries(concepts)) {
+    if (message.toLowerCase().includes(key)) {
+      return explanation;
+    }
+  }
+  
+  return `I'd be happy to explain that concept! Could you be more specific about what you'd like to learn about? For example:
+- Functions
+- Lists
+- Dictionaries
+- Classes
+- Loops
+- And more!`;
+}
+
+function getContextualResponses() {
+  const currentDay = userProgress.currentDay;
+  const phase = getPhaseForDay(currentDay);
+  
+  const responses = [
+    `You're on Day ${currentDay} of the ${phase} phase. How can I help you with today's lesson?`,
+    `Great progress! You've completed ${userProgress.completedDays.length} days so far. What would you like to work on?`,
+    `I'm here to help with your Python journey. Ask me about code, concepts, or debugging!`,
+    `Need help with the current lesson? I can explain concepts or help debug your code.`,
+    `You're doing great! Keep up the momentum. What can I help you with today?`
+  ];
+  
+  return responses;
+}
+
+function getPhaseForDay(day) {
+  if (day <= 30) return 'Beginner';
+  if (day <= 60) return 'Intermediate';
+  if (day <= 90) return 'Advanced';
+  if (day <= 110) return 'Expert';
+  return 'AI with Python';
+}
+
+function clearChatHistory() {
+  aiTutorState.conversationHistory = [];
+  const chatMessages = document.getElementById('chatbot-messages');
+  chatMessages.innerHTML = '';
+  addChatMessage('ai', 'Chat history cleared. How can I help you today?');
+}
+
+function exportChatHistory() {
+  const history = aiTutorState.conversationHistory.map(msg => 
+    `${msg.role.toUpperCase()}: ${msg.content}`
+  ).join('\n\n');
+  
+  const blob = new Blob([history], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `chat-history-${new Date().toISOString().split('T')[0]}.txt`;
+  a.click();
+  URL.revokeObjectURL(url);
+  
+  showToast('Chat history exported!', 'success');
+}
+
+// --- Firebase Notes System with Cloud Sync ---
+const notesState = {
+  notes: [],
+  currentNoteId: null,
+  isSyncing: false
+};
+
+// Initialize notes system
+function initializeNotesSystem() {
+  if (!currentUser) {
+    console.log('User not authenticated, notes will be stored locally');
+    loadLocalNotes();
+    return;
+  }
+  
+  // Load notes from Firebase
+  loadNotesFromFirebase();
+}
+
+// Load notes from Firebase Firestore
+async function loadNotesFromFirebase() {
+  if (!currentUser || !window.db) return;
+  
+  try {
+    notesState.isSyncing = true;
+    
+    const notesRef = window.db.collection('users').doc(currentUser.uid).collection('notes');
+    const snapshot = await notesRef.get();
+    
+    notesState.notes = [];
+    snapshot.forEach(doc => {
+      notesState.notes.push({
+        id: doc.id,
+        ...doc.data()
+      });
+    });
+    
+    renderNotesList();
+    notesState.isSyncing = false;
+    showToast('Notes synced from cloud', 'success');
+  } catch (error) {
+    console.error('Error loading notes:', error);
+    notesState.isSyncing = false;
+    // Fallback to local storage
+    loadLocalNotes();
+  }
+}
+
+// Load notes from local storage (fallback)
+function loadLocalNotes() {
+  const savedNotes = localStorage.getItem('pythonMasterNotes');
+  if (savedNotes) {
+    notesState.notes = JSON.parse(savedNotes);
+    renderNotesList();
+  }
+}
+
+// Save notes to local storage
+function saveLocalNotes() {
+  localStorage.setItem('pythonMasterNotes', JSON.stringify(notesState.notes));
+}
+
+// Create a new note
+async function createNote(title = 'Untitled Note') {
+  const newNote = {
+    title: title,
+    content: '',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    day: userProgress.currentDay
+  };
+  
+  if (currentUser && window.db) {
+    try {
+      const notesRef = window.db.collection('users').doc(currentUser.uid).collection('notes');
+      const docRef = await notesRef.add(newNote);
+      newNote.id = docRef.id;
+      notesState.notes.push(newNote);
+      renderNotesList();
+      selectNote(newNote.id);
+      showToast('Note created and synced', 'success');
+    } catch (error) {
+      console.error('Error creating note:', error);
+      // Fallback to local
+      newNote.id = 'local_' + Date.now();
+      notesState.notes.push(newNote);
+      saveLocalNotes();
+      renderNotesList();
+      selectNote(newNote.id);
+      showToast('Note created locally', 'info');
+    }
+  } else {
+    newNote.id = 'local_' + Date.now();
+    notesState.notes.push(newNote);
+    saveLocalNotes();
+    renderNotesList();
+    selectNote(newNote.id);
+    showToast('Note created locally', 'info');
+  }
+}
+
+// Update a note
+async function updateNote(noteId, content) {
+  const noteIndex = notesState.notes.findIndex(n => n.id === noteId);
+  if (noteIndex === -1) return;
+  
+  notesState.notes[noteIndex].content = content;
+  notesState.notes[noteIndex].updatedAt = new Date().toISOString();
+  
+  if (currentUser && window.db && !noteId.startsWith('local_')) {
+    try {
+      const noteRef = window.db.collection('users').doc(currentUser.uid).collection('notes').doc(noteId);
+      await noteRef.update({
+        content: content,
+        updatedAt: new Date().toISOString()
+      });
+      showToast('Note synced to cloud', 'success');
+    } catch (error) {
+      console.error('Error updating note:', error);
+      saveLocalNotes();
+    }
+  } else {
+    saveLocalNotes();
+  }
+}
+
+// Update note title
+async function updateNoteTitle(noteId, title) {
+  const noteIndex = notesState.notes.findIndex(n => n.id === noteId);
+  if (noteIndex === -1) return;
+  
+  notesState.notes[noteIndex].title = title;
+  notesState.notes[noteIndex].updatedAt = new Date().toISOString();
+  
+  if (currentUser && window.db && !noteId.startsWith('local_')) {
+    try {
+      const noteRef = window.db.collection('users').doc(currentUser.uid).collection('notes').doc(noteId);
+      await noteRef.update({
+        title: title,
+        updatedAt: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error('Error updating note title:', error);
+      saveLocalNotes();
+    }
+  } else {
+    saveLocalNotes();
+  }
+  
+  renderNotesList();
+}
+
+// Delete a note
+async function deleteNote(noteId) {
+  if (!confirm('Are you sure you want to delete this note?')) return;
+  
+  if (currentUser && window.db && !noteId.startsWith('local_')) {
+    try {
+      const noteRef = window.db.collection('users').doc(currentUser.uid).collection('notes').doc(noteId);
+      await noteRef.delete();
+      notesState.notes = notesState.notes.filter(n => n.id !== noteId);
+      renderNotesList();
+      
+      if (notesState.currentNoteId === noteId) {
+        notesState.currentNoteId = null;
+        document.getElementById('note-editor').value = '';
+        document.getElementById('note-title').value = '';
+      }
+      
+      showToast('Note deleted', 'success');
+    } catch (error) {
+      console.error('Error deleting note:', error);
+      // Fallback to local
+      notesState.notes = notesState.notes.filter(n => n.id !== noteId);
+      saveLocalNotes();
+      renderNotesList();
+      showToast('Note deleted locally', 'info');
+    }
+  } else {
+    notesState.notes = notesState.notes.filter(n => n.id !== noteId);
+    saveLocalNotes();
+    renderNotesList();
+    
+    if (notesState.currentNoteId === noteId) {
+      notesState.currentNoteId = null;
+      document.getElementById('note-editor').value = '';
+      document.getElementById('note-title').value = '';
+    }
+    
+    showToast('Note deleted locally', 'info');
+  }
+}
+
+// Select a note
+function selectNote(noteId) {
+  notesState.currentNoteId = noteId;
+  const note = notesState.notes.find(n => n.id === noteId);
+  
+  if (note) {
+    document.getElementById('note-title').value = note.title;
+    document.getElementById('note-editor').value = note.content;
+    
+    // Update active state in list
+    document.querySelectorAll('.note-item').forEach(item => {
+      item.classList.remove('active');
+    });
+    const activeItem = document.querySelector(`[data-note-id="${noteId}"]`);
+    if (activeItem) activeItem.classList.add('active');
+  }
+}
+
+// Render notes list
+function renderNotesList() {
+  const container = document.getElementById('notes-list');
+  if (!container) return;
+  
+  if (notesState.notes.length === 0) {
+    container.innerHTML = `
+      <div class="notes-empty">
+        <span class="material-symbols-rounded">note_add</span>
+        <p>No notes yet</p>
+        <button class="btn-primary" onclick="createNote()">Create your first note</button>
+      </div>
+    `;
+    return;
+  }
+  
+  // Sort by updated date
+  const sortedNotes = [...notesState.notes].sort((a, b) => 
+    new Date(b.updatedAt) - new Date(a.updatedAt)
+  );
+  
+  container.innerHTML = sortedNotes.map(note => `
+    <div class="note-item ${note.id === notesState.currentNoteId ? 'active' : ''}" 
+         data-note-id="${note.id}" 
+         onclick="selectNote('${note.id}')">
+      <div class="note-item-header">
+        <h4>${escapeHtml(note.title)}</h4>
+        <div class="note-item-actions">
+          <button class="icon-btn" onclick="event.stopPropagation(); deleteNote('${note.id}')" title="Delete note">
+            <span class="material-symbols-rounded">delete</span>
+          </button>
+        </div>
+      </div>
+      <p class="note-preview">${escapeHtml(note.content.substring(0, 100))}${note.content.length > 100 ? '...' : ''}</p>
+      <div class="note-meta">
+        <span>Day ${note.day}</span>
+        <span>${formatDate(note.updatedAt)}</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+// Format date for display
+function formatDate(dateString) {
+  const date = new Date(dateString);
+  const now = new Date();
+  const diff = now - date;
+  
+  if (diff < 60000) return 'Just now';
+  if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`;
+  if (diff < 86400000) return `${Math.floor(diff / 3600000)}h ago`;
+  if (diff < 604800000) return `${Math.floor(diff / 86400000)}d ago`;
+  
+  return date.toLocaleDateString();
+}
+
+// Search notes
+function searchNotes(query) {
+  const container = document.getElementById('notes-list');
+  if (!container) return;
+  
+  const filteredNotes = notesState.notes.filter(note =>
+    note.title.toLowerCase().includes(query.toLowerCase()) ||
+    note.content.toLowerCase().includes(query.toLowerCase())
+  );
+  
+  if (filteredNotes.length === 0) {
+    container.innerHTML = `
+      <div class="notes-empty">
+        <span class="material-symbols-rounded">search</span>
+        <p>No notes found</p>
+      </div>
+    `;
+    return;
+  }
+  
+  const sortedNotes = filteredNotes.sort((a, b) => 
+    new Date(b.updatedAt) - new Date(a.updatedAt)
+  );
+  
+  container.innerHTML = sortedNotes.map(note => `
+    <div class="note-item ${note.id === notesState.currentNoteId ? 'active' : ''}" 
+         data-note-id="${note.id}" 
+         onclick="selectNote('${note.id}')">
+      <div class="note-item-header">
+        <h4>${escapeHtml(note.title)}</h4>
+        <div class="note-item-actions">
+          <button class="icon-btn" onclick="event.stopPropagation(); deleteNote('${note.id}')" title="Delete note">
+            <span class="material-symbols-rounded">delete</span>
+          </button>
+        </div>
+      </div>
+      <p class="note-preview">${escapeHtml(note.content.substring(0, 100))}${note.content.length > 100 ? '...' : ''}</p>
+      <div class="note-meta">
+        <span>Day ${note.day}</span>
+        <span>${formatDate(note.updatedAt)}</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+// Sync notes manually
+async function syncNotes() {
+  if (!currentUser) {
+    showToast('Sign in to sync notes', 'info');
+    return;
+  }
+  
+  showToast('Syncing notes...', 'info');
+  await loadNotesFromFirebase();
+}
+
+// Export notes
+function exportNotes() {
+  const notesData = JSON.stringify(notesState.notes, null, 2);
+  const blob = new Blob([notesData], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `notes-export-${new Date().toISOString().split('T')[0]}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('Notes exported!', 'success');
+}
+
+// Import notes
+function importNotes(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    try {
+      const importedNotes = JSON.parse(e.target.result);
+      
+      for (const note of importedNotes) {
+        const newNote = {
+          ...note,
+          id: 'imported_' + Date.now() + Math.random(),
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        };
+        notesState.notes.push(newNote);
+        
+        if (currentUser && window.db) {
+          try {
+            const notesRef = window.db.collection('users').doc(currentUser.uid).collection('notes');
+            await notesRef.add(newNote);
+          } catch (error) {
+            console.error('Error syncing imported note:', error);
+          }
+        }
+      }
+      
+      saveLocalNotes();
+      renderNotesList();
+      showToast(`Imported ${importedNotes.length} notes`, 'success');
+    } catch (error) {
+      console.error('Error importing notes:', error);
+      showToast('Error importing notes', 'error');
+    }
+  };
+  reader.readAsText(file);
+}
+
+// --- Professional ATS Resume Builder ---
+const resumeState = {
+  personalInfo: {},
+  skills: [],
+  experience: [],
+  education: [],
+  projects: [],
+  atsScore: 0,
+  suggestions: []
+};
+
+// Calculate ATS score for resume
+function calculateATSScore(resumeData, jobDescription = '') {
+  let score = 0;
+  const suggestions = [];
+  
+  // Personal Information (15%)
+  if (resumeData.personalInfo.name && resumeData.personalInfo.email && resumeData.personalInfo.phone) {
+    score += 15;
+  } else {
+    suggestions.push('Add complete contact information (name, email, phone)');
+  }
+  
+  // Skills (25%)
+  if (resumeData.skills.length >= 5) {
+    score += 25;
+  } else if (resumeData.skills.length >= 3) {
+    score += 15;
+    suggestions.push('Add more relevant skills (aim for at least 5)');
+  } else {
+    suggestions.push('Add relevant skills to your resume');
+  }
+  
+  // Experience (30%)
+  if (resumeData.experience.length >= 2) {
+    score += 30;
+  } else if (resumeData.experience.length >= 1) {
+    score += 20;
+    suggestions.push('Add more work experience');
+  } else {
+    suggestions.push('Add work experience to your resume');
+  }
+  
+  // Education (15%)
+  if (resumeData.education.length >= 1) {
+    score += 15;
+  } else {
+    suggestions.push('Add your education details');
+  }
+  
+  // Projects (15%)
+  if (resumeData.projects.length >= 2) {
+    score += 15;
+  } else if (resumeData.projects.length >= 1) {
+    score += 10;
+    suggestions.push('Add more projects to showcase your skills');
+  } else {
+    suggestions.push('Add projects to demonstrate your abilities');
+  }
+  
+  // Keyword matching with job description
+  if (jobDescription) {
+    const jobKeywords = extractKeywords(jobDescription);
+    const resumeText = JSON.stringify(resumeData).toLowerCase();
+    const matchedKeywords = jobKeywords.filter(kw => resumeText.includes(kw.toLowerCase()));
+    
+    if (matchedKeywords.length >= jobKeywords.length * 0.7) {
+      score += 10;
+    } else {
+      suggestions.push(`Add more keywords from job description (matched ${matchedKeywords.length}/${jobKeywords.length})`);
+    }
+  }
+  
+  return {
+    score: Math.min(100, score),
+    suggestions: suggestions
+  };
+}
+
+// Extract keywords from text
+function extractKeywords(text) {
+  const commonWords = ['the', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'a', 'an', 'is', 'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'could', 'should', 'may', 'might', 'must', 'shall', 'can', 'need', 'dare', 'ought', 'used', 'to', 'it', 'this', 'that', 'these', 'those', 'i', 'you', 'he', 'she', 'we', 'they', 'what', 'which', 'who', 'whom', 'when', 'where', 'why', 'how', 'all', 'any', 'both', 'each', 'few', 'more', 'most', 'other', 'some', 'such', 'no', 'nor', 'not', 'only', 'own', 'same', 'so', 'than', 'too', 'very', 'just', 'also', 'now', 'here', 'there', 'then', 'once', 'never', 'always', 'often', 'sometimes', 'usually', 'still', 'already', 'again', 'further', 'then', 'once', 'here', 'there', 'when', 'where', 'why', 'how', 'all', 'any', 'both', 'each', 'few', 'more', 'most', 'other', 'some', 'such', 'no', 'nor', 'not', 'only', 'own', 'same', 'so', 'than', 'too', 'very'];
+  
+  const words = text.toLowerCase().match(/\b[a-z]{3,}\b/g) || [];
+  return words.filter(word => !commonWords.includes(word));
+}
+
+// Analyze skills
+function analyzeSkills(skills) {
+  const skillCategories = {
+    'Programming Languages': ['python', 'javascript', 'java', 'c++', 'c', 'go', 'rust', 'swift', 'kotlin', 'typescript', 'php', 'ruby'],
+    'Web Development': ['html', 'css', 'react', 'angular', 'vue', 'node.js', 'express', 'django', 'flask', 'spring', 'asp.net'],
+    'Data Science': ['pandas', 'numpy', 'matplotlib', 'scikit-learn', 'tensorflow', 'pytorch', 'sql', 'mongodb', 'postgresql'],
+    'Tools & Frameworks': ['git', 'docker', 'kubernetes', 'aws', 'azure', 'gcp', 'jenkins', 'ci/cd', 'agile', 'scrum'],
+    'Soft Skills': ['communication', 'teamwork', 'leadership', 'problem-solving', 'time-management', 'adaptability']
+  };
+  
+  const categorized = {};
+  skills.forEach(skill => {
+    const lowerSkill = skill.toLowerCase();
+    for (const [category, keywords] of Object.entries(skillCategories)) {
+      if (keywords.some(kw => lowerSkill.includes(kw))) {
+        if (!categorized[category]) categorized[category] = [];
+        categorized[category].push(skill);
+        break;
+      }
+    }
+  });
+  
+  return categorized;
+}
+
+// Generate resume preview
+function generateResumePreview(resumeData) {
+  return `
+    <div class="resume-preview">
+      <div class="resume-header">
+        <h1>${escapeHtml(resumeData.personalInfo.name || 'Your Name')}</h1>
+        <p>${escapeHtml(resumeData.personalInfo.email || '')} | ${escapeHtml(resumeData.personalInfo.phone || '')} | ${escapeHtml(resumeData.personalInfo.location || '')}</p>
+      </div>
+      
+      <div class="resume-section">
+        <h2>Summary</h2>
+        <p>${escapeHtml(resumeData.personalInfo.summary || 'Professional summary...')}</p>
+      </div>
+      
+      <div class="resume-section">
+        <h2>Skills</h2>
+        <ul>
+          ${resumeData.skills.map(skill => `<li>${escapeHtml(skill)}</li>`).join('')}
+        </ul>
+      </div>
+      
+      <div class="resume-section">
+        <h2>Experience</h2>
+        ${resumeData.experience.map(exp => `
+          <div class="resume-item">
+            <h3>${escapeHtml(exp.title)}</h3>
+            <p>${escapeHtml(exp.company)} | ${escapeHtml(exp.duration)}</p>
+            <ul>
+              ${exp.responsibilities.map(resp => `<li>${escapeHtml(resp)}</li>`).join('')}
+            </ul>
+          </div>
+        `).join('')}
+      </div>
+      
+      <div class="resume-section">
+        <h2>Education</h2>
+        ${resumeData.education.map(edu => `
+          <div class="resume-item">
+            <h3>${escapeHtml(edu.degree)}</h3>
+            <p>${escapeHtml(edu.school)} | ${escapeHtml(edu.year)}</p>
+          </div>
+        `).join('')}
+      </div>
+      
+      <div class="resume-section">
+        <h2>Projects</h2>
+        ${resumeData.projects.map(proj => `
+          <div class="resume-item">
+            <h3>${escapeHtml(proj.name)}</h3>
+            <p>${escapeHtml(proj.description)}</p>
+            <p><strong>Technologies:</strong> ${escapeHtml(proj.technologies)}</p>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+}
+
+// Save resume data
+function saveResumeData(resumeData) {
+  localStorage.setItem('resumeData', JSON.stringify(resumeData));
+  showToast('Resume saved!', 'success');
+}
+
+// Load resume data
+function loadResumeData() {
+  const saved = localStorage.getItem('resumeData');
+  if (saved) {
+    return JSON.parse(saved);
+  }
+  return {
+    personalInfo: {},
+    skills: [],
+    experience: [],
+    education: [],
+    projects: []
+  };
+}
+
+// Export resume as PDF
+function exportResumePDF() {
+  const resumeContent = document.getElementById('resume-preview-content');
+  if (!resumeContent) return;
+  
+  // Use window.print() for PDF export
+  window.print();
+  showToast('Resume exported as PDF', 'success');
+}
+
+// Match resume with job description
+function matchWithJob(jobDescription) {
+  const resumeData = loadResumeData();
+  const analysis = calculateATSScore(resumeData, jobDescription);
+  
+  resumeState.atsScore = analysis.score;
+  resumeState.suggestions = analysis.suggestions;
+  
+  // Update UI
+  const scoreDisplay = document.getElementById('ats-score-display');
+  const suggestionsDisplay = document.getElementById('ats-suggestions');
+  
+  if (scoreDisplay) {
+    scoreDisplay.textContent = `${analysis.score}%`;
+    scoreDisplay.className = `ats-score ${analysis.score >= 70 ? 'good' : analysis.score >= 50 ? 'fair' : 'poor'}`;
+  }
+  
+  if (suggestionsDisplay) {
+    suggestionsDisplay.innerHTML = analysis.suggestions.map(s => `<li>${escapeHtml(s)}</li>`).join('');
+  }
+  
+  showToast('Job matching complete', 'success');
+}
+
+// --- Certificate Verification System with QR Codes ---
+const certificateState = {
+  certificates: [],
+  currentCertificate: null
+};
+
+// Generate unique certificate ID
+function generateCertificateId() {
+  const timestamp = Date.now().toString(36);
+  const random = Math.random().toString(36).substring(2, 15);
+  return `CERT-${timestamp}-${random}`.toUpperCase();
+}
+
+// Generate certificate
+function generateCertificate(userName, courseName, completionDate, score) {
+  const certificateId = generateCertificateId();
+  
+  const certificate = {
+    id: certificateId,
+    userName: userName,
+    courseName: courseName,
+    completionDate: completionDate,
+    score: score,
+    issuedDate: new Date().toISOString(),
+    expiryDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(), // 1 year expiry
+    verified: false,
+    verificationCount: 0
+  };
+  
+  // Save to Firebase if available
+  if (currentUser && window.db) {
+    window.db.collection('certificates').doc(certificateId).set(certificate)
+      .then(() => {
+        console.log('Certificate saved to Firebase');
+      })
+      .catch(error => {
+        console.error('Error saving certificate:', error);
+        // Fallback to local storage
+        saveCertificateLocally(certificate);
+      });
+  } else {
+    saveCertificateLocally(certificate);
+  }
+  
+  certificateState.currentCertificate = certificate;
+  return certificate;
+}
+
+// Save certificate locally
+function saveCertificateLocally(certificate) {
+  const certificates = JSON.parse(localStorage.getItem('certificates') || '[]');
+  certificates.push(certificate);
+  localStorage.setItem('certificates', JSON.stringify(certificates));
+}
+
+// Generate QR code for certificate
+function generateQRCode(certificateId) {
+  // Using a simple QR code API (in production, use a proper QR code library)
+  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(certificateId)}`;
+  return qrUrl;
+}
+
+// Verify certificate
+async function verifyCertificate(certificateId) {
+  let certificate = null;
+  
+  // Try to fetch from Firebase
+  if (window.db) {
+    try {
+      const doc = await window.db.collection('certificates').doc(certificateId).get();
+      if (doc.exists) {
+        certificate = doc.data();
+        certificate.verified = true;
+        certificate.verificationCount = (certificate.verificationCount || 0) + 1;
+        
+        // Update verification count
+        await window.db.collection('certificates').doc(certificateId).update({
+          verificationCount: certificate.verificationCount
+        });
+      }
+    } catch (error) {
+      console.error('Error verifying certificate from Firebase:', error);
+    }
+  }
+  
+  // Fallback to local storage
+  if (!certificate) {
+    const certificates = JSON.parse(localStorage.getItem('certificates') || '[]');
+    certificate = certificates.find(c => c.id === certificateId);
+    if (certificate) {
+      certificate.verified = true;
+      certificate.verificationCount = (certificate.verificationCount || 0) + 1;
+      
+      // Update local storage
+      const index = certificates.findIndex(c => c.id === certificateId);
+      certificates[index] = certificate;
+      localStorage.setItem('certificates', JSON.stringify(certificates));
+    }
+  }
+  
+  return certificate;
+}
+
+// Check if certificate is expired
+function isCertificateExpired(certificate) {
+  const expiryDate = new Date(certificate.expiryDate);
+  const now = new Date();
+  return now > expiryDate;
+}
+
+// Display certificate
+function displayCertificate(certificate) {
+  const container = document.getElementById('certificate-display');
+  if (!container) return;
+  
+  const qrCodeUrl = generateQRCode(certificate.id);
+  const expired = isCertificateExpired(certificate);
+  
+  container.innerHTML = `
+    <div class="certificate-container ${expired ? 'expired' : ''}">
+      <div class="certificate-header">
+        <div class="certificate-logo">
+          <span class="material-symbols-rounded">school</span>
+          <h2>Python Master AI</h2>
+        </div>
+        <div class="certificate-badge ${expired ? 'expired-badge' : 'valid-badge'}">
+          ${expired ? 'EXPIRED' : 'VERIFIED'}
+        </div>
+      </div>
+      
+      <div class="certificate-body">
+        <h1>Certificate of Completion</h1>
+        <p class="certificate-text">This certifies that</p>
+        <h2 class="certificate-name">${escapeHtml(certificate.userName)}</h2>
+        <p class="certificate-text">has successfully completed</p>
+        <h3 class="certificate-course">${escapeHtml(certificate.courseName)}</h3>
+        
+        <div class="certificate-details">
+          <div class="detail-item">
+            <span class="detail-label">Certificate ID:</span>
+            <span class="detail-value">${certificate.id}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Completion Date:</span>
+            <span class="detail-value">${new Date(certificate.completionDate).toLocaleDateString()}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Score:</span>
+            <span class="detail-value">${certificate.score}%</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Issued Date:</span>
+            <span class="detail-value">${new Date(certificate.issuedDate).toLocaleDateString()}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Expiry Date:</span>
+            <span class="detail-value">${new Date(certificate.expiryDate).toLocaleDateString()}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Verification Count:</span>
+            <span class="detail-value">${certificate.verificationCount || 0}</span>
+          </div>
+        </div>
+        
+        <div class="certificate-qr">
+          <img src="${qrCodeUrl}" alt="QR Code" />
+          <p>Scan to verify</p>
+        </div>
+      </div>
+      
+      <div class="certificate-footer">
+        <div class="signature">
+          <div class="signature-line"></div>
+          <p>Authorized Signature</p>
+        </div>
+        <div class="seal">
+          <span class="material-symbols-rounded">verified</span>
+          <p>Official Seal</p>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// Download certificate as PDF
+function downloadCertificatePDF(certificate) {
+  const certificateElement = document.querySelector('.certificate-container');
+  if (!certificateElement) return;
+  
+  // Use window.print() for PDF export
+  window.print();
+  showToast('Certificate downloaded', 'success');
+}
+
+// Share certificate
+function shareCertificate(certificate) {
+  const shareUrl = `${window.location.origin}/verify/${certificate.id}`;
+  
+  if (navigator.share) {
+    navigator.share({
+      title: 'My Certificate',
+      text: `I completed ${certificate.courseName} with a score of ${certificate.score}%!`,
+      url: shareUrl
+    }).catch(error => {
+      console.error('Error sharing:', error);
+      copyToClipboard(shareUrl);
+    });
+  } else {
+    copyToClipboard(shareUrl);
+  }
+}
+
+// Copy to clipboard
+function copyToClipboard(text) {
+  navigator.clipboard.writeText(text).then(() => {
+    showToast('Link copied to clipboard', 'success');
+  }).catch(error => {
+    console.error('Error copying to clipboard:', error);
+  });
+}
+
+// Load user certificates
+async function loadUserCertificates() {
+  if (!currentUser) return [];
+  
+  let certificates = [];
+  
+  // Try to fetch from Firebase
+  if (window.db) {
+    try {
+      const snapshot = await window.db.collection('certificates')
+        .where('userName', '==', currentUser.name)
+        .get();
+      
+      snapshot.forEach(doc => {
+        certificates.push(doc.data());
+      });
+    } catch (error) {
+      console.error('Error loading certificates from Firebase:', error);
+    }
+  }
+  
+  // Fallback to local storage
+  if (certificates.length === 0) {
+    certificates = JSON.parse(localStorage.getItem('certificates') || '[]');
+    certificates = certificates.filter(c => c.userName === currentUser.name);
+  }
+  
+  certificateState.certificates = certificates;
+  return certificates;
+}
+
+// --- Admin Dashboard with CRUD Operations ---
+const adminState = {
+  users: [],
+  reports: [],
+  settings: {},
+  currentView: 'dashboard',
+  isLoading: false
+};
+
+// Check if user is admin
+function isAdmin() {
+  return currentUser && (currentUser.email === 'admin@pythonmaster.ai' || currentUser.role === 'admin');
+}
+
+// Load admin dashboard data
+async function loadAdminDashboard() {
+  if (!isAdmin()) {
+    showToast('Access denied. Admin only.', 'error');
+    return;
+  }
+  
+  adminState.isLoading = true;
+  
+  try {
+    // Load users from Firebase
+    if (window.db) {
+      const usersSnapshot = await window.db.collection('users').get();
+      adminState.users = [];
+      usersSnapshot.forEach(doc => {
+        adminState.users.push({ id: doc.id, ...doc.data() });
+      });
+      
+      // Load reports
+      const reportsSnapshot = await window.db.collection('reports').get();
+      adminState.reports = [];
+      reportsSnapshot.forEach(doc => {
+        adminState.reports.push({ id: doc.id, ...doc.data() });
+      });
+      
+      // Load settings
+      const settingsDoc = await window.db.collection('settings').doc('general').get();
+      if (settingsDoc.exists) {
+        adminState.settings = settingsDoc.data();
+      }
+    } else {
+      // Fallback to local storage for demo
+      adminState.users = JSON.parse(localStorage.getItem('adminUsers') || '[]');
+      adminState.reports = JSON.parse(localStorage.getItem('adminReports') || '[]');
+      adminState.settings = JSON.parse(localStorage.getItem('adminSettings') || '{}');
+    }
+    
+    renderAdminDashboard();
+    adminState.isLoading = false;
+  } catch (error) {
+    console.error('Error loading admin dashboard:', error);
+    adminState.isLoading = false;
+    showToast('Error loading dashboard data', 'error');
+  }
+}
+
+// Render admin dashboard
+function renderAdminDashboard() {
+  const container = document.getElementById('admin-dashboard-content');
+  if (!container) return;
+  
+  const totalUsers = adminState.users.length;
+  const activeUsers = adminState.users.filter(u => u.lastActive && Date.now() - new Date(u.lastActive).getTime() < 7 * 24 * 60 * 60 * 1000).length;
+  const totalXP = adminState.users.reduce((sum, u) => sum + (u.xp || 0), 0);
+  const pendingReports = adminState.reports.filter(r => r.status === 'pending').length;
+  
+  container.innerHTML = `
+    <div class="admin-dashboard">
+      <div class="admin-header">
+        <h2>Admin Dashboard</h2>
+        <div class="admin-stats">
+          <div class="stat-card">
+            <span class="stat-value">${totalUsers}</span>
+            <span class="stat-label">Total Users</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-value">${activeUsers}</span>
+            <span class="stat-label">Active Users</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-value">${totalXP}</span>
+            <span class="stat-label">Total XP Earned</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-value">${pendingReports}</span>
+            <span class="stat-label">Pending Reports</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="admin-nav">
+        <button class="admin-nav-btn ${adminState.currentView === 'dashboard' ? 'active' : ''}" onclick="switchAdminView('dashboard')">
+          <span class="material-symbols-rounded">dashboard</span>
+          Dashboard
+        </button>
+        <button class="admin-nav-btn ${adminState.currentView === 'users' ? 'active' : ''}" onclick="switchAdminView('users')">
+          <span class="material-symbols-rounded">people</span>
+          Users
+        </button>
+        <button class="admin-nav-btn ${adminState.currentView === 'reports' ? 'active' : ''}" onclick="switchAdminView('reports')">
+          <span class="material-symbols-rounded">report</span>
+          Reports
+        </button>
+        <button class="admin-nav-btn ${adminState.currentView === 'settings' ? 'active' : ''}" onclick="switchAdminView('settings')">
+          <span class="material-symbols-rounded">settings</span>
+          Settings
+        </button>
+      </div>
+      
+      <div class="admin-content">
+        ${renderAdminView()}
+      </div>
+    </div>
+  `;
+}
+
+// Switch admin view
+function switchAdminView(view) {
+  adminState.currentView = view;
+  renderAdminDashboard();
+}
+
+// Render current admin view
+function renderAdminView() {
+  switch (adminState.currentView) {
+    case 'dashboard':
+      return renderDashboardView();
+    case 'users':
+      return renderUsersView();
+    case 'reports':
+      return renderReportsView();
+    case 'settings':
+      return renderSettingsView();
+    default:
+      return renderDashboardView();
+  }
+}
+
+// Render dashboard view
+function renderDashboardView() {
+  const recentUsers = adminState.users.slice(-5).reverse();
+  const recentReports = adminState.reports.slice(-5).reverse();
+  
+  return `
+    <div class="dashboard-view">
+      <h3>Recent Activity</h3>
+      <div class="dashboard-grid">
+        <div class="dashboard-section">
+          <h4>Recent Users</h4>
+          <div class="recent-list">
+            ${recentUsers.map(user => `
+              <div class="recent-item">
+                <span class="item-name">${escapeHtml(user.name || user.email)}</span>
+                <span class="item-date">${user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A'}</span>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+        <div class="dashboard-section">
+          <h4>Recent Reports</h4>
+          <div class="recent-list">
+            ${recentReports.map(report => `
+              <div class="recent-item">
+                <span class="item-name">${escapeHtml(report.subject || 'No subject')}</span>
+                <span class="item-status status-${report.status}">${report.status || 'pending'}</span>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// Render users view
+function renderUsersView() {
+  return `
+    <div class="users-view">
+      <div class="view-header">
+        <h3>User Management</h3>
+        <button class="btn-primary" onclick="showAddUserModal()">
+          <span class="material-symbols-rounded">add</span>
+          Add User
+        </button>
+      </div>
+      <div class="users-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>XP</th>
+              <th>Streak</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${adminState.users.map(user => `
+              <tr>
+                <td>${escapeHtml(user.name || 'N/A')}</td>
+                <td>${escapeHtml(user.email)}</td>
+                <td>${user.xp || 0}</td>
+                <td>${user.streak || 0}</td>
+                <td><span class="status-badge ${user.active ? 'active' : 'inactive'}">${user.active ? 'Active' : 'Inactive'}</span></td>
+                <td>
+                  <button class="icon-btn" onclick="editUser('${user.id}')" title="Edit">
+                    <span class="material-symbols-rounded">edit</span>
+                  </button>
+                  <button class="icon-btn" onclick="deleteUser('${user.id}')" title="Delete">
+                    <span class="material-symbols-rounded">delete</span>
+                  </button>
+                </td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `;
+}
+
+// Render reports view
+function renderReportsView() {
+  return `
+    <div class="reports-view">
+      <div class="view-header">
+        <h3>Reports & Support Tickets</h3>
+        <div class="filter-buttons">
+          <button class="btn-secondary" onclick="filterReports('all')">All</button>
+          <button class="btn-secondary" onclick="filterReports('pending')">Pending</button>
+          <button class="btn-secondary" onclick="filterReports('resolved')">Resolved</button>
+        </div>
+      </div>
+      <div class="reports-list">
+        ${adminState.reports.map(report => `
+          <div class="report-card status-${report.status}">
+            <div class="report-header">
+              <h4>${escapeHtml(report.subject || 'No subject')}</h4>
+              <span class="report-status">${report.status || 'pending'}</span>
+            </div>
+            <p class="report-description">${escapeHtml(report.description || 'No description')}</p>
+            <div class="report-meta">
+              <span>From: ${escapeHtml(report.userName || 'Anonymous')}</span>
+              <span>${report.createdAt ? new Date(report.createdAt).toLocaleDateString() : 'N/A'}</span>
+            </div>
+            <div class="report-actions">
+              <button class="btn-secondary" onclick="viewReport('${report.id}')">View Details</button>
+              ${report.status === 'pending' ? `<button class="btn-primary" onclick="resolveReport('${report.id}')">Mark Resolved</button>` : ''}
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+}
+
+// Render settings view
+function renderSettingsView() {
+  return `
+    <div class="settings-view">
+      <h3>Platform Settings</h3>
+      <div class="settings-form">
+        <div class="form-group">
+          <label>Platform Name</label>
+          <input type="text" id="setting-platform-name" value="${escapeHtml(adminState.settings.platformName || 'Python Master AI')}" />
+        </div>
+        <div class="form-group">
+          <label>XP per Quiz</label>
+          <input type="number" id="setting-xp-quiz" value="${adminState.settings.xpPerQuiz || 25}" />
+        </div>
+        <div class="form-group">
+          <label>XP per Assignment</label>
+          <input type="number" id="setting-xp-assignment" value="${adminState.settings.xpPerAssignment || 50}" />
+        </div>
+        <div class="form-group">
+          <label>Minimum Pass Score (%)</label>
+          <input type="number" id="setting-pass-score" value="${adminState.settings.minPassScore || 70}" />
+        </div>
+        <div class="form-group">
+          <label>Maintenance Mode</label>
+          <select id="setting-maintenance">
+            <option value="false" ${!adminState.settings.maintenanceMode ? 'selected' : ''}>Disabled</option>
+            <option value="true" ${adminState.settings.maintenanceMode ? 'selected' : ''}>Enabled</option>
+          </select>
+        </div>
+        <button class="btn-primary" onclick="saveSettings()">Save Settings</button>
+      </div>
+    </div>
+  `;
+}
+
+// CRUD Operations for Users
+async function addUser(userData) {
+  if (!window.db) {
+    // Local storage fallback
+    const newUser = { id: 'local_' + Date.now(), ...userData, createdAt: new Date().toISOString() };
+    adminState.users.push(newUser);
+    localStorage.setItem('adminUsers', JSON.stringify(adminState.users));
+    renderAdminDashboard();
+    showToast('User added locally', 'success');
+    return;
+  }
+  
+  try {
+    const docRef = await window.db.collection('users').add(userData);
+    adminState.users.push({ id: docRef.id, ...userData });
+    renderAdminDashboard();
+    showToast('User added successfully', 'success');
+  } catch (error) {
+    console.error('Error adding user:', error);
+    showToast('Error adding user', 'error');
+  }
+}
+
+async function editUser(userId) {
+  const user = adminState.users.find(u => u.id === userId);
+  if (!user) return;
+  
+  // Show edit modal (simplified - in production, use a proper modal)
+  const newName = prompt('Enter new name:', user.name);
+  if (newName) {
+    user.name = newName;
+    
+    if (window.db) {
+      await window.db.collection('users').doc(userId).update({ name: newName });
+    } else {
+      localStorage.setItem('adminUsers', JSON.stringify(adminState.users));
+    }
+    
+    renderAdminDashboard();
+    showToast('User updated', 'success');
+  }
+}
+
+async function deleteUser(userId) {
+  if (!confirm('Are you sure you want to delete this user?')) return;
+  
+  if (window.db) {
+    await window.db.collection('users').doc(userId).delete();
+  }
+  
+  adminState.users = adminState.users.filter(u => u.id !== userId);
+  
+  if (!window.db) {
+    localStorage.setItem('adminUsers', JSON.stringify(adminState.users));
+  }
+  
+  renderAdminDashboard();
+  showToast('User deleted', 'success');
+}
+
+// CRUD Operations for Reports
+async function resolveReport(reportId) {
+  const report = adminState.reports.find(r => r.id === reportId);
+  if (!report) return;
+  
+  report.status = 'resolved';
+  report.resolvedAt = new Date().toISOString();
+  
+  if (window.db) {
+    await window.db.collection('reports').doc(reportId).update({
+      status: 'resolved',
+      resolvedAt: new Date().toISOString()
+    });
+  } else {
+    localStorage.setItem('adminReports', JSON.stringify(adminState.reports));
+  }
+  
+  renderAdminDashboard();
+  showToast('Report resolved', 'success');
+}
+
+// Settings Operations
+async function saveSettings() {
+  const settings = {
+    platformName: document.getElementById('setting-platform-name').value,
+    xpPerQuiz: parseInt(document.getElementById('setting-xp-quiz').value),
+    xpPerAssignment: parseInt(document.getElementById('setting-xp-assignment').value),
+    minPassScore: parseInt(document.getElementById('setting-pass-score').value),
+    maintenanceMode: document.getElementById('setting-maintenance').value === 'true'
+  };
+  
+  adminState.settings = settings;
+  
+  if (window.db) {
+    await window.db.collection('settings').doc('general').set(settings);
+  } else {
+    localStorage.setItem('adminSettings', JSON.stringify(settings));
+  }
+  
+  showToast('Settings saved', 'success');
+}
+
+// Filter reports
+function filterReports(status) {
+  const filtered = status === 'all' 
+    ? adminState.reports 
+    : adminState.reports.filter(r => r.status === status);
+  
+  // Update the reports list with filtered results
+  adminState.reports = filtered;
+  renderAdminDashboard();
+}
+
+// --- Comprehensive Error Handling System ---
+const errorHandlingState = {
+  errors: [],
+  errorLog: [],
+  maxLogSize: 100
+};
+
+// Error types enumeration
+const ErrorTypes = {
+  NETWORK: 'network',
+  AUTHENTICATION: 'authentication',
+  VALIDATION: 'validation',
+  DATABASE: 'database',
+  FILE: 'file',
+  PERMISSION: 'permission',
+  UNKNOWN: 'unknown'
+};
+
+// Custom error class
+class AppError extends Error {
+  constructor(message, type = ErrorTypes.UNKNOWN, details = null) {
+    super(message);
+    this.name = 'AppError';
+    this.type = type;
+    this.details = details;
+    this.timestamp = new Date().toISOString();
+  }
+}
+
+// Global error handler
+window.addEventListener('error', (event) => {
+  handleGlobalError(event.error, event.message, event.filename, event.lineno);
+});
+
+window.addEventListener('unhandledrejection', (event) => {
+  handlePromiseRejection(event.reason);
+});
+
+// Handle global errors
+function handleGlobalError(error, message, filename, lineno) {
+  const errorInfo = {
+    message: message || error?.message || 'Unknown error',
+    type: ErrorTypes.UNKNOWN,
+    filename: filename,
+    lineno: lineno,
+    timestamp: new Date().toISOString(),
+    stack: error?.stack
+  };
+  
+  logError(errorInfo);
+  showToast('An error occurred. Please try again.', 'error');
+}
+
+// Handle unhandled promise rejections
+function handlePromiseRejection(reason) {
+  const errorInfo = {
+    message: reason?.message || 'Promise rejection',
+    type: ErrorTypes.UNKNOWN,
+    timestamp: new Date().toISOString(),
+    stack: reason?.stack
+  };
+  
+  logError(errorInfo);
+  showToast('An error occurred. Please try again.', 'error');
+}
+
+// Log error
+function logError(errorInfo) {
+  errorHandlingState.errorLog.push(errorInfo);
+  
+  // Keep log size manageable
+  if (errorHandlingState.errorLog.length > errorHandlingState.maxLogSize) {
+    errorHandlingState.errorLog.shift();
+  }
+  
+  // Log to console in development
+  if (process.env.NODE_ENV === 'development') {
+    console.error('Error logged:', errorInfo);
+  }
+  
+  // Save to local storage
+  try {
+    localStorage.setItem('errorLog', JSON.stringify(errorHandlingState.errorLog));
+  } catch (e) {
+    console.error('Failed to save error log:', e);
+  }
+  
+  // Send to error tracking service (in production)
+  if (window.db && currentUser) {
+    sendErrorToFirebase(errorInfo);
+  }
+}
+
+// Send error to Firebase
+async function sendErrorToFirebase(errorInfo) {
+  try {
+    await window.db.collection('errorLogs').add({
+      ...errorInfo,
+      userId: currentUser.uid,
+      userEmail: currentUser.email
+    });
+  } catch (e) {
+    console.error('Failed to send error to Firebase:', e);
+  }
+}
+
+// Wrap async functions with error handling
+function withErrorHandling(fn, fallback = null) {
+  return async (...args) => {
+    try {
+      return await fn(...args);
+    } catch (error) {
+      const appError = error instanceof AppError ? error : new AppError(
+        error.message || 'An error occurred',
+        ErrorTypes.UNKNOWN,
+        { originalError: error }
+      );
+      
+      handleAppError(appError);
+      
+      if (fallback) {
+        return fallback(...args);
+      }
+      
+      throw appError;
+    }
+  };
+}
+
+// Handle application errors
+function handleAppError(error) {
+  logError({
+    message: error.message,
+    type: error.type,
+    timestamp: error.timestamp,
+    details: error.details
+  });
+  
+  // Show user-friendly message based on error type
+  switch (error.type) {
+    case ErrorTypes.NETWORK:
+      showToast('Network error. Please check your connection.', 'error');
+      break;
+    case ErrorTypes.AUTHENTICATION:
+      showToast('Authentication error. Please sign in again.', 'error');
+      break;
+    case ErrorTypes.VALIDATION:
+      showToast(error.message, 'warning');
+      break;
+    case ErrorTypes.DATABASE:
+      showToast('Database error. Please try again.', 'error');
+      break;
+    case ErrorTypes.PERMISSION:
+      showToast('You don\'t have permission to perform this action.', 'error');
+      break;
+    default:
+      showToast('An error occurred. Please try again.', 'error');
+  }
+}
+
+// Validate input data
+function validateInput(data, schema) {
+  const errors = [];
+  
+  for (const [field, rules] of Object.entries(schema)) {
+    const value = data[field];
+    
+    if (rules.required && (value === undefined || value === null || value === '')) {
+      errors.push(`${field} is required`);
+      continue;
+    }
+    
+    if (value !== undefined && value !== null) {
+      if (rules.type && typeof value !== rules.type) {
+        errors.push(`${field} must be of type ${rules.type}`);
+      }
+      
+      if (rules.minLength && value.length < rules.minLength) {
+        errors.push(`${field} must be at least ${rules.minLength} characters`);
+      }
+      
+      if (rules.maxLength && value.length > rules.maxLength) {
+        errors.push(`${field} must not exceed ${rules.maxLength} characters`);
+      }
+      
+      if (rules.pattern && !rules.pattern.test(value)) {
+        errors.push(`${field} format is invalid`);
+      }
+      
+      if (rules.min && value < rules.min) {
+        errors.push(`${field} must be at least ${rules.min}`);
+      }
+      
+      if (rules.max && value > rules.max) {
+        errors.push(`${field} must not exceed ${rules.max}`);
+      }
+    }
+  }
+  
+  if (errors.length > 0) {
+    throw new AppError(
+      'Validation failed',
+      ErrorTypes.VALIDATION,
+      { errors }
+    );
+  }
+  
+  return true;
+}
+
+// Retry failed operations
+async function withRetry(fn, maxRetries = 3, delay = 1000) {
+  let lastError;
+  
+  for (let i = 0; i < maxRetries; i++) {
+    try {
+      return await fn();
+    } catch (error) {
+      lastError = error;
+      
+      if (i < maxRetries - 1) {
+        await new Promise(resolve => setTimeout(resolve, delay * (i + 1)));
+      }
+    }
+  }
+  
+  throw lastError;
+}
+
+// --- Enhanced Toast Notification System ---
+const toastState = {
+  toasts: [],
+  maxToasts: 5,
+  defaultDuration: 3000
+};
+
+// Show toast notification
+function showToast(message, type = 'info', duration = toastState.defaultDuration) {
+  const toast = {
+    id: Date.now(),
+    message: message,
+    type: type,
+    duration: duration,
+    timestamp: new Date().toISOString()
+  };
+  
+  // Add to state
+  toastState.toasts.push(toast);
+  
+  // Limit number of toasts
+  if (toastState.toasts.length > toastState.maxToasts) {
+    toastState.toasts.shift();
+  }
+  
+  // Render toast
+  renderToast(toast);
+  
+  // Auto-remove after duration
+  setTimeout(() => {
+    removeToast(toast.id);
+  }, duration);
+}
+
+// Render toast notification
+function renderToast(toast) {
+  const container = document.getElementById('toast-container');
+  if (!container) {
+    // Create container if it doesn't exist
+    const newContainer = document.createElement('div');
+    newContainer.id = 'toast-container';
+    newContainer.className = 'toast-container';
+    document.body.appendChild(newContainer);
+  }
+  
+  const toastElement = document.createElement('div');
+  toastElement.id = `toast-${toast.id}`;
+  toastElement.className = `toast toast-${toast.type}`;
+  toastElement.innerHTML = `
+    <div class="toast-icon">
+      <span class="material-symbols-rounded">${getToastIcon(toast.type)}</span>
+    </div>
+    <div class="toast-message">${escapeHtml(toast.message)}</div>
+    <button class="toast-close" onclick="removeToast(${toast.id})">
+      <span class="material-symbols-rounded">close</span>
+    </button>
+  `;
+  
+  const toastContainer = document.getElementById('toast-container');
+  toastContainer.appendChild(toastElement);
+  
+  // Animate in
+  setTimeout(() => {
+    toastElement.classList.add('show');
+  }, 10);
+}
+
+// Get toast icon based on type
+function getToastIcon(type) {
+  const icons = {
+    success: 'check_circle',
+    error: 'error',
+    warning: 'warning',
+    info: 'info'
+  };
+  return icons[type] || icons.info;
+}
+
+// Remove toast notification
+function removeToast(toastId) {
+  const toastElement = document.getElementById(`toast-${toastId}`);
+  if (toastElement) {
+    toastElement.classList.remove('show');
+    setTimeout(() => {
+      toastElement.remove();
+    }, 300);
+  }
+  
+  // Remove from state
+  toastState.toasts = toastState.toasts.filter(t => t.id !== toastId);
+}
+
+// Clear all toasts
+function clearAllToasts() {
+  toastState.toasts.forEach(toast => {
+    removeToast(toast.id);
+  });
+}
+
+// Show success toast
+function showSuccessToast(message) {
+  showToast(message, 'success');
+}
+
+// Show error toast
+function showErrorToast(message) {
+  showToast(message, 'error', 5000);
+}
+
+// Show warning toast
+function showWarningToast(message) {
+  showToast(message, 'warning', 4000);
+}
+
+// Show loading toast
+function showLoadingToast(message = 'Loading...') {
+  const toastId = Date.now();
+  const toast = {
+    id: toastId,
+    message: message,
+    type: 'loading',
+    duration: 0,
+    timestamp: new Date().toISOString()
+  };
+  
+  toastState.toasts.push(toast);
+  renderToast(toast);
+  
+  return toastId;
+}
+
+// Update loading toast
+function updateLoadingToast(toastId, message) {
+  const toastElement = document.getElementById(`toast-${toastId}`);
+  if (toastElement) {
+    const messageElement = toastElement.querySelector('.toast-message');
+    if (messageElement) {
+      messageElement.textContent = message;
+    }
+  }
+}
+
+// Remove loading toast
+function removeLoadingToast(toastId) {
+  removeToast(toastId);
+}
+
+// --- Interview Preparation System ---
+const interviewState = {
+  questions: [],
+  currentQuestionIndex: 0,
+  userAnswers: [],
+  practiceMode: false,
+  timerInterval: null,
+  timeRemaining: 0
+};
+
+// Interview questions database
+const interviewQuestions = [
+  {
+    id: 1,
+    category: 'Basics',
+    difficulty: 'Easy',
+    question: 'What is Python and what are its key features?',
+    answer: 'Python is a high-level, interpreted programming language known for its simplicity and readability. Key features include: dynamic typing, automatic memory management, extensive standard library, cross-platform compatibility, and support for multiple programming paradigms (object-oriented, functional, procedural).',
+    tips: 'Focus on readability, simplicity, and versatility. Mention real-world applications like web development, data science, AI, and automation.',
+    keywords: ['interpreted', 'dynamic typing', 'memory management', 'standard library', 'paradigms']
+  },
+  {
+    id: 2,
+    category: 'Basics',
+    difficulty: 'Easy',
+    question: 'Explain the difference between lists and tuples in Python.',
+    answer: 'Lists are mutable, can be modified after creation, use square brackets [], and are generally used for homogeneous data. Tuples are immutable, cannot be modified after creation, use parentheses (), and are typically used for heterogeneous data. Tuples are also faster and more memory-efficient than lists.',
+    tips: 'Emphasize mutability as the key difference. Mention performance benefits of tuples.',
+    keywords: ['mutable', 'immutable', 'square brackets', 'parentheses', 'performance']
+  },
+  {
+    id: 3,
+    category: 'Basics',
+    difficulty: 'Easy',
+    question: 'What is the difference between == and is in Python?',
+    answer: '== compares the values of two objects, while is checks if two variables point to the same object in memory (identity comparison). Use == for value comparison and is for checking object identity, typically with None or singletons.',
+    tips: 'Give examples: a = [1, 2]; b = [1, 2]; a == b is True, but a is b is False.',
+    keywords: ['value comparison', 'identity', 'memory', 'None', 'singletons']
+  },
+  {
+    id: 4,
+    category: 'Intermediate',
+    difficulty: 'Medium',
+    question: 'Explain decorators in Python with an example.',
+    answer: 'Decorators are functions that modify the behavior of other functions without changing their source code. They use the @ symbol and are essentially higher-order functions. Example:\n\n```python\ndef timer(func):\n    def wrapper(*args, **kwargs):\n        import time\n        start = time.time()\n        result = func(*args, **kwargs)\n        print(f"Time: {time.time() - start}")\n        return result\n    return wrapper\n\n@timer\ndef my_function():\n    time.sleep(1)\n```',
+    tips: 'Explain that decorators wrap functions to add functionality. Mention common use cases like logging, timing, and authentication.',
+    keywords: ['higher-order functions', 'wrapper', '@ symbol', 'logging', 'timing']
+  },
+  {
+    id: 5,
+    category: 'Intermediate',
+    difficulty: 'Medium',
+    question: 'What are generators and how do they differ from lists?',
+    answer: 'Generators are functions that yield values one at a time using the yield keyword instead of returning all values at once. They are memory-efficient because they don\'t store all values in memory. Lists store all values in memory at once. Generators are lazy and only compute values when needed.',
+    tips: 'Highlight memory efficiency and lazy evaluation. Use the yield keyword example.',
+    keywords: ['yield', 'lazy evaluation', 'memory efficient', 'iterator', 'comprehension']
+  },
+  {
+    id: 6,
+    category: 'Intermediate',
+    difficulty: 'Medium',
+    question: 'Explain context managers and the with statement.',
+    answer: 'Context managers manage resources automatically using the with statement. They ensure proper cleanup of resources like files, database connections, or locks. The __enter__ and __exit__ methods define the behavior. Example:\n\n```python\nwith open("file.txt", "r") as f:\n    content = f.read()\n# File automatically closed here\n```',
+    tips: 'Focus on resource management and automatic cleanup. Mention __enter__ and __exit__ methods.',
+    keywords: ['with statement', 'resource management', '__enter__', '__exit__', 'cleanup']
+  },
+  {
+    id: 7,
+    category: 'Advanced',
+    difficulty: 'Hard',
+    question: 'Explain the GIL (Global Interpreter Lock) in Python.',
+    answer: 'The GIL is a mutex that protects access to Python objects, preventing multiple threads from executing Python bytecodes at once. This means Python threads are not truly concurrent for CPU-bound tasks. The GIL exists because CPython\'s memory management is not thread-safe. Workarounds include using multiprocessing instead of threading, or using libraries like NumPy that release the GIL.',
+    tips: 'Explain why it exists (memory management) and its impact on multi-threading. Mention multiprocessing as a solution.',
+    keywords: ['mutex', 'threading', 'multiprocessing', 'CPU-bound', 'memory management']
+  },
+  {
+    id: 8,
+    category: 'Advanced',
+    difficulty: 'Hard',
+    question: 'What is metaprogramming in Python?',
+    answer: 'Metaprogramming is writing code that manipulates code. In Python, this includes decorators, metaclasses, and dynamic code generation. Metaclasses allow you to customize class creation. Example:\n\n```python\nclass MyMeta(type):\n    def __new__(cls, name, bases, dct):\n        dct["custom_attr"] = "added by metaclass"\n        return super().__new__(cls, name, bases, dct)\n\nclass MyClass(metaclass=MyMeta):\n    pass\n```',
+    tips: 'Explain that metaprogramming is about code that writes code. Mention decorators and metaclasses.',
+    keywords: ['metaclasses', 'decorators', 'dynamic code', '__new__', 'class creation']
+  },
+  {
+    id: 9,
+    category: 'Data Structures',
+    difficulty: 'Medium',
+    question: 'Explain the difference between shallow copy and deep copy.',
+    answer: 'Shallow copy creates a new object but inserts references to the objects found in the original. Changes to nested objects affect both copies. Deep copy creates a new object and recursively copies all nested objects, creating completely independent copies. Use copy.copy() for shallow copy and copy.deepcopy() for deep copy.',
+    tips: 'Use the copy module examples. Explain when to use each based on object structure.',
+    keywords: ['copy.copy', 'copy.deepcopy', 'nested objects', 'references', 'independent']
+  },
+  {
+    id: 10,
+    category: 'OOP',
+    difficulty: 'Medium',
+    question: 'Explain method resolution order (MRO) in Python.',
+    answer: 'MRO is the order in which Python looks for methods in a hierarchy of classes. Python uses C3 linearization algorithm (MRO C3) to determine the order. You can view it using ClassName.__mro__ or ClassName.mro(). This is especially important in multiple inheritance to avoid diamond problems.',
+    tips: 'Explain multiple inheritance and the diamond problem. Show how to check MRO.',
+    keywords: ['C3 linearization', 'multiple inheritance', 'diamond problem', '__mro__', 'inheritance']
+  }
+];
+
+// Load interview questions
+function loadInterviewQuestions(category = 'all', difficulty = 'all') {
+  let filtered = interviewQuestions;
+  
+  if (category !== 'all') {
+    filtered = filtered.filter(q => q.category === category);
+  }
+  
+  if (difficulty !== 'all') {
+    filtered = filtered.filter(q => q.difficulty === difficulty);
+  }
+  
+  interviewState.questions = filtered;
+  interviewState.currentQuestionIndex = 0;
+  interviewState.userAnswers = [];
+  
+  return filtered;
+}
+
+// Get current question
+function getCurrentQuestion() {
+  if (interviewState.questions.length === 0) return null;
+  return interviewState.questions[interviewState.currentQuestionIndex];
+}
+
+// Submit answer
+function submitInterviewAnswer(answer) {
+  const currentQuestion = getCurrentQuestion();
+  if (!currentQuestion) return;
+  
+  interviewState.userAnswers.push({
+    questionId: currentQuestion.id,
+    question: currentQuestion.question,
+    answer: answer,
+    timestamp: new Date().toISOString()
+  });
+  
+  // Move to next question
+  if (interviewState.currentQuestionIndex < interviewState.questions.length - 1) {
+    interviewState.currentQuestionIndex++;
+    return { status: 'next', question: getCurrentQuestion() };
+  } else {
+    return { status: 'complete', results: evaluateInterviewAnswers() };
+  }
+}
+
+// Evaluate interview answers
+function evaluateInterviewAnswers() {
+  const results = interviewState.userAnswers.map(userAnswer => {
+    const question = interviewQuestions.find(q => q.id === userAnswer.questionId);
+    if (!question) return null;
+    
+    const keywordsMatched = question.keywords.filter(kw => 
+      userAnswer.answer.toLowerCase().includes(kw.toLowerCase())
+    ).length;
+    
+    const keywordScore = (keywordsMatched / question.keywords.length) * 100;
+    const lengthScore = Math.min(100, (userAnswer.answer.length / 100) * 100);
+    const overallScore = (keywordScore * 0.7) + (lengthScore * 0.3);
+    
+    return {
+      question: question.question,
+      userAnswer: userAnswer.answer,
+      modelAnswer: question.answer,
+      tips: question.tips,
+      keywords: question.keywords,
+      keywordsMatched: keywordsMatched,
+      score: Math.round(overallScore)
+    };
+  });
+  
+  const averageScore = results.reduce((sum, r) => sum + r.score, 0) / results.length;
+  
+  return {
+    results: results,
+    averageScore: Math.round(averageScore),
+    totalQuestions: results.length,
+    completedAt: new Date().toISOString()
+  };
+}
+
+// Start mock interview with timer
+function startMockInterview(duration = 30) {
+  interviewState.practiceMode = true;
+  interviewState.timeRemaining = duration * 60; // Convert to seconds
+  
+  interviewState.timerInterval = setInterval(() => {
+    interviewState.timeRemaining--;
+    
+    if (interviewState.timeRemaining <= 0) {
+      stopMockInterview();
+    }
+    
+    updateTimerDisplay();
+  }, 1000);
+  
+  loadInterviewQuestions();
+  return getCurrentQuestion();
+}
+
+// Stop mock interview
+function stopMockInterview() {
+  if (interviewState.timerInterval) {
+    clearInterval(interviewState.timerInterval);
+    interviewState.timerInterval = null;
+  }
+  
+  interviewState.practiceMode = false;
+  return evaluateInterviewAnswers();
+}
+
+// Update timer display
+function updateTimerDisplay() {
+  const minutes = Math.floor(interviewState.timeRemaining / 60);
+  const seconds = interviewState.timeRemaining % 60;
+  
+  const timerElement = document.getElementById('interview-timer');
+  if (timerElement) {
+    timerElement.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+  }
+}
+
+// Get interview tips by category
+function getInterviewTips(category) {
+  const tips = {
+    'Basics': 'Focus on fundamental concepts, syntax, and Python philosophy. Be ready to write simple code examples.',
+    'Intermediate': 'Understand advanced features like decorators, generators, and context managers. Be prepared to explain code snippets.',
+    'Advanced': 'Know about GIL, metaprogramming, memory management, and performance optimization.',
+    'Data Structures': 'Understand lists, tuples, dictionaries, sets, and their time complexities. Know when to use each.',
+    'OOP': 'Be comfortable with classes, inheritance, polymorphism, and method resolution order.',
+    'General': 'Practice explaining concepts clearly. Use examples. Be honest about what you don\'t know.'
+  };
+  
+  return tips[category] || tips['General'];
+}
+
+// Save interview results
+function saveInterviewResults(results) {
+  const savedResults = JSON.parse(localStorage.getItem('interviewResults') || '[]');
+  savedResults.push({
+    ...results,
+    userId: currentUser?.email || 'anonymous',
+    savedAt: new Date().toISOString()
+  });
+  localStorage.setItem('interviewResults', JSON.stringify(savedResults));
+  showToast('Interview results saved!', 'success');
+}
+
+// Load interview history
+function loadInterviewHistory() {
+  const savedResults = JSON.parse(localStorage.getItem('interviewResults') || '[]');
+  const userResults = currentUser 
+    ? savedResults.filter(r => r.userId === currentUser.email)
+    : savedResults;
+  
+  return userResults.sort((a, b) => new Date(b.savedAt) - new Date(a.savedAt));
+}
+
+// --- Support and Complaint System with Ticket Tracking ---
+const supportState = {
+  tickets: [],
+  currentTicket: null,
+  ticketCategories: ['Technical Issue', 'Billing', 'Content', 'Account', 'Feature Request', 'Bug Report', 'Other']
+};
+
+// Generate unique ticket ID
+function generateTicketId() {
+  const timestamp = Date.now().toString(36);
+  const random = Math.random().toString(36).substring(2, 8);
+  return `TKT-${timestamp}-${random}`.toUpperCase();
+}
+
+// Create support ticket
+async function createSupportTicket(ticketData) {
+  const ticketId = generateTicketId();
+  
+  const ticket = {
+    id: ticketId,
+    subject: ticketData.subject,
+    description: ticketData.description,
+    category: ticketData.category,
+    priority: ticketData.priority || 'medium',
+    status: 'open',
+    userId: currentUser?.email || 'anonymous',
+    userName: currentUser?.name || 'Anonymous User',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    messages: [
+      {
+        sender: 'user',
+        message: ticketData.description,
+        timestamp: new Date().toISOString()
+      }
+    ]
+  };
+  
+  // Save to Firebase if available
+  if (window.db) {
+    try {
+      await window.db.collection('supportTickets').doc(ticketId).set(ticket);
+      supportState.tickets.push(ticket);
+      showToast('Support ticket created successfully', 'success');
+      return ticket;
+    } catch (error) {
+      console.error('Error creating ticket:', error);
+      // Fallback to local storage
+    }
+  }
+  
+  // Fallback to local storage
+  const savedTickets = JSON.parse(localStorage.getItem('supportTickets') || '[]');
+  savedTickets.push(ticket);
+  localStorage.setItem('supportTickets', JSON.stringify(savedTickets));
+  supportState.tickets = savedTickets;
+  
+  showToast('Support ticket created locally', 'success');
+  return ticket;
+}
+
+// Load user tickets
+async function loadUserTickets() {
+  if (window.db && currentUser) {
+    try {
+      const snapshot = await window.db.collection('supportTickets')
+        .where('userId', '==', currentUser.email)
+        .get();
+      
+      supportState.tickets = [];
+      snapshot.forEach(doc => {
+        supportState.tickets.push(doc.data());
+      });
+      
+      return supportState.tickets;
+    } catch (error) {
+      console.error('Error loading tickets:', error);
+    }
+  }
+  
+  // Fallback to local storage
+  const savedTickets = JSON.parse(localStorage.getItem('supportTickets') || '[]');
+  const userTickets = currentUser 
+    ? savedTickets.filter(t => t.userId === currentUser.email)
+    : savedTickets;
+  
+  supportState.tickets = userTickets.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  return supportState.tickets;
+}
+
+// Get ticket by ID
+function getTicketById(ticketId) {
+  return supportState.tickets.find(t => t.id === ticketId);
+}
+
+// Add message to ticket
+async function addTicketMessage(ticketId, message, sender = 'user') {
+  const ticket = getTicketById(ticketId);
+  if (!ticket) {
+    showToast('Ticket not found', 'error');
+    return null;
+  }
+  
+  const newMessage = {
+    sender: sender,
+    message: message,
+    timestamp: new Date().toISOString()
+  };
+  
+  ticket.messages.push(newMessage);
+  ticket.updatedAt = new Date().toISOString();
+  
+  // Update in Firebase
+  if (window.db) {
+    try {
+      await window.db.collection('supportTickets').doc(ticketId).update({
+        messages: ticket.messages,
+        updatedAt: ticket.updatedAt
+      });
+      showToast('Message added', 'success');
+    } catch (error) {
+      console.error('Error adding message:', error);
+      // Fallback to local storage
+      updateTicketLocally(ticket);
+    }
+  } else {
+    updateTicketLocally(ticket);
+  }
+  
+  return ticket;
+}
+
+// Update ticket locally
+function updateTicketLocally(ticket) {
+  const savedTickets = JSON.parse(localStorage.getItem('supportTickets') || '[]');
+  const index = savedTickets.findIndex(t => t.id === ticket.id);
+  
+  if (index !== -1) {
+    savedTickets[index] = ticket;
+    localStorage.setItem('supportTickets', JSON.stringify(savedTickets));
+  }
+  
+  // Update state
+  const stateIndex = supportState.tickets.findIndex(t => t.id === ticket.id);
+  if (stateIndex !== -1) {
+    supportState.tickets[stateIndex] = ticket;
+  }
+  
+  showToast('Message added locally', 'success');
+}
+
+// Update ticket status
+async function updateTicketStatus(ticketId, status) {
+  const ticket = getTicketById(ticketId);
+  if (!ticket) {
+    showToast('Ticket not found', 'error');
+    return null;
+  }
+  
+  ticket.status = status;
+  ticket.updatedAt = new Date().toISOString();
+  
+  if (status === 'resolved' || status === 'closed') {
+    ticket.resolvedAt = new Date().toISOString();
+  }
+  
+  // Update in Firebase
+  if (window.db) {
+    try {
+      await window.db.collection('supportTickets').doc(ticketId).update({
+        status: status,
+        updatedAt: ticket.updatedAt,
+        resolvedAt: ticket.resolvedAt
+      });
+      showToast(`Ticket ${status}`, 'success');
+    } catch (error) {
+      console.error('Error updating status:', error);
+      updateTicketLocally(ticket);
+    }
+  } else {
+    updateTicketLocally(ticket);
+  }
+  
+  return ticket;
+}
+
+// Update ticket priority
+async function updateTicketPriority(ticketId, priority) {
+  const ticket = getTicketById(ticketId);
+  if (!ticket) {
+    showToast('Ticket not found', 'error');
+    return null;
+  }
+  
+  ticket.priority = priority;
+  ticket.updatedAt = new Date().toISOString();
+  
+  // Update in Firebase
+  if (window.db) {
+    try {
+      await window.db.collection('supportTickets').doc(ticketId).update({
+        priority: priority,
+        updatedAt: ticket.updatedAt
+      });
+      showToast('Priority updated', 'success');
+    } catch (error) {
+      console.error('Error updating priority:', error);
+      updateTicketLocally(ticket);
+    }
+  } else {
+    updateTicketLocally(ticket);
+  }
+  
+  return ticket;
+}
+
+// Close ticket
+async function closeTicket(ticketId) {
+  return updateTicketStatus(ticketId, 'closed');
+}
+
+// Reopen ticket
+async function reopenTicket(ticketId) {
+  return updateTicketStatus(ticketId, 'open');
+}
+
+// Get ticket statistics
+function getTicketStats() {
+  const stats = {
+    total: supportState.tickets.length,
+    open: supportState.tickets.filter(t => t.status === 'open').length,
+    inProgress: supportState.tickets.filter(t => t.status === 'in_progress').length,
+    resolved: supportState.tickets.filter(t => t.status === 'resolved').length,
+    closed: supportState.tickets.filter(t => t.status === 'closed').length,
+    byCategory: {},
+    byPriority: {
+      high: 0,
+      medium: 0,
+      low: 0
+    }
+  };
+  
+  supportState.tickets.forEach(ticket => {
+    // By category
+    if (!stats.byCategory[ticket.category]) {
+      stats.byCategory[ticket.category] = 0;
+    }
+    stats.byCategory[ticket.category]++;
+    
+    // By priority
+    if (stats.byPriority[ticket.priority] !== undefined) {
+      stats.byPriority[ticket.priority]++;
+    }
+  });
+  
+  return stats;
+}
+
+// Filter tickets
+function filterTickets(filters) {
+  let filtered = [...supportState.tickets];
+  
+  if (filters.status && filters.status !== 'all') {
+    filtered = filtered.filter(t => t.status === filters.status);
+  }
+  
+  if (filters.category && filters.category !== 'all') {
+    filtered = filtered.filter(t => t.category === filters.category);
+  }
+  
+  if (filters.priority && filters.priority !== 'all') {
+    filtered = filtered.filter(t => t.priority === filters.priority);
+  }
+  
+  if (filters.search) {
+    const searchLower = filters.search.toLowerCase();
+    filtered = filtered.filter(t => 
+      t.subject.toLowerCase().includes(searchLower) ||
+      t.description.toLowerCase().includes(searchLower) ||
+      t.id.toLowerCase().includes(searchLower)
+    );
+  }
+  
+  return filtered;
+}
+
+// Render ticket list
+function renderTicketList(tickets) {
+  if (tickets.length === 0) {
+    return `
+      <div class="tickets-empty">
+        <span class="material-symbols-rounded">support_agent</span>
+        <p>No tickets found</p>
+        <button class="btn-primary" onclick="showCreateTicketModal()">Create your first ticket</button>
+      </div>
+    `;
+  }
+  
+  return tickets.map(ticket => `
+    <div class="ticket-card status-${ticket.status} priority-${ticket.priority}" onclick="viewTicket('${ticket.id}')">
+      <div class="ticket-header">
+        <div class="ticket-info">
+          <span class="ticket-id">${ticket.id}</span>
+          <span class="ticket-category">${escapeHtml(ticket.category)}</span>
+        </div>
+        <div class="ticket-status">
+          <span class="status-badge ${ticket.status}">${ticket.status}</span>
+          <span class="priority-badge ${ticket.priority}">${ticket.priority}</span>
+        </div>
+      </div>
+      <h4 class="ticket-subject">${escapeHtml(ticket.subject)}</h4>
+      <p class="ticket-preview">${escapeHtml(ticket.description.substring(0, 100))}${ticket.description.length > 100 ? '...' : ''}</p>
+      <div class="ticket-meta">
+        <span class="ticket-date">${new Date(ticket.createdAt).toLocaleDateString()}</span>
+        <span class="ticket-messages">${ticket.messages.length} messages</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+// View ticket details
+function viewTicket(ticketId) {
+  const ticket = getTicketById(ticketId);
+  if (!ticket) return;
+  
+  supportState.currentTicket = ticket;
+  
+  const container = document.getElementById('ticket-details');
+  if (!container) return;
+  
+  container.innerHTML = `
+    <div class="ticket-details">
+      <div class="ticket-details-header">
+        <div class="ticket-title">
+          <h3>${escapeHtml(ticket.subject)}</h3>
+          <span class="ticket-id">${ticket.id}</span>
+        </div>
+        <div class="ticket-actions">
+          <select id="ticket-status-select" onchange="updateTicketStatus('${ticket.id}', this.value)">
+            <option value="open" ${ticket.status === 'open' ? 'selected' : ''}>Open</option>
+            <option value="in_progress" ${ticket.status === 'in_progress' ? 'selected' : ''}>In Progress</option>
+            <option value="resolved" ${ticket.status === 'resolved' ? 'selected' : ''}>Resolved</option>
+            <option value="closed" ${ticket.status === 'closed' ? 'selected' : ''}>Closed</option>
+          </select>
+          <button class="btn-secondary" onclick="closeTicket('${ticket.id}')">Close Ticket</button>
+        </div>
+      </div>
+      
+      <div class="ticket-info-grid">
+        <div class="info-item">
+          <span class="info-label">Category:</span>
+          <span class="info-value">${escapeHtml(ticket.category)}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Priority:</span>
+          <span class="info-value priority-${ticket.priority}">${ticket.priority}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Created:</span>
+          <span class="info-value">${new Date(ticket.createdAt).toLocaleString()}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Last Updated:</span>
+          <span class="info-value">${new Date(ticket.updatedAt).toLocaleString()}</span>
+        </div>
+      </div>
+      
+      <div class="ticket-messages">
+        <h4>Messages</h4>
+        <div class="messages-list">
+          ${ticket.messages.map(msg => `
+            <div class="message ${msg.sender === 'user' ? 'user-message' : 'support-message'}">
+              <div class="message-header">
+                <span class="message-sender">${msg.sender === 'user' ? 'You' : 'Support'}</span>
+                <span class="message-time">${new Date(msg.timestamp).toLocaleString()}</span>
+              </div>
+              <p class="message-content">${escapeHtml(msg.message)}</p>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+      
+      <div class="ticket-reply">
+        <textarea id="ticket-reply-input" placeholder="Type your reply..."></textarea>
+        <button class="btn-primary" onclick="sendTicketReply('${ticket.id}')">Send Reply</button>
+      </div>
+    </div>
+  `;
+}
+
+// Send ticket reply
+async function sendTicketReply(ticketId) {
+  const input = document.getElementById('ticket-reply-input');
+  const message = input ? input.value.trim() : '';
+  
+  if (!message) {
+    showToast('Please enter a message', 'warning');
+    return;
+  }
+  
+  const updatedTicket = await addTicketMessage(ticketId, message, 'user');
+  if (updatedTicket) {
+    viewTicket(ticketId);
+  }
+}
+
+// --- Gamification System (XP, Streaks, Badges, Leaderboards) ---
+const gamificationState = {
+  xp: 0,
+  totalXP: 0,
+  level: 1,
+  streak: 0,
+  lastActiveDate: null,
+  badges: [],
+  leaderboard: []
+};
+
+// Badge definitions
+const badgeDefinitions = {
+  'first_lesson': {
+    name: 'First Steps',
+    description: 'Complete your first lesson',
+    icon: 'school',
+    rarity: 'common',
+    xpReward: 50
+  },
+  'week_streak': {
+    name: 'Week Warrior',
+    description: 'Maintain a 7-day streak',
+    icon: 'local_fire_department',
+    rarity: 'rare',
+    xpReward: 200
+  },
+  'month_streak': {
+    name: 'Monthly Master',
+    description: 'Maintain a 30-day streak',
+    icon: 'emoji_events',
+    rarity: 'epic',
+    xpReward: 500
+  },
+  'quiz_master': {
+    name: 'Quiz Master',
+    description: 'Score 100% on 10 quizzes',
+    icon: 'psychology',
+    rarity: 'rare',
+    xpReward: 300
+  },
+  'code_ninja': {
+    name: 'Code Ninja',
+    description: 'Complete 50 assignments',
+    icon: 'code',
+    rarity: 'epic',
+    xpReward: 400
+  },
+  'project_builder': {
+    name: 'Project Builder',
+    description: 'Complete your first project',
+    icon: 'build',
+    rarity: 'common',
+    xpReward: 150
+  },
+  'expert_coder': {
+    name: 'Expert Coder',
+    description: 'Reach level 10',
+    icon: 'workspace_premium',
+    rarity: 'legendary',
+    xpReward: 1000
+  },
+  'perfect_score': {
+    name: 'Perfect Score',
+    description: 'Get 100% on any quiz',
+    icon: 'grade',
+    rarity: 'rare',
+    xpReward: 100
+  },
+  'speed_learner': {
+    name: 'Speed Learner',
+    description: 'Complete 5 lessons in one day',
+    icon: 'speed',
+    rarity: 'epic',
+    xpReward: 350
+  },
+  'helpful_peer': {
+    name: 'Helpful Peer',
+    description: 'Help 10 other learners',
+    icon: 'volunteer_activism',
+    rarity: 'rare',
+    xpReward: 250
+  }
+};
+
+// Calculate level from XP
+function calculateLevel(xp) {
+  return Math.floor(Math.sqrt(xp / 100)) + 1;
+}
+
+// Calculate XP needed for next level
+function xpForNextLevel(currentLevel) {
+  return Math.pow(currentLevel, 2) * 100;
+}
+
+// Add XP to user
+function addXP(amount, source = 'general') {
+  const oldLevel = gamificationState.level;
+  gamificationState.xp += amount;
+  gamificationState.totalXP += amount;
+  gamificationState.level = calculateLevel(gamificationState.xp);
+  
+  // Check for level up
+  if (gamificationState.level > oldLevel) {
+    showToast(`🎉 Level Up! You're now level ${gamificationState.level}!`, 'success');
+    checkBadge('expert_coder');
+  }
+  
+  // Save progress
+  saveGamificationProgress();
+  
+  // Update UI
+  updateGamificationUI();
+  
+  return { oldLevel, newLevel: gamificationState.level, xpGained: amount };
+}
+
+// Update streak
+function updateStreak() {
+  const today = new Date().toDateString();
+  const lastActive = gamificationState.lastActiveDate;
+  
+  if (lastActive) {
+    const lastDate = new Date(lastActive);
+    const diffDays = Math.floor((new Date() - lastDate) / (1000 * 60 * 60 * 24));
+    
+    if (diffDays === 1) {
+      // Consecutive day
+      gamificationState.streak++;
+      addXP(10 * gamificationState.streak, 'streak');
+      
+      // Check streak badges
+      if (gamificationState.streak >= 7) checkBadge('week_streak');
+      if (gamificationState.streak >= 30) checkBadge('month_streak');
+      
+      showToast(`🔥 Streak: ${gamificationState.streak} days!`, 'success');
+    } else if (diffDays > 1) {
+      // Streak broken
+      gamificationState.streak = 1;
+      showToast('Streak reset. Start fresh today!', 'info');
+    }
+  } else {
+    // First day
+    gamificationState.streak = 1;
+    showToast('🎯 First day! Start your streak!', 'success');
+  }
+  
+  gamificationState.lastActiveDate = today;
+  saveGamificationProgress();
+  updateGamificationUI();
+}
+
+// Check and award badge
+function checkBadge(badgeId) {
+  if (gamificationState.badges.includes(badgeId)) return false;
+  
+  const badge = badgeDefinitions[badgeId];
+  if (!badge) return false;
+  
+  let earned = false;
+  
+  switch (badgeId) {
+    case 'first_lesson':
+      earned = userProgress.completedDays.length >= 1;
+      break;
+    case 'week_streak':
+      earned = gamificationState.streak >= 7;
+      break;
+    case 'month_streak':
+      earned = gamificationState.streak >= 30;
+      break;
+    case 'quiz_master':
+      // Check if user has 10 perfect quiz scores
+      earned = (userProgress.quizScores || []).filter(s => s === 100).length >= 10;
+      break;
+    case 'code_ninja':
+      earned = userProgress.completedDays.length >= 50;
+      break;
+    case 'project_builder':
+      earned = (userProgress.completedProjects || []).length >= 1;
+      break;
+    case 'expert_coder':
+      earned = gamificationState.level >= 10;
+      break;
+    case 'perfect_score':
+      earned = (userProgress.quizScores || []).some(s => s === 100);
+      break;
+    case 'speed_learner':
+      // Check lessons completed today
+      const today = new Date().toDateString();
+      const todayLessons = (userProgress.lessonHistory || []).filter(
+        l => new Date(l.date).toDateString() === today
+      ).length;
+      earned = todayLessons >= 5;
+      break;
+    case 'helpful_peer':
+      earned = (userProgress.helpCount || 0) >= 10;
+      break;
+  }
+  
+  if (earned) {
+    gamificationState.badges.push(badgeId);
+    addXP(badge.xpReward, 'badge');
+    showToast(`🏆 Badge Earned: ${badge.name}!`, 'success');
+    saveGamificationProgress();
+    return true;
+  }
+  
+  return false;
+}
+
+// Get user badges
+function getUserBadges() {
+  return gamificationState.badges.map(badgeId => badgeDefinitions[badgeId]).filter(Boolean);
+}
+
+// Load leaderboard
+async function loadLeaderboard() {
+  if (window.db) {
+    try {
+      const snapshot = await window.db.collection('leaderboard')
+        .orderBy('totalXP', 'desc')
+        .limit(100)
+        .get();
+      
+      gamificationState.leaderboard = [];
+      snapshot.forEach(doc => {
+        gamificationState.leaderboard.push(doc.data());
+      });
+      
+      return gamificationState.leaderboard;
+    } catch (error) {
+      console.error('Error loading leaderboard:', error);
+    }
+  }
+  
+  // Fallback to local storage
+  const savedLeaderboard = JSON.parse(localStorage.getItem('leaderboard') || '[]');
+  gamificationState.leaderboard = savedLeaderboard.sort((a, b) => b.totalXP - a.totalXP);
+  return gamificationState.leaderboard;
+}
+
+// Update leaderboard
+async function updateLeaderboard() {
+  const leaderboardEntry = {
+    userId: currentUser?.email || 'anonymous',
+    userName: currentUser?.name || 'Anonymous',
+    totalXP: gamificationState.totalXP,
+    level: gamificationState.level,
+    streak: gamificationState.streak,
+    badges: gamificationState.badges.length,
+    lastUpdated: new Date().toISOString()
+  };
+  
+  if (window.db) {
+    try {
+      await window.db.collection('leaderboard')
+        .doc(currentUser?.email || 'anonymous')
+        .set(leaderboardEntry, { merge: true });
+    } catch (error) {
+      console.error('Error updating leaderboard:', error);
+    }
+  }
+  
+  // Update local storage
+  const savedLeaderboard = JSON.parse(localStorage.getItem('leaderboard') || '[]');
+  const existingIndex = savedLeaderboard.findIndex(
+    entry => entry.userId === leaderboardEntry.userId
+  );
+  
+  if (existingIndex !== -1) {
+    savedLeaderboard[existingIndex] = leaderboardEntry;
+  } else {
+    savedLeaderboard.push(leaderboardEntry);
+  }
+  
+  localStorage.setItem('leaderboard', JSON.stringify(savedLeaderboard));
+  gamificationState.leaderboard = savedLeaderboard.sort((a, b) => b.totalXP - a.totalXP);
+}
+
+// Get user rank on leaderboard
+function getUserRank() {
+  const userIndex = gamificationState.leaderboard.findIndex(
+    entry => entry.userId === (currentUser?.email || 'anonymous')
+  );
+  return userIndex !== -1 ? userIndex + 1 : null;
+}
+
+// Save gamification progress
+function saveGamificationProgress() {
+  const progress = {
+    xp: gamificationState.xp,
+    totalXP: gamificationState.totalXP,
+    level: gamificationState.level,
+    streak: gamificationState.streak,
+    lastActiveDate: gamificationState.lastActiveDate,
+    badges: gamificationState.badges
+  };
+  
+  localStorage.setItem('gamificationProgress', JSON.stringify(progress));
+  
+  // Update leaderboard
+  updateLeaderboard();
+}
+
+// Load gamification progress
+function loadGamificationProgress() {
+  const saved = localStorage.getItem('gamificationProgress');
+  if (saved) {
+    const progress = JSON.parse(saved);
+    gamificationState.xp = progress.xp || 0;
+    gamificationState.totalXP = progress.totalXP || 0;
+    gamificationState.level = progress.level || 1;
+    gamificationState.streak = progress.streak || 0;
+    gamificationState.lastActiveDate = progress.lastActiveDate;
+    gamificationState.badges = progress.badges || [];
+  }
+  
+  // Check daily streak
+  updateStreak();
+  
+  return gamificationState;
+}
+
+// Update gamification UI
+function updateGamificationUI() {
+  // Update XP display
+  const xpDisplay = document.getElementById('xp-display');
+  if (xpDisplay) {
+    xpDisplay.textContent = `${gamificationState.xp} XP`;
+  }
+  
+  // Update level display
+  const levelDisplay = document.getElementById('level-display');
+  if (levelDisplay) {
+    levelDisplay.textContent = `Level ${gamificationState.level}`;
+  }
+  
+  // Update streak display
+  const streakDisplay = document.getElementById('streak-display');
+  if (streakDisplay) {
+    streakDisplay.textContent = `${gamificationState.streak} 🔥`;
+  }
+  
+  // Update progress bar
+  const progressBar = document.getElementById('level-progress');
+  if (progressBar) {
+    const currentLevelXP = xpForNextLevel(gamificationState.level - 1);
+    const nextLevelXP = xpForNextLevel(gamificationState.level);
+    const progress = ((gamificationState.xp - currentLevelXP) / (nextLevelXP - currentLevelXP)) * 100;
+    progressBar.style.width = `${Math.min(100, progress)}%`;
+  }
+  
+  // Update badges display
+  const badgesDisplay = document.getElementById('badges-display');
+  if (badgesDisplay) {
+    const badges = getUserBadges();
+    badgesDisplay.innerHTML = badges.map(badge => `
+      <div class="badge badge-${badge.rarity}" title="${badge.description}">
+        <span class="material-symbols-rounded">${badge.icon}</span>
+        <span class="badge-name">${badge.name}</span>
+      </div>
+    `).join('');
+  }
+}
+
+// Render leaderboard
+function renderLeaderboard() {
+  const container = document.getElementById('leaderboard-container');
+  if (!container) return;
+  
+  const userRank = getUserRank();
+  
+  container.innerHTML = `
+    <div class="leaderboard">
+      <h3>🏆 Leaderboard</h3>
+      <div class="leaderboard-list">
+        ${gamificationState.leaderboard.slice(0, 10).map((entry, index) => `
+          <div class="leaderboard-item ${entry.userId === (currentUser?.email || 'anonymous') ? 'current-user' : ''}">
+            <div class="rank rank-${index + 1}">${index + 1}</div>
+            <div class="user-info">
+              <span class="user-name">${escapeHtml(entry.userName)}</span>
+              <span class="user-level">Level ${entry.level}</span>
+            </div>
+            <div class="stats">
+              <span class="xp">${entry.totalXP} XP</span>
+              <span class="streak">${entry.streak} 🔥</span>
+              <span class="badges">${entry.badges} 🏆</span>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+      ${userRank ? `<p class="your-rank">Your rank: #${userRank}</p>` : ''}
+    </div>
+  `;
+}
+
+// Render badges collection
+function renderBadgesCollection() {
+  const container = document.getElementById('badges-collection');
+  if (!container) return;
+  
+  const userBadges = getUserBadges();
+  const allBadges = Object.values(badgeDefinitions);
+  
+  container.innerHTML = `
+    <div class="badges-collection">
+      <h3>🏆 Badge Collection</h3>
+      <div class="badges-grid">
+        ${allBadges.map(badge => {
+          const earned = gamificationState.badges.includes(Object.keys(badgeDefinitions).find(k => badgeDefinitions[k] === badge));
+          return `
+            <div class="badge-card ${earned ? 'earned' : 'locked'} badge-${badge.rarity}">
+              <div class="badge-icon">
+                <span class="material-symbols-rounded">${badge.icon}</span>
+              </div>
+              <div class="badge-info">
+                <h4>${badge.name}</h4>
+                <p>${badge.description}</p>
+                <span class="badge-rarity">${badge.rarity}</span>
+                ${earned ? `<span class="badge-earned">✓ Earned</span>` : `<span class="badge-locked">🔒 Locked</span>`}
+              </div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    </div>
+  `;
+}
+
+// --- Offline Mode with Service Worker ---
+const offlineState = {
+  isOnline: navigator.onLine,
+  serviceWorkerRegistered: false,
+  pendingSync: []
+};
+
+// Register service worker
+async function registerServiceWorker() {
+  if ('serviceWorker' in navigator) {
+    try {
+      const registration = await navigator.serviceWorker.register('/sw.js');
+      offlineState.serviceWorkerRegistered = true;
+      console.log('[Service Worker] Registered successfully:', registration);
+      
+      // Listen for updates
+      registration.addEventListener('updatefound', () => {
+        const newWorker = registration.installing;
+        newWorker.addEventListener('statechange', () => {
+          if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+            showToast('New version available. Refresh to update.', 'info');
+          }
+        });
+      });
+      
+      // Listen for controller change
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        window.location.reload();
+      });
+      
+      showToast('Offline mode enabled', 'success');
+    } catch (error) {
+      console.error('[Service Worker] Registration failed:', error);
+      offlineState.serviceWorkerRegistered = false;
+    }
+  } else {
+    console.log('[Service Worker] Not supported in this browser');
+  }
+}
+
+// Check online status
+function checkOnlineStatus() {
+  offlineState.isOnline = navigator.onLine;
+  updateOnlineStatusUI();
+}
+
+// Update online status UI
+function updateOnlineStatusUI() {
+  const statusIndicator = document.getElementById('online-status');
+  if (statusIndicator) {
+    statusIndicator.className = `online-status ${offlineState.isOnline ? 'online' : 'offline'}`;
+    statusIndicator.textContent = offlineState.isOnline ? 'Online' : 'Offline';
+  }
+  
+  if (!offlineState.isOnline) {
+    showToast('You are offline. Some features may be limited.', 'warning');
+  }
+}
+
+// Add event listeners for online/offline status
+function setupOfflineListeners() {
+  window.addEventListener('online', () => {
+    offlineState.isOnline = true;
+    updateOnlineStatusUI();
+    showToast('Back online!', 'success');
+    syncPendingData();
+  });
+  
+  window.addEventListener('offline', () => {
+    offlineState.isOnline = false;
+    updateOnlineStatusUI();
+    showToast('You are offline. Changes will sync when back online.', 'warning');
+  });
+}
+
+// Sync pending data when back online
+async function syncPendingData() {
+  if (offlineState.pendingSync.length === 0) return;
+  
+  showToast('Syncing pending data...', 'info');
+  
+  for (const item of offlineState.pendingSync) {
+    try {
+      await syncItem(item);
+    } catch (error) {
+      console.error('Error syncing item:', error);
+    }
+  }
+  
+  offlineState.pendingSync = [];
+  showToast('Sync complete!', 'success');
+}
+
+// Sync individual item
+async function syncItem(item) {
+  switch (item.type) {
+    case 'progress':
+      await syncProgress(item.data);
+      break;
+    case 'note':
+      await syncNote(item.data);
+      break;
+    case 'quiz':
+      await syncQuiz(item.data);
+      break;
+    case 'assignment':
+      await syncAssignment(item.data);
+      break;
+  }
+}
+
+// Queue item for sync when offline
+function queueForSync(type, data) {
+  if (offlineState.isOnline) {
+    syncItem({ type, data });
+  } else {
+    offlineState.pendingSync.push({ type, data });
+    localStorage.setItem('pendingSync', JSON.stringify(offlineState.pendingSync));
+  }
+}
+
+// Load pending sync from localStorage
+function loadPendingSync() {
+  const saved = localStorage.getItem('pendingSync');
+  if (saved) {
+    offlineState.pendingSync = JSON.parse(saved);
+  }
+}
+
+// Clear service worker cache
+async function clearServiceWorkerCache() {
+  if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+    navigator.serviceWorker.controller.postMessage({ type: 'CLEAR_CACHE' });
+    showToast('Cache cleared', 'success');
+  }
+}
+
+// Get cache size
+async function getCacheSize() {
+  if ('caches' in window) {
+    const cacheNames = await caches.keys();
+    let totalSize = 0;
+    
+    for (const cacheName of cacheNames) {
+      const cache = await caches.open(cacheName);
+      const keys = await cache.keys();
+      
+      for (const request of keys) {
+        const response = await cache.match(request);
+        if (response) {
+          const blob = await response.blob();
+          totalSize += blob.size;
+        }
+      }
+    }
+    
+    return (totalSize / 1024 / 1024).toFixed(2) + ' MB';
+  }
+  
+  return 'N/A';
 }
 
 // --- Landing Page Button Functions ---
