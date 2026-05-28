@@ -5870,6 +5870,308 @@ html {
 }
 
 /* ==========================================================================
+   LANDING PAGE BUTTON EFFECTS
+   ========================================================================== */
+/* Button Loading State */
+.btn-loading {
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+.btn-loading .loading-spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Ripple Effect Animation */
+@keyframes ripple-animation {
+  to {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+/* Hover Glow Effect */
+.btn-landing-primary:hover,
+.btn-landing-outline:hover,
+.btn-hero-primary:hover,
+.btn-hero-secondary:hover,
+.btn-primary:hover,
+.btn-secondary:hover {
+  box-shadow: 0 0 20px rgba(6, 182, 212, 0.5),
+              0 0 40px rgba(6, 182, 212, 0.3),
+              0 0 60px rgba(6, 182, 212, 0.1);
+  transform: translateY(-2px);
+}
+
+.btn-landing-primary:hover {
+  background: linear-gradient(135deg, #0891b2, #7c3aed);
+}
+
+.btn-hero-primary:hover {
+  background: linear-gradient(135deg, #0891b2, #7c3aed);
+  box-shadow: 0 0 30px rgba(6, 182, 212, 0.6),
+              0 0 60px rgba(6, 182, 212, 0.4);
+}
+
+.btn-hero-secondary:hover {
+  background: rgba(6, 182, 212, 0.2);
+  border-color: var(--neon-cyan);
+  box-shadow: 0 0 20px rgba(6, 182, 212, 0.4);
+}
+
+/* Toast Notifications */
+.toast-notification {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  background: rgba(15, 15, 35, 0.95);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  color: var(--text-white);
+  font-size: 14px;
+  font-weight: 500;
+  z-index: 10001;
+  transform: translateX(400px);
+  opacity: 0;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.toast-notification.show {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+.toast-notification.toast-success {
+  border-color: var(--neon-emerald);
+  box-shadow: 0 8px 32px rgba(16, 185, 129, 0.3);
+}
+
+.toast-notification.toast-success .material-symbols-rounded {
+  color: var(--neon-emerald);
+}
+
+.toast-notification.toast-error {
+  border-color: var(--neon-red);
+  box-shadow: 0 8px 32px rgba(239, 68, 68, 0.3);
+}
+
+.toast-notification.toast-error .material-symbols-rounded {
+  color: var(--neon-red);
+}
+
+.toast-notification.toast-info {
+  border-color: var(--neon-cyan);
+  box-shadow: 0 8px 32px rgba(6, 182, 212, 0.3);
+}
+
+.toast-notification.toast-info .material-symbols-rounded {
+  color: var(--neon-cyan);
+}
+
+/* Walkthrough Modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(10px);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.modal-overlay.show {
+  opacity: 1;
+}
+
+.modal-content {
+  width: 90%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  transform: scale(0.9);
+  transition: transform 0.3s ease;
+}
+
+.modal-overlay.show .modal-content {
+  transform: scale(1);
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.modal-header h3 {
+  font-size: 24px;
+  font-weight: 700;
+  margin: 0;
+  background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  color: var(--text-gray);
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  transition: var(--transition-smooth);
+}
+
+.modal-close:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-white);
+}
+
+.modal-close .material-symbols-rounded {
+  font-size: 24px;
+}
+
+.modal-body {
+  color: var(--text-white);
+}
+
+/* Walkthrough Steps */
+.walkthrough-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.walkthrough-step {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  transition: var(--transition-smooth);
+  opacity: 0.5;
+}
+
+.walkthrough-step.active {
+  background: rgba(6, 182, 212, 0.1);
+  border-color: var(--neon-cyan);
+  opacity: 1;
+  box-shadow: 0 0 20px rgba(6, 182, 212, 0.2);
+}
+
+.step-number {
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 700;
+  color: white;
+  flex-shrink: 0;
+}
+
+.step-content h4 {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0 0 4px;
+  color: var(--text-white);
+}
+
+.step-content p {
+  font-size: 14px;
+  color: var(--text-gray);
+  margin: 0;
+}
+
+.walkthrough-navigation {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.step-indicator {
+  font-size: 14px;
+  color: var(--text-gray);
+  font-weight: 500;
+}
+
+/* Button Active State */
+button:active {
+  transform: scale(0.98);
+}
+
+/* Focus States for Accessibility */
+button:focus-visible {
+  outline: 2px solid var(--neon-cyan);
+  outline-offset: 2px;
+}
+
+/* Mobile Responsive for Toast */
+@media (max-width: 480px) {
+  .toast-notification {
+    right: 12px;
+    left: 12px;
+    top: 12px;
+  }
+  
+  .modal-content {
+    width: 95%;
+    max-height: 85vh;
+  }
+  
+  .walkthrough-step {
+    padding: 16px;
+  }
+  
+  .step-number {
+    width: 32px;
+    height: 32px;
+    font-size: 14px;
+  }
+  
+  .step-content h4 {
+    font-size: 14px;
+  }
+  
+  .step-content p {
+    font-size: 12px;
+  }
+}
+
+/* ==========================================================================
    ADMIN DASHBOARD STYLES
    ========================================================================== */
 .admin-dashboard {

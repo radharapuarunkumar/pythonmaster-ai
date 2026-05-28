@@ -5055,9 +5055,181 @@ function sendChatbotMessage() {
 }
 
 // --- Landing Page Button Functions ---
+// Universal CTA Handler with loading animations and effects
+const buttonState = new Map(); // Track button states to prevent duplicate clicks
+
+function handleCTAClick(event, action) {
+  event.preventDefault();
+  event.stopPropagation();
+  
+  const button = event.currentTarget;
+  
+  // Prevent duplicate clicks
+  if (buttonState.get(button) === 'loading') {
+    console.log('Button already being processed, ignoring click');
+    return;
+  }
+  
+  // Add loading state
+  buttonState.set(button, 'loading');
+  button.classList.add('btn-loading');
+  
+  // Add ripple effect
+  createRippleEffect(event, button);
+  
+  // Show loading animation
+  const originalContent = button.innerHTML;
+  button.innerHTML = '<span class="loading-spinner"></span>';
+  
+  // Simulate loading delay (300ms)
+  setTimeout(() => {
+    // Restore button
+    button.innerHTML = originalContent;
+    button.classList.remove('btn-loading');
+    buttonState.set(button, 'idle');
+    
+    // Execute action
+    executeCTAAction(action);
+  }, 300);
+}
+
+function executeCTAAction(action) {
+  console.log('Executing CTA action:', action);
+  
+  switch(action) {
+    case 'get-started':
+      handleGetStarted();
+      break;
+    case 'start-learning':
+      handleStartLearning();
+      break;
+    case 'start-projects':
+      handleStartProjects();
+      break;
+    case 'features':
+      handleFeatures();
+      break;
+    case 'how-it-works':
+      handleHowItWorks();
+      break;
+    default:
+      console.warn('Unknown CTA action:', action);
+      showToast('Action not recognized', 'error');
+  }
+}
+
+function handleGetStarted() {
+  // Check if user is logged in
+  const isLoggedIn = checkUserAuth();
+  
+  if (isLoggedIn) {
+    // Navigate to dashboard section
+    navigateToSection('dashboard');
+    showToast('Welcome back! Redirecting to dashboard...', 'success');
+  } else {
+    // Show auth/login modal
+    showAuthGate();
+    showToast('Please sign in to get started', 'info');
+  }
+}
+
+function handleStartLearning() {
+  // Check if user is logged in
+  const isLoggedIn = checkUserAuth();
+  
+  if (!isLoggedIn) {
+    showAuthGate();
+    showToast('Please sign in to start learning', 'info');
+    return;
+  }
+  
+  // Navigate to Day 1 of the roadmap
+  navigateToDay(1);
+  showToast('Starting your Python journey with Day 1!', 'success');
+}
+
+function handleStartProjects() {
+  // Check if user is logged in
+  const isLoggedIn = checkUserAuth();
+  
+  if (!isLoggedIn) {
+    showAuthGate();
+    showToast('Please sign in to access projects', 'info');
+    return;
+  }
+  
+  // Navigate to projects section
+  navigateToSection('projects');
+  showToast('Opening project dashboard...', 'success');
+}
+
+function handleFeatures() {
+  // Smooth scroll to features section
+  scrollToFeatures();
+}
+
+function handleHowItWorks() {
+  // Open interactive walkthrough modal
+  showWalkthroughModal();
+}
+
+// Navigation Router System
+function navigateToSection(sectionId) {
+  console.log('Navigating to section:', sectionId);
+  
+  // Hide landing page
+  const landingPage = document.getElementById('landing-page');
+  if (landingPage) {
+    landingPage.style.display = 'none';
+  }
+  
+  // Show app container
+  const appContainer = document.querySelector('.app-container');
+  if (appContainer) {
+    appContainer.style.display = 'flex';
+  }
+  
+  // Remove auth-gate-active class
+  document.body.classList.remove('auth-gate-active');
+  
+  // Switch to the requested view
+  switchView(sectionId);
+}
+
+function navigateToDay(dayNumber) {
+  console.log('Navigating to Day:', dayNumber);
+  
+  // Navigate to dashboard first
+  navigateToSection('dashboard');
+  
+  // After dashboard is loaded, select the specific day
+  setTimeout(() => {
+    selectDay(dayNumber);
+  }, 500);
+}
+
+function selectDay(dayNumber) {
+  // Find and click the day button
+  const dayButton = document.querySelector(`[data-day="${dayNumber}"]`);
+  if (dayButton) {
+    dayButton.click();
+  } else {
+    console.warn('Day button not found:', dayNumber);
+    showToast(`Day ${dayNumber} not found`, 'error');
+  }
+}
+
+// Check user authentication status
+function checkUserAuth() {
+  // Check if user is authenticated (you can modify this based on your auth system)
+  const user = localStorage.getItem('currentUser');
+  return user !== null;
+}
+
+// Original functions (kept for backward compatibility)
 function showAuthGate() {
   document.body.classList.add('auth-gate-active');
-  const authOverlay = document.getElementById('auth-splash-overlay');
+  const authOverlay = document.getElementById('signin-gateway');
   if (authOverlay) {
     authOverlay.style.display = 'flex';
   }
@@ -5067,7 +5239,225 @@ function scrollToFeatures() {
   const featuresSection = document.getElementById('features-section');
   if (featuresSection) {
     featuresSection.scrollIntoView({ behavior: 'smooth' });
+  } else {
+    showToast('Features section not found', 'error');
   }
+}
+
+// Walkthrough Modal
+function showWalkthroughModal() {
+  const modalHTML = `
+    <div id="walkthrough-modal" class="modal-overlay">
+      <div class="modal-content glass-card">
+        <div class="modal-header">
+          <h3>How Python Master AI Works</h3>
+          <button class="modal-close" onclick="closeWalkthroughModal()">
+            <span class="material-symbols-rounded">close</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="walkthrough-steps">
+            <div class="walkthrough-step active" data-step="1">
+              <div class="step-number">1</div>
+              <div class="step-content">
+                <h4>Sign Up</h4>
+                <p>Create your free account with Google or email</p>
+              </div>
+            </div>
+            <div class="walkthrough-step" data-step="2">
+              <div class="step-number">2</div>
+              <div class="step-content">
+                <h4>Learn Day by Day</h4>
+                <p>Follow our structured 120-day Python roadmap</p>
+              </div>
+            </div>
+            <div class="walkthrough-step" data-step="3">
+              <div class="step-number">3</div>
+              <div class="step-content">
+                <h4>Get AI Help</h4>
+                <p>Ask our AI tutor for explanations and debugging</p>
+              </div>
+            </div>
+            <div class="walkthrough-step" data-step="4">
+              <div class="step-number">4</div>
+              <div class="step-content">
+                <h4>Build Projects</h4>
+                <p>Create real-world projects for your portfolio</p>
+              </div>
+            </div>
+            <div class="walkthrough-step" data-step="5">
+              <div class="step-number">5</div>
+              <div class="step-content">
+                <h4>Earn Certificate</h4>
+                <p>Complete all days and get verified certificate</p>
+              </div>
+            </div>
+          </div>
+          <div class="walkthrough-navigation">
+            <button class="btn-secondary" onclick="prevWalkthroughStep()">Previous</button>
+            <span class="step-indicator">Step 1 of 5</span>
+            <button class="btn-primary" onclick="nextWalkthroughStep()">Next</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  // Remove existing modal if any
+  const existingModal = document.getElementById('walkthrough-modal');
+  if (existingModal) {
+    existingModal.remove();
+  }
+  
+  // Add new modal
+  document.body.insertAdjacentHTML('beforeend', modalHTML);
+  
+  // Add animation
+  setTimeout(() => {
+    const modal = document.getElementById('walkthrough-modal');
+    if (modal) {
+      modal.classList.add('show');
+    }
+  }, 10);
+}
+
+function closeWalkthroughModal() {
+  const modal = document.getElementById('walkthrough-modal');
+  if (modal) {
+    modal.classList.remove('show');
+    setTimeout(() => {
+      modal.remove();
+    }, 300);
+  }
+}
+
+let currentWalkthroughStep = 1;
+
+function nextWalkthroughStep() {
+  const steps = document.querySelectorAll('.walkthrough-step');
+  if (currentWalkthroughStep < steps.length) {
+    steps[currentWalkthroughStep - 1].classList.remove('active');
+    currentWalkthroughStep++;
+    steps[currentWalkthroughStep - 1].classList.add('active');
+    updateStepIndicator();
+  } else {
+    // Close modal on last step
+    closeWalkthroughModal();
+    showToast('Ready to start? Sign up now!', 'success');
+  }
+}
+
+function prevWalkthroughStep() {
+  const steps = document.querySelectorAll('.walkthrough-step');
+  if (currentWalkthroughStep > 1) {
+    steps[currentWalkthroughStep - 1].classList.remove('active');
+    currentWalkthroughStep--;
+    steps[currentWalkthroughStep - 1].classList.add('active');
+    updateStepIndicator();
+  }
+}
+
+function updateStepIndicator() {
+  const indicator = document.querySelector('.step-indicator');
+  if (indicator) {
+    indicator.textContent = `Step ${currentWalkthroughStep} of 5`;
+  }
+}
+
+// Ripple Effect
+function createRippleEffect(event, button) {
+  const ripple = document.createElement('span');
+  const rect = button.getBoundingClientRect();
+  const size = Math.max(rect.width, rect.height);
+  const x = event.clientX - rect.left - size / 2;
+  const y = event.clientY - rect.top - size / 2;
+  
+  ripple.style.cssText = `
+    position: absolute;
+    width: ${size}px;
+    height: ${size}px;
+    left: ${x}px;
+    top: ${y}px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    transform: scale(0);
+    animation: ripple-animation 0.6s ease-out;
+    pointer-events: none;
+  `;
+  
+  button.style.position = 'relative';
+  button.style.overflow = 'hidden';
+  button.appendChild(ripple);
+  
+  setTimeout(() => {
+    ripple.remove();
+  }, 600);
+}
+
+// Toast Notification System
+function showToast(message, type = 'info') {
+  const toast = document.createElement('div');
+  toast.className = `toast-notification toast-${type}`;
+  toast.innerHTML = `
+    <span class="material-symbols-rounded">${type === 'success' ? 'check_circle' : type === 'error' ? 'error' : 'info'}</span>
+    <span>${message}</span>
+  `;
+  
+  document.body.appendChild(toast);
+  
+  // Animate in
+  setTimeout(() => {
+    toast.classList.add('show');
+  }, 10);
+  
+  // Remove after 3 seconds
+  setTimeout(() => {
+    toast.classList.remove('show');
+    setTimeout(() => {
+      toast.remove();
+    }, 300);
+  }, 3000);
+}
+
+// Automatic Button Testing
+function testAllButtons() {
+  console.log('=== Button Testing Started ===');
+  
+  const buttons = document.querySelectorAll('[data-cta]');
+  let workingCount = 0;
+  let brokenCount = 0;
+  
+  buttons.forEach((button, index) => {
+    const action = button.getAttribute('data-cta');
+    const hasHandler = typeof handleCTAClick === 'function';
+    
+    if (hasHandler) {
+      workingCount++;
+      console.log(`✓ Button ${index + 1}: "${action}" - Handler exists`);
+    } else {
+      brokenCount++;
+      console.log(`✗ Button ${index + 1}: "${action}" - Handler missing`);
+    }
+  });
+  
+  console.log(`=== Button Testing Complete ===`);
+  console.log(`Total buttons: ${buttons.length}`);
+  console.log(`Working: ${workingCount}`);
+  console.log(`Broken: ${brokenCount}`);
+  
+  // Test section IDs
+  console.log('=== Section ID Testing ===');
+  const sections = ['features-section', 'dashboard', 'projects'];
+  sections.forEach(sectionId => {
+    const section = document.getElementById(sectionId);
+    if (section) {
+      console.log(`✓ Section "${sectionId}" exists`);
+    } else {
+      console.log(`✗ Section "${sectionId}" not found`);
+    }
+  });
+  
+  return { total: buttons.length, working: workingCount, broken: brokenCount };
 }
 
 // --- Professional Certificate System ---
@@ -6550,4 +6940,9 @@ window.addEventListener('DOMContentLoaded', () => {
   
   // Initialize notifications
   updateNotificationBadge();
+  
+  // Test all landing page buttons
+  setTimeout(() => {
+    testAllButtons();
+  }, 1000);
 });

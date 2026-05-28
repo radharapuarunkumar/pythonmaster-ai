@@ -30,8 +30,8 @@
           <span class="logo-text">Python Master AI</span>
         </div>
         <div class="landing-nav-buttons">
-          <button class="btn-landing-outline" onclick="scrollToFeatures()">Features</button>
-          <button class="btn-landing-primary" onclick="showAuthGate()">Get Started</button>
+          <button class="btn-landing-outline" data-cta="features" onclick="handleCTAClick(event, 'features')">Features</button>
+          <button class="btn-landing-primary" data-cta="get-started" onclick="handleCTAClick(event, 'get-started')">Get Started</button>
         </div>
       </nav>
 
@@ -55,11 +55,11 @@
             </div>
           </div>
           <div class="hero-cta">
-            <button class="btn-hero-primary" onclick="showAuthGate()">
+            <button class="btn-hero-primary" data-cta="start-learning" onclick="handleCTAClick(event, 'start-learning')">
               <span class="material-symbols-rounded">rocket_launch</span>
               Start Learning Free
             </button>
-            <button class="btn-hero-secondary" onclick="scrollToFeatures()">
+            <button class="btn-hero-secondary" data-cta="how-it-works" onclick="handleCTAClick(event, 'how-it-works')">
               <span class="material-symbols-rounded">play_circle</span>
               See How It Works
             </button>
@@ -389,7 +389,7 @@
             <span class="project-level ai">AI & ML</span>
           </div>
         </div>
-        <button class="btn-primary btn-large" onclick="showAuthGate()">
+        <button class="btn-primary btn-large" data-cta="start-projects" onclick="handleCTAClick(event, 'start-projects')">
           <span class="material-symbols-rounded">rocket_launch</span> Start Building Projects
         </button>
       </div>
