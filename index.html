@@ -883,55 +883,120 @@
         </div>
 
         <div class="dashboard-grid">
-          <!-- Left Col: Roadmap paths -->
+          <!-- Left Col: Day-wise Roadmap -->
           <div class="col-main-roadmap">
-            <!-- Course Cards Section -->
-            <div class="card course-cards-section">
+            <!-- Phase Selector -->
+            <div class="card phase-selector-card neon-border-purple">
               <div class="card-header-row">
-                <h3>Course Modules</h3>
-                <span class="badge-accent">9 Chapters</span>
+                <span class="material-symbols-rounded text-purple">map</span>
+                <h3>Select Phase</h3>
               </div>
-              <div class="course-cards-grid" id="course-cards-grid">
-                <!-- Dynamic course cards -->
+              <div class="phase-buttons">
+                <button class="phase-btn active" onclick="selectPhase('beginner')">
+                  <span class="phase-badge beginner">Beginner</span>
+                  <span>Days 1-30</span>
+                </button>
+                <button class="phase-btn" onclick="selectPhase('intermediate')">
+                  <span class="phase-badge intermediate">Intermediate</span>
+                  <span>Days 31-60</span>
+                </button>
+                <button class="phase-btn" onclick="selectPhase('advanced')">
+                  <span class="phase-badge advanced">Advanced</span>
+                  <span>Days 61-90</span>
+                </button>
+                <button class="phase-btn" onclick="selectPhase('expert')">
+                  <span class="phase-badge expert">Expert</span>
+                  <span>Days 91-110</span>
+                </button>
+                <button class="phase-btn" onclick="selectPhase('ai')">
+                  <span class="phase-badge ai">AI with Python</span>
+                  <span>Days 111-120</span>
+                </button>
               </div>
             </div>
 
-            <!-- Smart AI Roadmap Generator Card -->
-            <div class="card ai-roadmap-card neon-border-cyan">
+            <!-- Day-wise Roadmap Display -->
+            <div class="card day-wise-roadmap-card neon-border-cyan">
               <div class="card-header-row">
-                <span class="material-symbols-rounded text-cyan">psychology</span>
-                <h3>Smart AI Dynamic Roadmap</h3>
+                <span class="material-symbols-rounded text-cyan">calendar_today</span>
+                <h3>Day-wise Learning Path</h3>
+                <span class="badge-accent" id="current-phase-label">Beginner Phase</span>
               </div>
-              <p class="text-secondary card-desc">AI scans your weak domains and test history to update your path.</p>
-              <div class="ai-roadmap-results" id="ai-roadmap-summary">
-                <div class="ai-pulse-bar">
-                  <div class="ai-pulse-dot"></div>
-                  <span>AI Monitor active: Click 'Evaluate Weaknesses' to customize your pipeline.</span>
-                </div>
+              <div class="day-progress-bar">
+                <div class="progress-fill" id="day-progress-fill" style="width: 0%;"></div>
+                <span class="progress-text" id="day-progress-text">0/30 Days Completed</span>
               </div>
-              <button class="btn-cyan btn-small" onclick="generateSmartAIRoadmap()">
-                Evaluate Weaknesses & Re-Model Roadmap
+              <div class="days-grid" id="days-grid-container">
+                <!-- Days will be rendered dynamically -->
+              </div>
+            </div>
+
+            <!-- Current Day Details -->
+            <div class="card current-day-card neon-border-emerald" id="current-day-details" style="display: none;">
+              <div class="card-header-row">
+                <span class="material-symbols-rounded text-emerald">school</span>
+                <h3 id="current-day-title">Day 1: Introduction</h3>
+                <span class="difficulty-badge" id="current-day-difficulty">Easy</span>
+              </div>
+              <div class="day-meta">
+                <span class="meta-item">
+                  <span class="material-symbols-rounded">schedule</span>
+                  <span id="current-day-time">2 hours</span>
+                </span>
+                <span class="meta-item">
+                  <span class="material-symbols-rounded">star</span>
+                  <span id="current-day-xp">+50 XP</span>
+                </span>
+              </div>
+              <div class="day-content-tabs">
+                <button class="day-tab active" onclick="switchDayTab('theory')">Theory</button>
+                <button class="day-tab" onclick="switchDayTab('examples')">Examples</button>
+                <button class="day-tab" onclick="switchDayTab('practice')">Practice</button>
+                <button class="day-tab" onclick="switchDayTab('quiz')">Quiz</button>
+                <button class="day-tab" onclick="switchDayTab('project')">Project</button>
+              </div>
+              <div class="day-tab-content" id="day-theory-content">
+                <!-- Theory content will be rendered here -->
+              </div>
+              <button class="btn-success w-full mt-1" onclick="completeDay()">
+                <span class="material-symbols-rounded">check_circle</span> Complete Day
               </button>
-            </div>
-
-            <!-- The Structural Roadmap Nodes -->
-            <div class="card roadmap-path-card">
-              <div class="card-header-row">
-                <h3>Job Readiness Foundation Roadmap</h3>
-                <span class="badge-accent">Job Focused</span>
-              </div>
-              <p class="text-secondary card-desc">Progress sequentially through 6 coding chapters with active assignments.</p>
-              <div class="roadmap-nodes-container" id="roadmap-container">
-                <!-- Rendered dynamically in app.js -->
-              </div>
             </div>
           </div>
 
-          <!-- Right Col: Streak, challenges, achievements -->
+          <!-- Right Col: Progress, Streak, Badges -->
           <div class="col-side-widgets">
-            <!-- Daily Coding Challenge -->
+            <!-- Progress Overview -->
+            <div class="card progress-overview-card neon-border-purple">
+              <div class="card-header-row">
+                <span class="material-symbols-rounded text-purple">trending_up</span>
+                <h3>Your Progress</h3>
+              </div>
+              <div class="overall-progress">
+                <div class="progress-circle">
+                  <div class="progress-value" id="overall-progress-value">0%</div>
+                  <div class="progress-label">Complete</div>
+                </div>
+              </div>
+              <div class="progress-stats">
+                <div class="stat-row">
+                  <span class="material-symbols-rounded text-cyan">military_tech</span>
+                  <span>Current Day: <strong id="current-day-display">1</strong>/120</span>
+                </div>
+                <div class="stat-row">
+                  <span class="material-symbols-rounded text-orange">local_fire_department</span>
+                  <span>Streak: <strong id="streak-display">0</strong> days</span>
+                </div>
+                <div class="stat-row">
+                  <span class="material-symbols-rounded text-emerald">emoji_events</span>
+                  <span>Total XP: <strong id="total-xp-display">0</strong></span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Daily Challenge -->
             <div class="card challenge-card neon-border-orange">
-              <span class="badge-orange-neon">DAILY PROBLEM</span>
+              <span class="badge-orange-neon">DAILY CHALLENGE</span>
               <h3>Quest of the Day</h3>
               <div class="timer-row">
                 <span class="material-symbols-rounded">alarm</span>
@@ -943,23 +1008,13 @@
               </button>
             </div>
 
-            <!-- Unlocked Achievements Badges -->
+            <!-- Earned Badges -->
             <div class="card achievements-card">
               <h3>Earned Badges</h3>
-              <p class="text-secondary font-sm">Complete projects and score perfect quizzes to display milestones.</p>
+              <p class="text-secondary font-sm">Complete milestones to earn badges.</p>
               <div class="achievements-mini-grid" id="achievements-container">
-                <!-- Dynamic cards -->
+                <!-- Dynamic badges -->
               </div>
-            </div>
-
-            <!-- Dynamic certificate claim container -->
-            <div class="card certificate-claim-card neon-border-emerald" id="card-claim-certificate-dashboard">
-              <span class="material-symbols-rounded icon-cert text-emerald">workspace_premium</span>
-              <h3>Course Certificate</h3>
-              <p class="text-secondary font-sm">Complete all 6 Python modules to generate your job certificate.</p>
-              <button class="btn-success w-full font-sm" onclick="switchView('certificate')">
-                View Certificate Panel
-              </button>
             </div>
           </div>
         </div>

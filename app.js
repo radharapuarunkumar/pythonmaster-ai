@@ -2,7 +2,755 @@
    Python Master AI - Core Application Script
    ========================================================================== */
 
-// --- 1. Multilingual Curriculums & Job Readiness Data ---
+// --- Day-wise Python Curriculum (120 Days) ---
+const DAY_WISE_CURRICULUM = {
+  // BEGINNER PHASE (Days 1-30)
+  beginner: [
+    // Day 1
+    {
+      day: 1,
+      phase: "Beginner",
+      title: "Introduction to Python & Environment Setup",
+      difficulty: "Easy",
+      estimatedTime: "2 hours",
+      theory: `
+        <h3>What is Python?</h3>
+        <p>Python is a high-level, interpreted programming language known for its simplicity and readability. Created by Guido van Rossum in 1991, it has become one of the most popular languages for web development, data science, AI, and automation.</p>
+        <h3>Why Learn Python?</h3>
+        <ul>
+          <li>Easy to learn and read</li>
+          <li>Versatile - used in web, AI, data science, automation</li>
+          <li>Large community and extensive libraries</li>
+          <li>High demand in job market</li>
+        </ul>
+        <h3>Setting Up Your Environment</h3>
+        <p>You'll need Python installed on your computer. Download it from python.org and follow the installation guide. We'll use an online editor for this course, but local setup is recommended for serious development.</p>
+      `,
+      notes: "Python uses indentation instead of braces for code blocks. This makes code more readable but requires careful attention to spacing.",
+      examples: [
+        {
+          title: "Your First Python Program",
+          code: `print("Hello, World!")
+print("Welcome to Python Master AI!")`
+        },
+        {
+          title: "Comments in Python",
+          code: `# This is a single-line comment
+"""
+This is a multi-line comment
+used for longer explanations
+"""
+print("Comments don't execute")`
+        }
+      ],
+      practiceProblems: [
+        "Print your name using print()",
+        "Write a comment explaining what print() does",
+        "Print a multi-line message using triple quotes"
+      ],
+      assignment: "Create a program that prints a personal introduction including your name, age, and why you want to learn Python.",
+      miniProject: "Personal Introduction Card - Create a program that displays a nicely formatted introduction card with your details.",
+      quiz: [
+        { question: "Who created Python?", options: ["Bill Gates", "Guido van Rossum", "Elon Musk", "Mark Zuckerberg"], correct: 1 },
+        { question: "What year was Python created?", options: ["1985", "1991", "2000", "2010"], correct: 1 },
+        { question: "What symbol is used for single-line comments?", options: ["//", "#", "/*", "--"], correct: 1 },
+        { question: "What does print() do?", options: ["Stores data", "Displays output", "Calculates math", "Creates files"], correct: 1 },
+        { question: "Python uses _____ instead of braces for code blocks", options: ["Parentheses", "Indentation", "Semicolons", "Colons"], correct: 1 },
+        { question: "Which is NOT a use case for Python?", options: ["Web Development", "Data Science", "Mobile Apps", "AI"], correct: 2 },
+        { question: "What is the file extension for Python files?", options: [".python", ".py", ".pt", ".pyt"], correct: 1 },
+        { question: "How do you write multi-line comments?", options: ["// //", "# # #", '""" """', "/* */"], correct: 2 },
+        { question: "print('Hello') will display:", options: ["Hello", "'Hello'", "print('Hello')", "Error"], correct: 0 },
+        { question: "Python is a _____ language", options: ["Compiled", "Interpreted", "Assembly", "Machine"], correct: 1 }
+      ],
+      aiExplanation: "Python's interpreted nature means code is executed line by line, making debugging easier. The print() function is your primary tool for output and debugging throughout your Python journey."
+    },
+    // Day 2
+    {
+      day: 2,
+      phase: "Beginner",
+      title: "Variables & Data Types",
+      difficulty: "Easy",
+      estimatedTime: "2.5 hours",
+      theory: `
+        <h3>What are Variables?</h3>
+        <p>Variables are containers for storing data values. In Python, you create a variable by assigning a value to it using the = operator.</p>
+        <h3>Basic Data Types</h3>
+        <ul>
+          <li><strong>String (str):</strong> Text data, enclosed in quotes</li>
+          <li><strong>Integer (int):</strong> Whole numbers</li>
+          <li><strong>Float (float):</strong> Decimal numbers</li>
+          <li><strong>Boolean (bool):</strong> True or False values</li>
+        </ul>
+        <h3>Naming Variables</h3>
+        <p>Variable names must start with a letter or underscore, can only contain letters, numbers, and underscores, and are case-sensitive.</p>
+      `,
+      notes: "Python is dynamically typed, meaning you don't need to declare variable types. The type is determined automatically based on the assigned value.",
+      examples: [
+        {
+          title: "Creating Variables",
+          code: `name = "Arun"
+age = 25
+height = 5.9
+is_student = True
+
+print(name)
+print(type(age))  # <class 'int'>`
+        },
+        {
+          title: "Type Conversion",
+          code: `num_str = "100"
+num = int(num_str)
+print(num + 50)  # 150
+
+price = 19.99
+price_int = int(price)
+print(price_int)  # 19`
+        }
+      ],
+      practiceProblems: [
+        "Create variables for your name, age, and favorite color",
+        "Convert a string number to an integer and add 10 to it",
+        "Check the type of different variables using type()"
+      ],
+      assignment: "Create a student profile with variables for name, age, grade, GPA, and enrollment status. Print each variable with a descriptive label.",
+      miniProject: "Student Profile Generator - Create a program that collects student information and displays it in a formatted profile.",
+      quiz: [
+        { question: "Which data type stores text?", options: ["int", "str", "float", "bool"], correct: 1 },
+        { question: "What is the result of type(3.14)?", options: ["<class 'int'>", "<class 'float'>", "<class 'str'>", "<class 'number'>"], correct: 1 },
+        { question: "Which is a valid variable name?", options: ["2name", "my-name", "my_name", "class"], correct: 2 },
+        { question: "int('50') will return:", options: ["'50'", "50", "Error", "50.0"], correct: 1 },
+        { question: "True is a _____ type", options: ["String", "Integer", "Boolean", "Float"], correct: 2 },
+        { question: "Python is _____ typed", options: ["Statically", "Dynamically", "Strongly", "Weakly"], correct: 1 },
+        { question: "float('3.5') returns:", options: ["3", "3.5", "'3.5'", "Error"], correct: 1 },
+        { question: "Which is NOT a basic data type?", options: ["str", "int", "list", "float"], correct: 2 },
+        { question: "Variable names are _____ sensitive", options: ["Case", "Space", "Number", "Symbol"], correct: 0 },
+        { question: "What does x = 5 do?", options: ["Compares x to 5", "Assigns 5 to x", "Checks if x equals 5", "Creates function x"], correct: 1 }
+      ],
+      aiExplanation: "Understanding data types is fundamental because each type has different operations available. For example, you can do math on numbers but not on strings. Type conversion allows you to move between different data types when needed."
+    }
+    // Continue with more days... (this is a sample structure)
+    // Day 3-30 will follow similar structure with progressive difficulty
+  ],
+  
+  // INTERMEDIATE PHASE (Days 31-60)
+  intermediate: [
+    {
+      day: 31,
+      phase: "Intermediate",
+      title: "Object-Oriented Programming: Classes & Objects",
+      difficulty: "Medium",
+      estimatedTime: "3 hours",
+      theory: `
+        <h3>Object-Oriented Programming (OOP)</h3>
+        <p>OOP is a programming paradigm based on "objects" containing data and methods. It helps organize complex code into reusable, modular structures.</p>
+        <h3>Classes and Objects</h3>
+        <p>A <strong>class</strong> is a blueprint for creating objects. An <strong>object</strong> is an instance of a class.</p>
+        <h3>Key OOP Concepts</h3>
+        <ul>
+          <li><strong>Encapsulation:</strong> Bundling data and methods</li>
+          <li><strong>Inheritance:</strong> Creating new classes from existing ones</li>
+          <li><strong>Polymorphism:</strong> Same method, different behaviors</li>
+        </ul>
+      `,
+      notes: "Classes use PascalCase naming convention. The __init__ method is the constructor that initializes object attributes.",
+      examples: [
+        {
+          title: "Creating a Class",
+          code: `class Student:
+    def __init__(self, name, age):
+        self.name = name
+        self.age = age
+    
+    def introduce(self):
+        return f"Hi, I'm {self.name}, {self.age} years old"
+
+student1 = Student("Arun", 25)
+print(student1.introduce())`
+        }
+      ],
+      practiceProblems: [
+        "Create a Car class with make, model, and year attributes",
+        "Add a method to display car information",
+        "Create multiple Car objects"
+      ],
+      assignment: "Create a BankAccount class with deposit, withdraw, and check_balance methods. Include error handling for insufficient funds.",
+      miniProject: "Student Management System - Create classes for Student, Course, and Enrollment to manage student-course relationships.",
+      quiz: [
+        { question: "What is a class?", options: ["An object", "A blueprint for objects", "A function", "A variable"], correct: 1 },
+        { question: "What does __init__ do?", options: ["Deletes objects", "Initializes objects", "Prints objects", "Copies objects"], correct: 1 },
+        { question: "self refers to:", options: ["The class", "The current object", "The parent", "The module"], correct: 1 },
+        { question: "Which creates an object?", options: ["class", "def", "ClassName()", "import"], correct: 2 },
+        { question: "Encapsulation means:", options: ["Deleting code", "Bundling data and methods", "Copying code", "Splitting files"], correct: 1 },
+        { question: "Inheritance allows:", options: ["Deleting classes", "Creating classes from existing ones", "Merging files", "Renaming classes"], correct: 1 },
+        { question: "Class names use:", options: ["snake_case", "camelCase", "PascalCase", "UPPER_CASE"], correct: 2 },
+        { question: "Methods are:", options: ["Variables in classes", "Functions in classes", "Imports", "Comments"], correct: 1 },
+        { question: "What is polymorphism?", options: ["Same method, different behaviors", "Same class, different names", "Same variable, different types", "Same file, different code"], correct: 0 },
+        { question: "Objects are:", options: ["Blueprints", "Instances of classes", "Functions", "Modules"], correct: 1 }
+      ],
+      aiExplanation: "OOP is fundamental for building scalable applications. Classes allow you to create reusable code structures. Understanding OOP will help you work with frameworks like Django, Flask, and popular libraries."
+    }
+    // Days 32-60 will continue with OOP, file handling, databases, APIs, etc.
+  ],
+  
+  // ADVANCED PHASE (Days 61-90)
+  advanced: [
+    {
+      day: 61,
+      phase: "Advanced",
+      title: "Advanced Python: Decorators & Generators",
+      difficulty: "Hard",
+      estimatedTime: "4 hours",
+      theory: `
+        <h3>Decorators</h3>
+        <p>Decorators are functions that modify the behavior of other functions. They allow you to wrap another function to extend its behavior without permanently modifying it.</p>
+        <h3>Generators</h3>
+        <p>Generators are functions that return an iterable set of items, one at a time, in a special way. They use the yield keyword instead of return.</p>
+        <h3>Use Cases</h3>
+        <ul>
+          <li>Decorators: Logging, authentication, timing functions</li>
+          <li>Generators: Processing large datasets, infinite sequences</li>
+        </ul>
+      `,
+      notes: "Decorators use the @ symbol syntax. Generators are memory-efficient for large datasets as they yield one item at a time.",
+      examples: [
+        {
+          title: "Creating a Decorator",
+          code: `def timer_decorator(func):
+    def wrapper():
+        import time
+        start = time.time()
+        func()
+        end = time.time()
+        print(f"Time: {end - start:.2f}s")
+    return wrapper
+
+@timer_decorator
+def slow_function():
+    import time
+    time.sleep(1)
+    print("Function executed")
+
+slow_function()`
+        },
+        {
+          title: "Creating a Generator",
+          code: `def number_generator(n):
+    for i in range(n):
+        yield i
+
+for num in number_generator(5):
+    print(num)  # 0, 1, 2, 3, 4`
+        }
+      ],
+      practiceProblems: [
+        "Create a decorator that logs function calls",
+        "Build a generator for Fibonacci sequence",
+        "Combine decorator and generator"
+      ],
+      assignment: "Create a caching decorator that memoizes function results to improve performance for expensive calculations.",
+      miniProject: "Data Pipeline - Build a data processing pipeline using generators to handle large CSV files efficiently with decorators for logging and error handling.",
+      quiz: [
+        { question: "Decorators modify:", options: ["Variables", "Functions", "Classes", "Modules"], correct: 1 },
+        { question: "What symbol is used for decorators?", options: ["#", "@", "&", "*"], correct: 1 },
+        { question: "Generators use:", options: ["return", "yield", "print", "output"], correct: 1 },
+        { question: "Decorators are:", options: ["Classes", "Functions", "Variables", "Imports"], correct: 1 },
+        { question: "yield returns:", options: ["All values at once", "One value at a time", "Nothing", "Error"], correct: 1 },
+        { question: "Decorators help with:", options: ["Deleting code", "Extending function behavior", "Renaming functions", "Copying functions"], correct: 1 },
+        { question: "Generators are:", options: ["Memory intensive", "Memory efficient", "Slow", "Unusable"], correct: 1 },
+        { question: "A decorator takes:", options: ["A class", "A function", "A variable", "A module"], correct: 1 },
+        { question: "yield can be used:", options: ["Only once", "Multiple times", "Never", "In imports"], correct: 1 },
+        { question: "Decorators are applied:", options: ["After function definition", "Before function definition", "Inside function", "In separate file"], correct: 1 }
+      ],
+      aiExplanation: "Decorators and generators are powerful Python features used extensively in frameworks and libraries. Decorators enable aspect-oriented programming, while generators provide lazy evaluation for memory efficiency."
+    }
+    // Days 62-90 will continue with async programming, multithreading, performance optimization, etc.
+  ],
+  
+  // EXPERT PHASE (Days 91-110)
+  expert: [
+    {
+      day: 91,
+      phase: "Expert",
+      title: "System Design & Architecture Patterns",
+      difficulty: "Expert",
+      estimatedTime: "5 hours",
+      theory: `
+        <h3>System Design Fundamentals</h3>
+        <p>System design involves defining the architecture, components, modules, interfaces, and data for a system to satisfy specified requirements.</p>
+        <h3>Architecture Patterns</h3>
+        <ul>
+          <li><strong>MVC (Model-View-Controller):</strong> Separates concerns in web applications</li>
+          <li><strong>Microservices:</strong> Decomposes applications into small services</li>
+          <li><strong>Event-Driven:</strong> Components communicate through events</li>
+        </ul>
+        <h3>Scalability Principles</h3>
+        <p>Horizontal vs vertical scaling, load balancing, caching strategies, database sharding, and CDN implementation.</p>
+      `,
+      notes: "Good system design considers scalability, reliability, maintainability, and security. Always design for failure and implement proper monitoring.",
+      examples: [
+        {
+          title: "Simple MVC Pattern",
+          code: `# Model
+class User:
+    def __init__(self, name, email):
+        self.name = name
+        self.email = email
+
+# View
+def render_user(user):
+    return f"User: {user.name} ({user.email})"
+
+# Controller
+class UserController:
+    def __init__(self):
+        self.users = []
+    
+    def create_user(self, name, email):
+        user = User(name, email)
+        self.users.append(user)
+        return render_user(user)
+
+controller = UserController()
+print(controller.create_user("Arun", "arun@email.com"))`
+        }
+      ],
+      practiceProblems: [
+        "Design a simple REST API structure",
+        "Create a microservice communication pattern",
+        "Implement a basic caching layer"
+      ],
+      assignment: "Design and implement a scalable URL shortening service considering high traffic, database design, and caching strategies.",
+      miniProject: "Microservices Architecture - Build a simple e-commerce system with separate services for users, products, and orders communicating via REST APIs.",
+      quiz: [
+        { question: "MVC stands for:", options: ["Model-View-Controller", "Multiple-View-Component", "Main-View-Code", "Module-View-Class"], correct: 0 },
+        { question: "Microservices architecture:", options: ["Monolithic", "Decomposed into small services", "Single file", "No database"], correct: 1 },
+        { question: "Horizontal scaling means:", options: ["Better hardware", "More machines", "Less code", "Single server"], correct: 1 },
+        { question: "Load balancing:", options: ["Slows traffic", "Distributes traffic", "Blocks traffic", "Monitors traffic"], correct: 1 },
+        { question: "CDN stands for:", options: ["Central Data Network", "Content Delivery Network", "Cache Data Node", "Computer Data Network"], correct: 1 },
+        { question: "Vertical scaling:", options: ["More machines", "Better hardware", "Less code", "Smaller database"], correct: 1 },
+        { question: "Caching improves:", options: ["Security", "Performance", "Reliability", "Scalability"], correct: 1 },
+        { question: "Database sharding:", options: ["Single database", "Splitting database", "Deleting database", "Copying database"], correct: 1 },
+        { question: "Event-driven architecture:", options: ["Synchronous", "Asynchronous communication", "No communication", "Direct calls"], correct: 1 },
+        { question: "System design considers:", options: ["Only features", "Scalability, reliability, maintainability", "Only UI", "Only database"], correct: 1 }
+      ],
+      aiExplanation: "System design is crucial for building production-ready applications. Understanding these patterns will help you architect solutions that can handle real-world scale and complexity."
+    }
+    // Days 92-110 will continue with distributed systems, DevOps, cloud deployment, etc.
+  ],
+  
+  // AI WITH PYTHON PHASE (Days 111-120)
+  ai: [
+    {
+      day: 111,
+      phase: "AI with Python",
+      title: "Machine Learning Fundamentals with scikit-learn",
+      difficulty: "Expert",
+      estimatedTime: "6 hours",
+      theory: `
+        <h3>Introduction to Machine Learning</h3>
+        <p>Machine Learning is a subset of AI that enables systems to learn from data and improve without explicit programming.</p>
+        <h3>Types of ML</h3>
+        <ul>
+          <li><strong>Supervised Learning:</strong> Learning from labeled data</li>
+          <li><strong>Unsupervised Learning:</strong> Finding patterns in unlabeled data</li>
+          <li><strong>Reinforcement Learning:</strong> Learning through rewards/penalties</li>
+        </ul>
+        <h3>scikit-learn Library</h3>
+        <p>Python's most popular ML library providing tools for classification, regression, clustering, and more.</p>
+      `,
+      notes: "Machine learning requires understanding of statistics, linear algebra, and programming. Always split data into training and test sets to evaluate model performance.",
+      examples: [
+        {
+          title: "Simple Classification with scikit-learn",
+          code: `from sklearn.datasets import load_iris
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score
+
+# Load dataset
+iris = load_iris()
+X, y = iris.data, iris.target
+
+# Split data
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+
+# Train model
+model = RandomForestClassifier()
+model.fit(X_train, y_train)
+
+# Predict and evaluate
+predictions = model.predict(X_test)
+print(f"Accuracy: {accuracy_score(y_test, predictions):.2f}")`
+        }
+      ],
+      practiceProblems: [
+        "Load a dataset and explore its features",
+        "Split data into training and test sets",
+        "Train a simple classifier and evaluate"
+      ],
+      assignment: "Build a complete ML pipeline: load data, preprocess, train multiple models, compare performance, and select the best model.",
+      miniProject: "Iris Flower Classifier - Build a web application that classifies iris flowers based on measurements using a trained ML model.",
+      quiz: [
+        { question: "Supervised learning uses:", options: ["Labeled data", "Unlabeled data", "No data", "Random data"], correct: 0 },
+        { question: "scikit-learn is for:", options: ["Web development", "Machine learning", "Game development", "Database"], correct: 1 },
+        { question: "Train-test split helps:", options: ["Use all data", "Evaluate model performance", "Speed up training", "Reduce memory"], correct: 1 },
+        { question: "Random Forest is:", options: ["A single tree", "Ensemble of trees", "A database", "A graph"], correct: 1 },
+        { question: "Accuracy measures:", options: ["Training speed", "Model correctness", "Data size", "Code length"], correct: 1 },
+        { question: "Unsupervised learning:", options: ["Uses labels", "Finds patterns", "Uses rewards", "No learning"], correct: 1 },
+        { question: "Overfitting occurs when:", options: ["Model too simple", "Model too complex", "No data", "Perfect model"], correct: 1 },
+        { question: "Cross-validation:", options: ["Single split", "Multiple splits", "No split", "Random split"], correct: 1 },
+        { question: "Feature engineering:", options: ["Deleting features", "Creating/modifying features", "Ignoring features", "Random features"], correct: 1 },
+        { question: "ML requires:", options: ["Only code", "Statistics and math", "Only data", "No knowledge"], correct: 1 }
+      ],
+      aiExplanation: "Machine learning is transforming industries. Understanding the fundamentals will enable you to build intelligent applications. scikit-learn provides an excellent starting point with comprehensive tools and documentation."
+    }
+    // Days 112-120 will continue with deep learning, NLP, computer vision, AI deployment, etc.
+  ]
+};
+
+// --- Helper Functions for Day-wise Curriculum ---
+function getDayContent(dayNumber) {
+  const allDays = [
+    ...DAY_WISE_CURRICULUM.beginner,
+    ...DAY_WISE_CURRICULUM.intermediate,
+    ...DAY_WISE_CURRICULUM.advanced,
+    ...DAY_WISE_CURRICULUM.expert,
+    ...DAY_WISE_CURRICULUM.ai
+  ];
+  return allDays.find(day => day.day === dayNumber);
+}
+
+function getPhaseFromDay(dayNumber) {
+  if (dayNumber <= 30) return 'beginner';
+  if (dayNumber <= 60) return 'intermediate';
+  if (dayNumber <= 90) return 'advanced';
+  if (dayNumber <= 110) return 'expert';
+  return 'ai';
+}
+
+function getAllDays() {
+  return [
+    ...DAY_WISE_CURRICULUM.beginner,
+    ...DAY_WISE_CURRICULUM.intermediate,
+    ...DAY_WISE_CURRICULUM.advanced,
+    ...DAY_WISE_CURRICULUM.expert,
+    ...DAY_WISE_CURRICULUM.ai
+  ];
+}
+
+function getDaysByPhase(phase) {
+  return DAY_WISE_CURRICULUM[phase] || [];
+}
+
+// --- Progress Tracking State ---
+const userProgress = {
+  currentDay: 1,
+  completedDays: [],
+  xp: 0,
+  streak: 0,
+  lastActiveDate: null,
+  badges: [],
+  totalXP: 0
+};
+
+// --- Progress Tracking Functions ---
+function updateProgress(dayNumber, completed) {
+  if (completed) {
+    if (!userProgress.completedDays.includes(dayNumber)) {
+      userProgress.completedDays.push(dayNumber);
+      userProgress.xp += 50; // 50 XP per completed day
+      userProgress.totalXP += 50;
+      checkForBadges();
+      saveProgress();
+    }
+  }
+}
+
+function updateStreak() {
+  const today = new Date().toDateString();
+  if (userProgress.lastActiveDate !== today) {
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    
+    if (userProgress.lastActiveDate === yesterday.toDateString()) {
+      userProgress.streak += 1;
+    } else if (userProgress.lastActiveDate !== today) {
+      userProgress.streak = 1;
+    }
+    
+    userProgress.lastActiveDate = today;
+    saveProgress();
+  }
+}
+
+function checkForBadges() {
+  const badges = [
+    { name: 'First Steps', condition: () => userProgress.completedDays.length >= 1 },
+    { name: 'Week Warrior', condition: () => userProgress.streak >= 7 },
+    { name: 'Month Master', condition: () => userProgress.streak >= 30 },
+    { name: 'Beginner Complete', condition: () => userProgress.completedDays.filter(d => d <= 30).length === 30 },
+    { name: 'Intermediate Complete', condition: () => userProgress.completedDays.filter(d => d > 30 && d <= 60).length === 30 },
+    { name: 'Advanced Complete', condition: () => userProgress.completedDays.filter(d => d > 60 && d <= 90).length === 30 },
+    { name: 'Expert Complete', condition: () => userProgress.completedDays.filter(d => d > 90 && d <= 110).length === 20 },
+    { name: 'AI Master', condition: () => userProgress.completedDays.filter(d => d > 110).length === 10 },
+    { name: 'Python Master', condition: () => userProgress.completedDays.length === 120 },
+    { name: 'XP Hunter', condition: () => userProgress.totalXP >= 5000 }
+  ];
+  
+  badges.forEach(badge => {
+    if (badge.condition() && !userProgress.badges.includes(badge.name)) {
+      userProgress.badges.push(badge.name);
+      showBadgeNotification(badge.name);
+    }
+  });
+}
+
+function showBadgeNotification(badgeName) {
+  alert(`🏆 Badge Earned: ${badgeName}!`);
+}
+
+function getCompletionPercentage() {
+  return Math.round((userProgress.completedDays.length / 120) * 100);
+}
+
+function saveProgress() {
+  localStorage.setItem('pythonMasterProgress', JSON.stringify(userProgress));
+}
+
+function loadProgress() {
+  const saved = localStorage.getItem('pythonMasterProgress');
+  if (saved) {
+    Object.assign(userProgress, JSON.parse(saved));
+  }
+}
+
+// --- Day-wise Roadmap UI Functions ---
+let currentPhase = 'beginner';
+
+function selectPhase(phase) {
+  currentPhase = phase;
+  
+  // Update phase buttons
+  const buttons = document.querySelectorAll('.phase-btn');
+  buttons.forEach(btn => btn.classList.remove('active'));
+  event.target.closest('.phase-btn').classList.add('active');
+  
+  // Update phase label
+  const phaseLabel = document.getElementById('current-phase-label');
+  const phaseNames = {
+    beginner: 'Beginner Phase',
+    intermediate: 'Intermediate Phase',
+    advanced: 'Advanced Phase',
+    expert: 'Expert Phase',
+    ai: 'AI with Python'
+  };
+  if (phaseLabel) phaseLabel.textContent = phaseNames[phase];
+  
+  // Render days for selected phase
+  renderDaysGrid(phase);
+}
+
+function renderDaysGrid(phase) {
+  const container = document.getElementById('days-grid-container');
+  if (!container) return;
+  
+  const days = getDaysByPhase(phase);
+  const phaseRanges = {
+    beginner: { start: 1, end: 30 },
+    intermediate: { start: 31, end: 60 },
+    advanced: { start: 61, end: 90 },
+    expert: { start: 91, end: 110 },
+    ai: { start: 111, end: 120 }
+  };
+  
+  const range = phaseRanges[phase];
+  const completedInPhase = userProgress.completedDays.filter(d => d >= range.start && d <= range.end).length;
+  const totalInPhase = range.end - range.start + 1;
+  
+  // Update progress bar
+  const progressFill = document.getElementById('day-progress-fill');
+  const progressText = document.getElementById('day-progress-text');
+  if (progressFill) progressFill.style.width = `${(completedInPhase / totalInPhase) * 100}%`;
+  if (progressText) progressText.textContent = `${completedInPhase}/${totalInPhase} Days Completed`;
+  
+  // Render day items
+  container.innerHTML = '';
+  for (let i = range.start; i <= range.end; i++) {
+    const isCompleted = userProgress.completedDays.includes(i);
+    const isCurrent = userProgress.currentDay === i;
+    const isLocked = i > userProgress.currentDay;
+    
+    const dayItem = document.createElement('div');
+    dayItem.className = `day-item ${isCompleted ? 'completed' : ''} ${isCurrent ? 'current' : ''} ${isLocked ? 'locked' : ''}`;
+    dayItem.onclick = () => !isLocked && selectDay(i);
+    
+    dayItem.innerHTML = `
+      <span class="day-number">${i}</span>
+      <span class="day-status">${isCompleted ? '✓' : isCurrent ? 'Current' : isLocked ? '🔒' : ''}</span>
+    `;
+    
+    container.appendChild(dayItem);
+  }
+}
+
+function selectDay(dayNumber) {
+  const dayContent = getDayContent(dayNumber);
+  if (!dayContent) return;
+  
+  userProgress.currentDay = dayNumber;
+  saveProgress();
+  
+  // Show day details card
+  const detailsCard = document.getElementById('current-day-details');
+  if (detailsCard) detailsCard.style.display = 'block';
+  
+  // Update day details
+  document.getElementById('current-day-title').textContent = `Day ${dayNumber}: ${dayContent.title}`;
+  document.getElementById('current-day-difficulty').textContent = dayContent.difficulty;
+  document.getElementById('current-day-difficulty').className = `difficulty-badge ${dayContent.difficulty}`;
+  document.getElementById('current-day-time').textContent = dayContent.estimatedTime;
+  
+  // Render theory content by default
+  renderDayTabContent('theory', dayContent);
+  
+  // Re-render grid to update current day indicator
+  renderDaysGrid(currentPhase);
+  
+  // Scroll to day details
+  detailsCard.scrollIntoView({ behavior: 'smooth' });
+}
+
+function renderDayTabContent(tab, dayContent) {
+  const container = document.getElementById('day-theory-content');
+  if (!container) return;
+  
+  switch (tab) {
+    case 'theory':
+      container.innerHTML = dayContent.theory;
+      break;
+    case 'examples':
+      container.innerHTML = dayContent.examples.map(ex => `
+        <div class="example-block">
+          <h4>${ex.title}</h4>
+          <pre class="code-block">${ex.code}</pre>
+        </div>
+      `).join('');
+      break;
+    case 'practice':
+      container.innerHTML = `
+        <h4>Practice Problems</h4>
+        <ul>
+          ${dayContent.practiceProblems.map(p => `<li>${p}</li>`).join('')}
+        </ul>
+        <h4>Assignment</h4>
+        <p>${dayContent.assignment}</p>
+      `;
+      break;
+    case 'quiz':
+      container.innerHTML = `
+        <h4>Quiz (${dayContent.quiz.length} Questions)</h4>
+        ${dayContent.quiz.map((q, i) => `
+          <div class="quiz-question">
+            <p><strong>Q${i + 1}:</strong> ${q.question}</p>
+            <div class="quiz-options">
+              ${q.options.map((opt, j) => `
+                <label class="quiz-option">
+                  <input type="radio" name="q${i}" value="${j}">
+                  ${opt}
+                </label>
+              `).join('')}
+            </div>
+          </div>
+        `).join('')}
+        <button class="btn-primary mt-1" onclick="submitQuiz(${dayContent.day})">Submit Quiz</button>
+      `;
+      break;
+    case 'project':
+      container.innerHTML = `
+        <h4>Mini Project</h4>
+        <p>${dayContent.miniProject}</p>
+      `;
+      break;
+  }
+}
+
+function switchDayTab(tab) {
+  const buttons = document.querySelectorAll('.day-tab');
+  buttons.forEach(btn => btn.classList.remove('active'));
+  event.target.classList.add('active');
+  
+  const dayContent = getDayContent(userProgress.currentDay);
+  if (dayContent) {
+    renderDayTabContent(tab, dayContent);
+  }
+}
+
+function completeDay() {
+  updateProgress(userProgress.currentDay, true);
+  updateStreak();
+  
+  // Move to next day
+  if (userProgress.currentDay < 120) {
+    userProgress.currentDay++;
+  }
+  
+  saveProgress();
+  updateProgressDisplay();
+  renderDaysGrid(currentPhase);
+  
+  alert(`Day ${userProgress.currentDay - 1} completed! +50 XP earned.`);
+}
+
+function updateProgressDisplay() {
+  // Update progress circle
+  const progressValue = document.getElementById('overall-progress-value');
+  const progressCircle = document.querySelector('.progress-circle');
+  const percentage = getCompletionPercentage();
+  
+  if (progressValue) progressValue.textContent = `${percentage}%`;
+  if (progressCircle) {
+    progressCircle.style.background = `conic-gradient(var(--neon-purple) ${percentage}%, var(--bg-darkest) ${percentage}%)`;
+  }
+  
+  // Update stats
+  document.getElementById('current-day-display').textContent = userProgress.currentDay;
+  document.getElementById('streak-display').textContent = userProgress.streak;
+  document.getElementById('total-xp-display').textContent = userProgress.totalXP;
+}
+
+function submitQuiz(dayNumber) {
+  const dayContent = getDayContent(dayNumber);
+  if (!dayContent) return;
+  
+  let correct = 0;
+  dayContent.quiz.forEach((q, i) => {
+    const selected = document.querySelector(`input[name="q${i}"]:checked`);
+    if (selected && parseInt(selected.value) === q.correct) {
+      correct++;
+    }
+  });
+  
+  const score = Math.round((correct / dayContent.quiz.length) * 100);
+  const xpEarned = score >= 70 ? 25 : 0;
+  
+  if (xpEarned > 0) {
+    userProgress.xp += xpEarned;
+    userProgress.totalXP += xpEarned;
+    saveProgress();
+    updateProgressDisplay();
+  }
+  
+  alert(`Quiz Score: ${score}% (${correct}/${dayContent.quiz.length} correct)\n${xpEarned > 0 ? `+${xpEarned} XP earned!` : 'Need 70% to earn XP'}`);
+}
+
+// Initialize progress on load
+document.addEventListener('DOMContentLoaded', () => {
+  loadProgress();
+  updateProgressDisplay();
+  renderDaysGrid('beginner');
+});
+
+// --- Legacy Curriculum (kept for reference, will be removed after migration) ---
 const CURRICULUMS = {
   en: [
     {
@@ -4305,6 +5053,1450 @@ function sendChatbotMessage() {
   
   chatMessages.scrollTop = chatMessages.scrollHeight;
 }
+
+// --- Landing Page Button Functions ---
+function showAuthGate() {
+  document.body.classList.add('auth-gate-active');
+  const authOverlay = document.getElementById('auth-splash-overlay');
+  if (authOverlay) {
+    authOverlay.style.display = 'flex';
+  }
+}
+
+function scrollToFeatures() {
+  const featuresSection = document.getElementById('features-section');
+  if (featuresSection) {
+    featuresSection.scrollIntoView({ behavior: 'smooth' });
+  }
+}
+
+// --- Professional Certificate System ---
+const certificateSystem = {
+  generateVerificationId: function() {
+    const timestamp = Date.now().toString(36).toUpperCase();
+    const random = Math.random().toString(36).substring(2, 8).toUpperCase();
+    return `PYM-${timestamp}-${random}`;
+  },
+  
+  generateCertificate: function(userName, completionDate) {
+    const verificationId = this.generateVerificationId();
+    const certificate = {
+      verificationId: verificationId,
+      userName: userName,
+      completionDate: completionDate,
+      issueDate: new Date().toISOString(),
+      totalXP: userProgress.totalXP,
+      completedDays: userProgress.completedDays.length,
+      badges: userProgress.badges,
+      status: 'verified'
+    };
+    
+    // Save to Firebase (simulated for now)
+    this.saveCertificateToFirebase(certificate);
+    
+    // Generate QR code
+    const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${verificationId}`;
+    
+    return {
+      certificate: certificate,
+      qrCodeUrl: qrCodeUrl
+    };
+  },
+  
+  saveCertificateToFirebase: function(certificate) {
+    // Simulated Firebase save - in production, this would use Firebase SDK
+    const certificates = JSON.parse(localStorage.getItem('pythonMasterCertificates') || '[]');
+    certificates.push(certificate);
+    localStorage.setItem('pythonMasterCertificates', JSON.stringify(certificates));
+    console.log('Certificate saved to Firebase:', certificate);
+  },
+  
+  verifyCertificate: function(verificationId) {
+    const certificates = JSON.parse(localStorage.getItem('pythonMasterCertificates') || '[]');
+    const certificate = certificates.find(c => c.verificationId === verificationId);
+    
+    if (certificate) {
+      return {
+        valid: true,
+        certificate: certificate
+      };
+    } else {
+      return {
+        valid: false,
+        message: 'Certificate not found or invalid'
+      };
+    }
+  },
+  
+  downloadCertificatePDF: function(certificate) {
+    // Create a printable certificate HTML
+    const certificateHTML = `
+      <html>
+      <head>
+        <title>Python Master AI Certificate - ${certificate.userName}</title>
+        <style>
+          body { font-family: Arial, sans-serif; padding: 40px; text-align: center; background: #f0f0f0; }
+          .certificate { background: white; padding: 60px; max-width: 800px; margin: 0 auto; border: 10px solid #9333ea; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+          .header { color: #9333ea; font-size: 48px; font-weight: bold; margin-bottom: 20px; }
+          .sub-header { color: #666; font-size: 24px; margin-bottom: 40px; }
+          .name { font-size: 42px; font-weight: bold; color: #333; margin: 30px 0; }
+          .details { font-size: 18px; color: #666; margin: 20px 0; }
+          .verification { font-size: 14px; color: #999; margin-top: 50px; }
+          .badge { display: inline-block; padding: 10px 20px; background: #9333ea; color: white; border-radius: 5px; margin-top: 30px; }
+        </style>
+      </head>
+      <body>
+        <div class="certificate">
+          <div class="header">🏆 Certificate of Completion</div>
+          <div class="sub-header">Python Master AI Course</div>
+          <div class="name">${certificate.userName}</div>
+          <div class="details">Has successfully completed the Python Master AI course</div>
+          <div class="details">Total XP: ${certificate.totalXP} | Days Completed: ${certificate.completedDays}/120</div>
+          <div class="details">Completed on: ${new Date(certificate.completionDate).toLocaleDateString()}</div>
+          <div class="badge">VERIFIED</div>
+          <div class="verification">Verification ID: ${certificate.verificationId}</div>
+        </div>
+      </body>
+      </html>
+    `;
+    
+    // Create a blob and download
+    const blob = new Blob([certificateHTML], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Python-Master-AI-Certificate-${certificate.userName}.html`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    alert('Certificate downloaded successfully!');
+  }
+};
+
+function generateUserCertificate() {
+  if (userProgress.completedDays.length < 120) {
+    alert(`Complete all 120 days to earn your certificate. Current progress: ${userProgress.completedDays.length}/120 days`);
+    return;
+  }
+  
+  const userName = prompt('Enter your full name for the certificate:');
+  if (!userName) return;
+  
+  const result = certificateSystem.generateCertificate(userName, new Date().toISOString());
+  
+  // Display certificate
+  displayCertificate(result.certificate, result.qrCodeUrl);
+}
+
+function displayCertificate(certificate, qrCodeUrl) {
+  const certificateView = document.getElementById('view-certificate');
+  if (!certificateView) return;
+  
+  certificateView.innerHTML = `
+    <div class="view-header-intro">
+      <h2>Your Certificate</h2>
+      <p class="text-secondary">Congratulations! You've earned your Python Master AI certificate.</p>
+    </div>
+    
+    <div class="certificate-display">
+      <div class="certificate-paper">
+        <div class="certificate-header">
+          <span class="material-symbols-rounded text-purple">workspace_premium</span>
+          <h1>Certificate of Completion</h1>
+        </div>
+        <div class="certificate-body">
+          <p class="certificate-subtitle">Python Master AI Course</p>
+          <h2 class="certificate-name">${certificate.userName}</h2>
+          <p class="certificate-text">Has successfully completed the comprehensive Python Master AI course</p>
+          <div class="certificate-stats">
+            <div class="cert-stat">
+              <span class="material-symbols-rounded text-emerald">emoji_events</span>
+              <span>Total XP: ${certificate.totalXP}</span>
+            </div>
+            <div class="cert-stat">
+              <span class="material-symbols-rounded text-cyan">calendar_today</span>
+              <span>Days Completed: ${certificate.completedDays}/120</span>
+            </div>
+            <div class="cert-stat">
+              <span class="material-symbols-rounded text-orange">military_tech</span>
+              <span>Badges Earned: ${certificate.badges.length}</span>
+            </div>
+          </div>
+          <p class="certificate-date">Completed on: ${new Date(certificate.completionDate).toLocaleDateString()}</p>
+        </div>
+        <div class="certificate-footer">
+          <div class="qr-code-section">
+            <img src="${qrCodeUrl}" alt="QR Code" class="qr-code">
+            <p class="verification-id">ID: ${certificate.verificationId}</p>
+          </div>
+          <div class="certificate-actions">
+            <button class="btn-primary" onclick="certificateSystem.downloadCertificatePDF(${JSON.stringify(certificate).replace(/"/g, '&quot;')})">
+              <span class="material-symbols-rounded">download</span> Download PDF
+            </button>
+            <button class="btn-secondary" onclick="shareCertificate()">
+              <span class="material-symbols-rounded">share</span> Share
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  switchView('certificate');
+}
+
+function verifyCertificateById() {
+  const verificationId = prompt('Enter Certificate Verification ID:');
+  if (!verificationId) return;
+  
+  const result = certificateSystem.verifyCertificate(verificationId);
+  
+  if (result.valid) {
+    alert(`✓ Certificate Valid!\n\nName: ${result.certificate.userName}\nCompletion Date: ${new Date(result.certificate.completionDate).toLocaleDateString()}\nTotal XP: ${result.certificate.totalXP}`);
+  } else {
+    alert(`✗ ${result.message}`);
+  }
+}
+
+function shareCertificate() {
+  if (navigator.share) {
+    navigator.share({
+      title: 'Python Master AI Certificate',
+      text: 'I earned my Python Master AI certificate!',
+      url: window.location.href
+    });
+  } else {
+    alert('Sharing not supported on this browser. Copy the URL to share.');
+  }
+}
+
+// --- Premium AI Tutor System ---
+const aiTutorSystem = {
+  conversationHistory: [],
+  isTyping: false,
+  
+  generateResponse: function(userMessage, context = '') {
+    // Simulated AI responses based on context
+    const responses = {
+      code: {
+        keywords: ['error', 'bug', 'debug', 'fix', 'not working', 'wrong'],
+        responses: [
+          "I can help you debug that! Let me analyze the code. The issue might be with the syntax or logic. Could you show me the specific line causing the error?",
+          "Debugging is part of the learning process! Let's break down the problem step by step. First, check if all variables are defined before use.",
+          "I see the issue. This is a common error in Python. Remember to check your indentation and variable names. Would you like me to explain the fix?"
+        ]
+      },
+      explanation: {
+        keywords: ['explain', 'what is', 'how does', 'why', 'understand'],
+        responses: [
+          "Great question! Let me explain this concept in simple terms. Think of it like building blocks - each piece has a specific purpose.",
+          "I'd be happy to explain! This concept is fundamental to Python programming. Let me break it down into smaller, easier-to-understand parts.",
+          "Understanding this will help you write better code. Here's the key idea: it's about organizing your code in a logical way."
+        ]
+      },
+      help: {
+        keywords: ['help', 'stuck', 'confused', 'don\'t understand'],
+        responses: [
+          "I'm here to help! Let's work through this together. What specific part is confusing you?",
+          "Don't worry, everyone gets stuck sometimes. Let me guide you through this step by step.",
+          "I can help you understand this better. Let's start with the basics and build up from there."
+        ]
+      },
+      general: {
+        keywords: [],
+        responses: [
+          "I'm your AI Python tutor! Ask me anything about Python programming, and I'll do my best to help you learn.",
+          "That's an interesting question! Let me think about the best way to explain this to you.",
+          "I'm here to support your Python learning journey. What would you like to explore today?",
+          "Great to see you learning! Python is a powerful language. What specific topic would you like to discuss?"
+        ]
+      }
+    };
+    
+    // Determine response type based on keywords
+    let responseType = 'general';
+    for (const type in responses) {
+      if (type === 'general') continue;
+      if (responses[type].keywords.some(keyword => userMessage.toLowerCase().includes(keyword))) {
+        responseType = type;
+        break;
+      }
+    }
+    
+    const typeResponses = responses[responseType].responses;
+    return typeResponses[Math.floor(Math.random() * typeResponses.length)];
+  },
+  
+  typeResponse: function(message, callback) {
+    this.isTyping = true;
+    const container = document.getElementById('ai-tutor-messages');
+    if (!container) return;
+    
+    // Create typing indicator
+    const typingDiv = document.createElement('div');
+    typingDiv.className = 'ai-tutor-message ai typing';
+    typingDiv.innerHTML = `
+      <div class="typing-indicator">
+        <span class="dot"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+      </div>
+    `;
+    container.appendChild(typingDiv);
+    container.scrollTop = container.scrollHeight;
+    
+    // Simulate typing delay
+    const typingDelay = 1000 + Math.random() * 1000;
+    setTimeout(() => {
+      container.removeChild(typingDiv);
+      
+      // Type out the response character by character
+      const messageDiv = document.createElement('div');
+      messageDiv.className = 'ai-tutor-message ai';
+      container.appendChild(messageDiv);
+      
+      let i = 0;
+      const typeSpeed = 30;
+      
+      function typeChar() {
+        if (i < message.length) {
+          messageDiv.innerHTML = `<p>${message.substring(0, i + 1)}<span class="cursor">|</span></p>`;
+          i++;
+          container.scrollTop = container.scrollHeight;
+          setTimeout(typeChar, typeSpeed);
+        } else {
+          messageDiv.innerHTML = `<p>${message}</p>`;
+          this.isTyping = false;
+          if (callback) callback();
+        }
+      }
+      
+      typeChar.call(this);
+    }, typingDelay);
+  },
+  
+  explainCode: function(code) {
+    // Simulated code explanation
+    const explanations = [
+      "This code demonstrates a fundamental Python concept. The key takeaway here is understanding how the flow of execution works.",
+      "This is a great example of Python's simplicity. Notice how readable the code is - that's one of Python's strengths!",
+      "This code shows an important pattern in Python programming. Understanding this will help you write more efficient code."
+    ];
+    
+    return explanations[Math.floor(Math.random() * explanations.length)];
+  },
+  
+  suggestImprovement: function(code) {
+    // Simulated code improvement suggestions
+    const suggestions = [
+      "Consider adding error handling to make this code more robust.",
+      "You could optimize this by using list comprehension for better performance.",
+      "Adding comments would make this code more maintainable for future reference.",
+      "Consider breaking this into smaller functions for better organization."
+    ];
+    
+    return suggestions[Math.floor(Math.random() * suggestions.length)];
+  }
+};
+
+function sendAITutorMessage() {
+  const input = document.getElementById('ai-tutor-input');
+  const message = input.value.trim();
+  if (!message || aiTutorSystem.isTyping) return;
+  
+  const container = document.getElementById('ai-tutor-messages');
+  
+  // Add user message
+  container.innerHTML += `
+    <div class="ai-tutor-message user">
+      <div class="message-avatar">You</div>
+      <p>${message}</p>
+    </div>
+  `;
+  
+  input.value = '';
+  aiTutorSystem.conversationHistory.push({ role: 'user', content: message });
+  
+  // Generate and type AI response
+  const response = aiTutorSystem.generateResponse(message);
+  aiTutorSystem.typeResponse(response, () => {
+    aiTutorSystem.conversationHistory.push({ role: 'ai', content: response });
+  });
+  
+  container.scrollTop = container.scrollHeight;
+}
+
+function requestCodeExplanation() {
+  const code = document.getElementById('code-editor')?.value;
+  if (!code) {
+    alert('Please write some code in the editor first.');
+    return;
+  }
+  
+  const explanation = aiTutorSystem.explainCode(code);
+  const container = document.getElementById('ai-tutor-messages');
+  
+  container.innerHTML += `
+    <div class="ai-tutor-message ai">
+      <div class="message-avatar">AI</div>
+      <p><strong>Code Explanation:</strong> ${explanation}</p>
+    </div>
+  `;
+  
+  container.scrollTop = container.scrollHeight;
+}
+
+function requestCodeImprovement() {
+  const code = document.getElementById('code-editor')?.value;
+  if (!code) {
+    alert('Please write some code in the editor first.');
+    return;
+  }
+  
+  const suggestion = aiTutorSystem.suggestImprovement(code);
+  const container = document.getElementById('ai-tutor-messages');
+  
+  container.innerHTML += `
+    <div class="ai-tutor-message ai">
+      <div class="message-avatar">AI</div>
+      <p><strong>💡 Improvement Suggestion:</strong> ${suggestion}</p>
+    </div>
+  `;
+  
+  container.scrollTop = container.scrollHeight;
+}
+
+// --- Real-world Portfolio Projects System ---
+const portfolioProjects = {
+  beginner: [
+    {
+      id: 'calculator',
+      title: 'Calculator App',
+      description: 'Build a fully functional calculator with basic arithmetic operations.',
+      difficulty: 'Easy',
+      estimatedTime: '2 hours',
+      xpReward: 100,
+      skills: ['Variables', 'Functions', 'Operators', 'Input/Output'],
+      starterCode: `# Calculator App
+def add(a, b):
+    return a + b
+
+def subtract(a, b):
+    return a - b
+
+def multiply(a, b):
+    return a * b
+
+def divide(a, b):
+    if b != 0:
+        return a / b
+    return "Cannot divide by zero"
+
+# Main program
+print("Simple Calculator")
+print("1. Add")
+print("2. Subtract")
+print("3. Multiply")
+print("4. Divide")
+
+choice = input("Enter choice (1-4): ")
+num1 = float(input("Enter first number: "))
+num2 = float(input("Enter second number: "))
+
+if choice == '1':
+    print(f"Result: {add(num1, num2)}")
+elif choice == '2':
+    print(f"Result: {subtract(num1, num2)}")
+elif choice == '3':
+    print(f"Result: {multiply(num1, num2)}")
+elif choice == '4':
+    print(f"Result: {divide(num1, num2)}")
+else:
+    print("Invalid choice")`,
+      instructions: [
+        'Implement all four basic operations',
+        'Add error handling for division by zero',
+        'Add a loop to allow multiple calculations',
+        'Add option to clear and start over'
+      ],
+      features: ['Basic arithmetic', 'Error handling', 'User-friendly interface']
+    },
+    {
+      id: 'expense-tracker',
+      title: 'Expense Tracker',
+      description: 'Track your daily expenses and calculate totals by category.',
+      difficulty: 'Easy',
+      estimatedTime: '3 hours',
+      xpReward: 150,
+      skills: ['Lists', 'Dictionaries', 'Loops', 'File I/O'],
+      starterCode: `# Expense Tracker
+expenses = []
+
+def add_expense():
+    description = input("Enter expense description: ")
+    amount = float(input("Enter amount: "))
+    category = input("Enter category (food, transport, entertainment, other): ")
+    
+    expense = {
+        'description': description,
+        'amount': amount,
+        'category': category,
+        'date': input("Enter date (YYYY-MM-DD): ")
+    }
+    
+    expenses.append(expense)
+    print("Expense added successfully!")
+
+def view_expenses():
+    total = 0
+    print("\n--- All Expenses ---")
+    for expense in expenses:
+        print(f"{expense['date']}: {expense['description']} - ₹{expense['amount']} ({expense['category']})")
+        total += expense['amount']
+    print(f"\nTotal: ₹{total}")
+
+def category_summary():
+    categories = {}
+    for expense in expenses:
+        cat = expense['category']
+        if cat not in categories:
+            categories[cat] = 0
+        categories[cat] += expense['amount']
+    
+    print("\n--- Category Summary ---")
+    for cat, total in categories.items():
+        print(f"{cat}: ₹{total}")
+
+# Main menu
+while True:
+    print("\n1. Add Expense")
+    print("2. View All Expenses")
+    print("3. Category Summary")
+    print("4. Exit")
+    
+    choice = input("Enter choice: ")
+    
+    if choice == '1':
+        add_expense()
+    elif choice == '2':
+        view_expenses()
+    elif choice == '3':
+        category_summary()
+    elif choice == '4':
+        break
+    else:
+        print("Invalid choice")`,
+      instructions: [
+        'Add expense categories with colors',
+        'Implement expense editing and deletion',
+        'Add monthly expense reports',
+        'Save expenses to file for persistence'
+      ],
+      features: ['Add/view expenses', 'Category tracking', 'Summary reports']
+    },
+    {
+      id: 'quiz-app',
+      title: 'Quiz Application',
+      description: 'Create an interactive quiz with multiple-choice questions.',
+      difficulty: 'Easy',
+      estimatedTime: '2.5 hours',
+      xpReward: 125,
+      skills: ['Dictionaries', 'Lists', 'Loops', 'String manipulation'],
+      starterCode: `# Quiz Application
+quiz_questions = [
+    {
+        'question': 'What is the output of print(2 ** 3)?',
+        'options': ['6', '8', '9', '12'],
+        'correct': 1
+    },
+    {
+        'question': 'Which keyword is used to define a function in Python?',
+        'options': ['function', 'def', 'func', 'define'],
+        'correct': 1
+    },
+    {
+        'question': 'What data type is the result of 10 / 3?',
+        'options': ['int', 'float', 'str', 'bool'],
+        'correct': 1
+    },
+    {
+        'question': 'How do you create a list in Python?',
+        'options': ['list()', '[]', '{}', '()'],
+        'correct': 1
+    },
+    {
+        'question': 'What does len() function do?',
+        'options': ['Calculates length', 'Converts to lowercase', 'Creates list', 'None of above'],
+        'correct': 0
+    }
+]
+
+def run_quiz():
+    score = 0
+    total_questions = len(quiz_questions)
+    
+    print("Welcome to Python Quiz!")
+    print(f"Total Questions: {total_questions}\n")
+    
+    for i, question in enumerate(quiz_questions):
+        print(f"Q{i+1}: {question['question']}")
+        
+        for j, option in enumerate(question['options']):
+            print(f"{j+1}. {option}")
+        
+        answer = int(input("Enter your answer (1-4): ")) - 1
+        
+        if answer == question['correct']:
+            score += 1
+            print("Correct!\n")
+        else:
+            print(f"Wrong! Correct answer: {question['options'][question['correct']]}\n")
+    
+    percentage = (score / total_questions) * 100
+    print(f"\nQuiz Complete!")
+    print(f"Your Score: {score}/{total_questions} ({percentage}%)")
+    
+    if percentage >= 80:
+        print("Excellent! You're a Python pro!")
+    elif percentage >= 60:
+        print("Good job! Keep practicing!")
+    else:
+        print("Keep learning! You'll get there!")
+
+# Run the quiz
+run_quiz()`,
+      instructions: [
+        'Add more questions on different topics',
+        'Implement a timer for each question',
+        'Add difficulty levels (easy, medium, hard)',
+        'Save high scores to file'
+      ],
+      features: ['Multiple choice questions', 'Score tracking', 'Performance feedback']
+    }
+  ],
+  
+  intermediate: [
+    {
+      id: 'chat-app',
+      title: 'Chat Application',
+      description: 'Build a real-time chat application with multiple users.',
+      difficulty: 'Medium',
+      estimatedTime: '5 hours',
+      xpReward: 250,
+      skills: ['Sockets', 'Threading', 'JSON', 'Network programming'],
+      starterCode: `# Chat Application (Server)
+import socket
+import threading
+
+clients = []
+
+def handle_client(client_socket, address):
+    print(f"New connection from {address}")
+    
+    while True:
+        try:
+            message = client_socket.recv(1024).decode('utf-8')
+            if not message:
+                break
+            
+            print(f"Received: {message}")
+            
+            # Broadcast to all clients
+            for client in clients:
+                if client != client_socket:
+                    try:
+                        client.send(message.encode('utf-8'))
+                    except:
+                        clients.remove(client)
+        except:
+            break
+    
+    print(f"Connection closed: {address}")
+    clients.remove(client_socket)
+    client_socket.close()
+
+def start_server():
+    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server.bind(('localhost', 5555))
+    server.listen(5)
+    
+    print("Chat server started on port 5555")
+    
+    while True:
+        client_socket, address = server.accept()
+        clients.append(client_socket)
+        
+        thread = threading.Thread(target=handle_client, args=(client_socket, address))
+        thread.start()
+
+if __name__ == "__main__":
+    start_server()`,
+      instructions: [
+        'Implement client-side chat interface',
+        'Add user authentication',
+        'Create private messaging',
+        'Add chat history and file sharing'
+      ],
+      features: ['Real-time messaging', 'Multiple users', 'Broadcast messages']
+    }
+    // More intermediate projects...
+  ],
+  
+  advanced: [
+    {
+      id: 'ai-chatbot',
+      title: 'AI Chatbot',
+      description: 'Build an intelligent chatbot using natural language processing.',
+      difficulty: 'Hard',
+      estimatedTime: '8 hours',
+      xpReward: 400,
+      skills: ['NLP', 'Machine Learning', 'APIs', 'Pattern matching'],
+      starterCode: `# AI Chatbot
+import re
+import random
+
+class SimpleChatbot:
+    def __init__(self):
+        self.patterns = {
+            r'hello|hi|hey': ['Hello!', 'Hi there!', 'Hey! How can I help?'],
+            r'how are you': ['I am doing great!', 'I am fine, thanks!', 'All systems operational!'],
+            r'what is your name': ['I am Python Bot!', 'Call me Python Assistant!', 'I am an AI chatbot!'],
+            r'bye|goodbye': ['Goodbye!', 'See you later!', 'Have a great day!'],
+            r'thank': ['You are welcome!', 'Happy to help!', 'Anytime!'],
+            r'python': ['Python is amazing!', 'Python is versatile and powerful!', 'I love Python!']
+        }
+    
+    def get_response(self, user_input):
+        user_input = user_input.lower()
+        
+        for pattern, responses in self.patterns.items():
+            if re.search(pattern, user_input):
+                return random.choice(responses)
+        
+        return "I don't understand. Can you rephrase?"
+    
+    def chat(self):
+        print("AI Chatbot (type 'quit' to exit)")
+        
+        while True:
+            user_input = input("You: ")
+            
+            if user_input.lower() == 'quit':
+                print("Bot: Goodbye!")
+                break
+            
+            response = self.get_response(user_input)
+            print(f"Bot: {response}")
+
+# Run the chatbot
+bot = SimpleChatbot()
+bot.chat()`,
+      instructions: [
+        'Integrate with a real NLP library (spaCy, NLTK)',
+        'Add context awareness and memory',
+        'Implement intent classification',
+        'Connect to external APIs for more knowledge'
+      ],
+      features: ['Pattern matching', 'Natural language understanding', 'Context awareness']
+    }
+    // More advanced projects...
+  ],
+  
+  expert: [
+    {
+      id: 'saas-platform',
+      title: 'Full SaaS Platform',
+      description: 'Build a complete Software-as-a-Service platform with user management.',
+      difficulty: 'Expert',
+      estimatedTime: '20 hours',
+      xpReward: 1000,
+      skills: ['Django/Flask', 'Databases', 'Authentication', 'API Design', 'Deployment'],
+      starterCode: `# SaaS Platform - User Management (Flask)
+from flask import Flask, request, jsonify
+from flask_sqlalchemy import SQLAlchemy
+from flask_jwt_extended import JWTManager, create_access_token
+from werkzeug.security import generate_password_hash, check_password_hash
+import datetime
+
+app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///saas.db'
+app.config['JWT_SECRET_KEY'] = 'your-secret-key'
+app.config['JWT_ACCESS_TOKEN_EXPIRES'] = datetime.timedelta(hours=1)
+
+db = SQLAlchemy(app)
+jwt = JWTManager(app)
+
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    password_hash = db.Column(db.String(256), nullable=False)
+    subscription_tier = db.Column(db.String(50), default='free')
+    created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    
+    def set_password(self, password):
+        self.password_hash = generate_password_hash(password)
+    
+    def check_password(self, password):
+        return check_password_hash(self.password_hash, password)
+
+@app.route('/api/register', methods=['POST'])
+def register():
+    data = request.get_json()
+    email = data.get('email')
+    password = data.get('password')
+    
+    if User.query.filter_by(email=email).first():
+        return jsonify({'error': 'Email already exists'}), 400
+    
+    user = User(email=email)
+    user.set_password(password)
+    db.session.add(user)
+    db.session.commit()
+    
+    return jsonify({'message': 'User registered successfully'}), 201
+
+@app.route('/api/login', methods=['POST'])
+def login():
+    data = request.get_json()
+    email = data.get('email')
+    password = data.get('password')
+    
+    user = User.query.filter_by(email=email).first()
+    
+    if not user or not user.check_password(password):
+        return jsonify({'error': 'Invalid credentials'}), 401
+    
+    access_token = create_access_token(identity=user.id)
+    return jsonify({'access_token': access_token, 'user_id': user.id}), 200
+
+if __name__ == '__main__':
+    with app.app_context():
+        db.create_all()
+    app.run(debug=True)`,
+      instructions: [
+        'Add subscription tiers and payment integration',
+        'Implement role-based access control',
+        'Add analytics dashboard',
+        'Set up CI/CD pipeline and deployment'
+      ],
+      features: ['User authentication', 'Subscription management', 'API endpoints', 'Database integration']
+    }
+    // More expert projects...
+  ]
+};
+
+function loadProject(projectId) {
+  const allProjects = [...portfolioProjects.beginner, ...portfolioProjects.intermediate, ...portfolioProjects.advanced, ...portfolioProjects.expert];
+  const project = allProjects.find(p => p.id === projectId);
+  
+  if (!project) return;
+  
+  // Load project into code editor
+  const editor = document.getElementById('code-editor');
+  if (editor) {
+    editor.value = project.starterCode;
+  }
+  
+  // Show project details
+  alert(`Project: ${project.title}\n\n${project.description}\n\nSkills: ${project.skills.join(', ')}\nXP Reward: ${project.xpReward}`);
+  
+  switchView('playground');
+}
+
+function renderProjectsView() {
+  const container = document.getElementById('projects-container');
+  if (!container) return;
+  
+  container.innerHTML = `
+    <div class="projects-grid">
+      ${portfolioProjects.beginner.map(project => `
+        <div class="project-card neon-border-emerald">
+          <div class="project-header">
+            <span class="material-symbols-rounded text-emerald">code</span>
+            <h3>${project.title}</h3>
+            <span class="difficulty-badge ${project.difficulty}">${project.difficulty}</span>
+          </div>
+          <p class="project-description">${project.description}</p>
+          <div class="project-meta">
+            <span class="meta-item">
+              <span class="material-symbols-rounded">schedule</span>
+              <span>${project.estimatedTime}</span>
+            </span>
+            <span class="meta-item">
+              <span class="material-symbols-rounded">emoji_events</span>
+              <span>+${project.xpReward} XP</span>
+            </span>
+          </div>
+          <div class="project-skills">
+            ${project.skills.map(skill => `<span class="skill-tag">${skill}</span>`).join('')}
+          </div>
+          <button class="btn-success w-full" onclick="loadProject('${project.id}')">
+            <span class="material-symbols-rounded">play_arrow</span> Start Project
+          </button>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+// --- Enhanced Resume Builder with ATS & AI ---
+const resumeBuilder = {
+  atsKeywords: [
+    'python', 'javascript', 'sql', 'django', 'flask', 'react', 'node.js',
+    'machine learning', 'data analysis', 'api', 'database', 'git',
+    'agile', 'scrum', 'problem solving', 'communication', 'leadership',
+    'collaboration', 'debugging', 'testing', 'deployment', 'cloud'
+  ],
+  
+  calculateATSScore: function(resumeData) {
+    const text = `${resumeData.name} ${resumeData.summary} ${resumeData.skills} ${resumeData.experience} ${resumeData.projects}`.toLowerCase();
+    let matchedKeywords = 0;
+    
+    this.atsKeywords.forEach(keyword => {
+      if (text.includes(keyword.toLowerCase())) {
+        matchedKeywords++;
+      }
+    });
+    
+    const score = Math.round((matchedKeywords / this.atsKeywords.length) * 100);
+    return {
+      score: score,
+      matchedKeywords: matchedKeywords,
+      totalKeywords: this.atsKeywords.length,
+      missingKeywords: this.atsKeywords.filter(k => !text.includes(k.toLowerCase()))
+    };
+  },
+  
+  analyzeSkills: function(skillsText) {
+    const skills = skillsText.split(',').map(s => s.trim().toLowerCase());
+    const skillCategories = {
+      'Programming Languages': ['python', 'javascript', 'java', 'c++', 'typescript', 'go', 'rust'],
+      'Web Development': ['html', 'css', 'react', 'angular', 'vue', 'django', 'flask', 'node.js'],
+      'Data & AI': ['machine learning', 'data analysis', 'pandas', 'numpy', 'tensorflow', 'pytorch', 'sql'],
+      'Tools & DevOps': ['git', 'docker', 'kubernetes', 'aws', 'azure', 'jenkins', 'linux'],
+      'Soft Skills': ['communication', 'leadership', 'problem solving', 'teamwork', 'agile', 'scrum']
+    };
+    
+    const analysis = {};
+    for (const category in skillCategories) {
+      const matched = skills.filter(s => skillCategories[category].some(cat => s.includes(cat)));
+      if (matched.length > 0) {
+        analysis[category] = matched;
+      }
+    }
+    
+    return analysis;
+  },
+  
+  matchJobs: function(skillsText) {
+    const skills = skillsText.split(',').map(s => s.trim().toLowerCase());
+    
+    const jobMatches = [
+      {
+        title: 'Python Developer',
+        requiredSkills: ['python', 'django', 'flask', 'sql', 'git'],
+        match: this.calculateJobMatch(skills, ['python', 'django', 'flask', 'sql', 'git'])
+      },
+      {
+        title: 'Data Scientist',
+        requiredSkills: ['python', 'machine learning', 'pandas', 'numpy', 'sql'],
+        match: this.calculateJobMatch(skills, ['python', 'machine learning', 'pandas', 'numpy', 'sql'])
+      },
+      {
+        title: 'Full Stack Developer',
+        requiredSkills: ['python', 'javascript', 'react', 'django', 'sql'],
+        match: this.calculateJobMatch(skills, ['python', 'javascript', 'react', 'django', 'sql'])
+      },
+      {
+        title: 'Backend Developer',
+        requiredSkills: ['python', 'django', 'flask', 'api', 'database'],
+        match: this.calculateJobMatch(skills, ['python', 'django', 'flask', 'api', 'database'])
+      },
+      {
+        title: 'ML Engineer',
+        requiredSkills: ['python', 'machine learning', 'tensorflow', 'pytorch', 'data analysis'],
+        match: this.calculateJobMatch(skills, ['python', 'machine learning', 'tensorflow', 'pytorch', 'data analysis'])
+      }
+    ];
+    
+    return jobMatches.sort((a, b) => b.match - a.match);
+  },
+  
+  calculateJobMatch: function(userSkills, requiredSkills) {
+    const matched = requiredSkills.filter(req => 
+      userSkills.some(user => user.includes(req.toLowerCase()))
+    );
+    return Math.round((matched.length / requiredSkills.length) * 100);
+  },
+  
+  templates: {
+    modern: {
+      name: 'Modern',
+      description: 'Clean and contemporary design',
+      class: 'template-modern'
+    },
+    professional: {
+      name: 'Professional',
+      description: 'Traditional corporate style',
+      class: 'template-professional'
+    },
+    creative: {
+      name: 'Creative',
+      description: 'Bold and unique layout',
+      class: 'template-creative'
+    },
+    minimal: {
+      name: 'Minimal',
+      description: 'Simple and elegant',
+      class: 'template-minimal'
+    }
+  }
+};
+
+function runATSCheck() {
+  const name = document.getElementById('res-name')?.value || '';
+  const summary = document.getElementById('res-summary')?.value || '';
+  const skills = document.getElementById('res-skills')?.value || '';
+  const experience = document.getElementById('res-experience')?.value || '';
+  const projects = document.getElementById('res-projects')?.value || '';
+  
+  const resumeData = { name, summary, skills, experience, projects };
+  const atsResult = resumeBuilder.calculateATSScore(resumeData);
+  
+  // Display ATS score
+  const atsScoreDisplay = document.getElementById('ats-score-display');
+  if (atsScoreDisplay) {
+    atsScoreDisplay.innerHTML = `
+      <div class="ats-score-card">
+        <div class="ats-score-circle">
+          <span class="ats-score-value">${atsResult.score}%</span>
+          <span class="ats-score-label">ATS Score</span>
+        </div>
+        <div class="ats-details">
+          <p>Matched Keywords: ${atsResult.matchedKeywords}/${atsResult.totalKeywords}</p>
+          <div class="ats-missing">
+            <p><strong>Missing Keywords:</strong></p>
+            <div class="missing-keywords">
+              ${atsResult.missingKeywords.map(kw => `<span class="missing-tag">${kw}</span>`).join('')}
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+  
+  alert(`ATS Score: ${atsResult.score}%\nMatched ${atsResult.matchedKeywords} out of ${atsResult.totalKeywords} keywords`);
+}
+
+function analyzeResumeSkills() {
+  const skills = document.getElementById('res-skills')?.value || '';
+  if (!skills) {
+    alert('Please enter your skills first.');
+    return;
+  }
+  
+  const analysis = resumeBuilder.analyzeSkills(skills);
+  
+  const skillsAnalysisDisplay = document.getElementById('skills-analysis-display');
+  if (skillsAnalysisDisplay) {
+    skillsAnalysisDisplay.innerHTML = `
+      <div class="skills-analysis-card">
+        <h4>Skills Analysis</h4>
+        ${Object.entries(analysis).map(([category, skillList]) => `
+          <div class="skill-category">
+            <h5>${category}</h5>
+            <div class="category-skills">
+              ${skillList.map(skill => `<span class="skill-analyzed">${skill}</span>`).join('')}
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    `;
+  }
+}
+
+function matchJobsForResume() {
+  const skills = document.getElementById('res-skills')?.value || '';
+  if (!skills) {
+    alert('Please enter your skills first.');
+    return;
+  }
+  
+  const jobMatches = resumeBuilder.matchJobs(skills);
+  
+  const jobMatchingDisplay = document.getElementById('job-matching-display');
+  if (jobMatchingDisplay) {
+    jobMatchingDisplay.innerHTML = `
+      <div class="job-matching-card">
+        <h4>Job Matches</h4>
+        <div class="job-matches-list">
+          ${jobMatches.map(job => `
+            <div class="job-match-item">
+              <div class="job-match-header">
+                <h5>${job.title}</h5>
+                <span class="match-percentage ${job.match >= 70 ? 'high' : job.match >= 50 ? 'medium' : 'low'}">${job.match}%</span>
+              </div>
+              <div class="job-match-skills">
+                ${job.requiredSkills.map(skill => `<span class="job-skill">${skill}</span>`).join('')}
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  }
+}
+
+// --- Complaint/Support System ---
+const supportSystem = {
+  tickets: [],
+  
+  createTicket: function(subject, category, description, priority) {
+    const ticketId = 'TKT-' + Date.now().toString(36).toUpperCase();
+    const ticket = {
+      id: ticketId,
+      subject: subject,
+      category: category,
+      description: description,
+      priority: priority,
+      status: 'Open',
+      createdAt: new Date().toISOString(),
+      replies: [],
+      feedback: null
+    };
+    
+    this.tickets.push(ticket);
+    this.saveTickets();
+    
+    return ticket;
+  },
+  
+  addReply: function(ticketId, message, isAdmin = false) {
+    const ticket = this.tickets.find(t => t.id === ticketId);
+    if (!ticket) return null;
+    
+    const reply = {
+      message: message,
+      isAdmin: isAdmin,
+      timestamp: new Date().toISOString()
+    };
+    
+    ticket.replies.push(reply);
+    
+    if (isAdmin && ticket.status === 'Open') {
+      ticket.status = 'In Progress';
+    }
+    
+    this.saveTickets();
+    return ticket;
+  },
+  
+  resolveTicket: function(ticketId) {
+    const ticket = this.tickets.find(t => t.id === ticketId);
+    if (!ticket) return null;
+    
+    ticket.status = 'Resolved';
+    ticket.resolvedAt = new Date().toISOString();
+    this.saveTickets();
+    
+    return ticket;
+  },
+  
+  submitFeedback: function(ticketId, rating, comments) {
+    const ticket = this.tickets.find(t => t.id === ticketId);
+    if (!ticket) return null;
+    
+    ticket.feedback = {
+      rating: rating,
+      comments: comments,
+      submittedAt: new Date().toISOString()
+    };
+    
+    this.saveTickets();
+    return ticket;
+  },
+  
+  saveTickets: function() {
+    localStorage.setItem('pythonMasterSupportTickets', JSON.stringify(this.tickets));
+  },
+  
+  loadTickets: function() {
+    const saved = localStorage.getItem('pythonMasterSupportTickets');
+    if (saved) {
+      this.tickets = JSON.parse(saved);
+    }
+  },
+  
+  getTicket: function(ticketId) {
+    return this.tickets.find(t => t.id === ticketId);
+  },
+  
+  getUserTickets: function() {
+    return this.tickets;
+  }
+};
+
+function createSupportTicket() {
+  const subject = document.getElementById('support-subject')?.value;
+  const category = document.getElementById('support-category')?.value;
+  const description = document.getElementById('support-description')?.value;
+  const priority = document.getElementById('support-priority')?.value;
+  
+  if (!subject || !description) {
+    alert('Please fill in all required fields.');
+    return;
+  }
+  
+  const ticket = supportSystem.createTicket(subject, category, description, priority);
+  
+  alert(`Support ticket created successfully!\n\nTicket ID: ${ticket.id}\nWe will respond within 24-48 hours.`);
+  
+  // Clear form
+  document.getElementById('support-subject').value = '';
+  document.getElementById('support-description').value = '';
+  
+  // Refresh tickets list
+  renderSupportTickets();
+}
+
+function renderSupportTickets() {
+  supportSystem.loadTickets();
+  const container = document.getElementById('support-tickets-list');
+  if (!container) return;
+  
+  const tickets = supportSystem.getUserTickets();
+  
+  if (tickets.length === 0) {
+    container.innerHTML = '<p class="text-secondary">No support tickets yet.</p>';
+    return;
+  }
+  
+  container.innerHTML = tickets.map(ticket => `
+    <div class="support-ticket-card">
+      <div class="ticket-header">
+        <div class="ticket-info">
+          <span class="ticket-id">${ticket.id}</span>
+          <span class="ticket-subject">${ticket.subject}</span>
+        </div>
+        <span class="ticket-status status-${ticket.status.toLowerCase()}">${ticket.status}</span>
+      </div>
+      <div class="ticket-meta">
+        <span class="ticket-category">${ticket.category}</span>
+        <span class="ticket-priority priority-${ticket.priority.toLowerCase()}">${ticket.priority}</span>
+        <span class="ticket-date">${new Date(ticket.createdAt).toLocaleDateString()}</span>
+      </div>
+      <div class="ticket-description">
+        ${ticket.description}
+      </div>
+      ${ticket.replies.length > 0 ? `
+        <div class="ticket-replies">
+          <h4>Replies (${ticket.replies.length})</h4>
+          ${ticket.replies.map(reply => `
+            <div class="ticket-reply ${reply.isAdmin ? 'admin' : 'user'}">
+              <span class="reply-author">${reply.isAdmin ? 'Support Team' : 'You'}</span>
+              <p>${reply.message}</p>
+              <span class="reply-time">${new Date(reply.timestamp).toLocaleString()}</span>
+            </div>
+          `).join('')}
+        </div>
+      ` : ''}
+      <div class="ticket-actions">
+        <button class="btn-primary btn-small" onclick="viewTicketDetails('${ticket.id}')">View Details</button>
+        ${ticket.status !== 'Resolved' ? `
+          <button class="btn-secondary btn-small" onclick="addTicketReply('${ticket.id}')">Add Reply</button>
+        ` : `
+          <button class="btn-success btn-small" onclick="submitTicketFeedback('${ticket.id}')">Rate Support</button>
+        `}
+      </div>
+    </div>
+  `).join('');
+}
+
+function viewTicketDetails(ticketId) {
+  const ticket = supportSystem.getTicket(ticketId);
+  if (!ticket) return;
+  
+  alert(`Ticket Details:\n\nID: ${ticket.id}\nSubject: ${ticket.subject}\nCategory: ${ticket.category}\nPriority: ${ticket.priority}\nStatus: ${ticket.status}\nCreated: ${new Date(ticket.createdAt).toLocaleString()}\n\nReplies: ${ticket.replies.length}`);
+}
+
+function addTicketReply(ticketId) {
+  const message = prompt('Enter your reply:');
+  if (!message) return;
+  
+  supportSystem.addReply(ticketId, message, false);
+  alert('Reply added successfully!');
+  renderSupportTickets();
+}
+
+function submitTicketFeedback(ticketId) {
+  const rating = prompt('Rate the support (1-5 stars):');
+  if (!rating || rating < 1 || rating > 5) {
+    alert('Please enter a valid rating between 1 and 5.');
+    return;
+  }
+  
+  const comments = prompt('Any additional comments (optional):');
+  
+  supportSystem.submitFeedback(ticketId, parseInt(rating), comments);
+  alert('Thank you for your feedback!');
+}
+
+// --- Enhanced Offline Mode System ---
+const offlineMode = {
+  cachedLessons: [],
+  savedNotes: [],
+  offlineProjects: [],
+  isOnline: navigator.onLine,
+  
+  cacheLesson: function(dayNumber, content) {
+    const cachedIndex = this.cachedLessons.findIndex(l => l.day === dayNumber);
+    if (cachedIndex >= 0) {
+      this.cachedLessons[cachedIndex] = { day: dayNumber, content: content, cachedAt: new Date().toISOString() };
+    } else {
+      this.cachedLessons.push({ day: dayNumber, content: content, cachedAt: new Date().toISOString() });
+    }
+    this.saveOfflineData();
+  },
+  
+  saveNote: function(dayNumber, note) {
+    const noteIndex = this.savedNotes.findIndex(n => n.day === dayNumber);
+    if (noteIndex >= 0) {
+      this.savedNotes[noteIndex] = { day: dayNumber, note: note, updatedAt: new Date().toISOString() };
+    } else {
+      this.savedNotes.push({ day: dayNumber, note: note, updatedAt: new Date().toISOString() });
+    }
+    this.saveOfflineData();
+  },
+  
+  saveOfflineProject: function(projectId, code) {
+    const projectIndex = this.offlineProjects.findIndex(p => p.id === projectId);
+    if (projectIndex >= 0) {
+      this.offlineProjects[projectIndex] = { id: projectId, code: code, savedAt: new Date().toISOString() };
+    } else {
+      this.offlineProjects.push({ id: projectId, code: code, savedAt: new Date().toISOString() });
+    }
+    this.saveOfflineData();
+  },
+  
+  saveOfflineData: function() {
+    const offlineData = {
+      cachedLessons: this.cachedLessons,
+      savedNotes: this.savedNotes,
+      offlineProjects: this.offlineProjects
+    };
+    localStorage.setItem('pythonMasterOfflineData', JSON.stringify(offlineData));
+  },
+  
+  loadOfflineData: function() {
+    const saved = localStorage.getItem('pythonMasterOfflineData');
+    if (saved) {
+      const data = JSON.parse(saved);
+      this.cachedLessons = data.cachedLessons || [];
+      this.savedNotes = data.savedNotes || [];
+      this.offlineProjects = data.offlineProjects || [];
+    }
+  },
+  
+  syncWhenOnline: function() {
+    if (this.isOnline) {
+      // Sync cached data to server (simulated)
+      console.log('Syncing offline data to server...');
+      
+      // Clear synced data
+      this.cachedLessons = [];
+      this.savedNotes = [];
+      this.offlineProjects = [];
+      this.saveOfflineData();
+      
+      alert('Offline data synced successfully!');
+    }
+  },
+  
+  applyOfflineTheme: function() {
+    document.body.classList.add('offline-mode-active');
+    
+    // Update CSS variables for offline theme
+    document.documentElement.style.setProperty('--bg-dark', '#1a1a2e');
+    document.documentElement.style.setProperty('--bg-darkest', '#16213e');
+    document.documentElement.style.setProperty('--text-gray', '#a0a0a0');
+  },
+  
+  removeOfflineTheme: function() {
+    document.body.classList.remove('offline-mode-active');
+    
+    // Reset CSS variables
+    document.documentElement.style.removeProperty('--bg-dark');
+    document.documentElement.style.removeProperty('--bg-darkest');
+    document.documentElement.style.removeProperty('--text-gray');
+  },
+  
+  checkConnectivity: function() {
+    this.isOnline = navigator.onLine;
+    
+    if (!this.isOnline) {
+      this.applyOfflineTheme();
+      showOfflineNotification();
+    } else {
+      this.removeOfflineTheme();
+      this.syncWhenOnline();
+    }
+  }
+};
+
+function showOfflineNotification() {
+  const notification = document.createElement('div');
+  notification.className = 'offline-notification';
+  notification.innerHTML = `
+    <span class="material-symbols-rounded">wifi_off</span>
+    <span>You are offline. Cached content is available.</span>
+  `;
+  document.body.appendChild(notification);
+  
+  setTimeout(() => {
+    notification.remove();
+  }, 5000);
+}
+
+function cacheCurrentLesson() {
+  const currentDay = userProgress.currentDay;
+  const dayContent = getDayContent(currentDay);
+  if (dayContent) {
+    offlineMode.cacheLesson(currentDay, dayContent);
+    alert(`Day ${currentDay} content cached for offline use.`);
+  }
+}
+
+function saveLessonNote() {
+  const currentDay = userProgress.currentDay;
+  const note = prompt('Enter your note for this lesson:');
+  if (note) {
+    offlineMode.saveNote(currentDay, note);
+    alert('Note saved successfully!');
+  }
+}
+
+function saveProjectOffline(projectId) {
+  const code = document.getElementById('code-editor')?.value;
+  if (code) {
+    offlineMode.saveOfflineProject(projectId, code);
+    alert('Project saved for offline use.');
+  }
+}
+
+// Listen for online/offline events
+window.addEventListener('online', () => {
+  offlineMode.isOnline = true;
+  offlineMode.removeOfflineTheme();
+  offlineMode.syncWhenOnline();
+});
+
+window.addEventListener('offline', () => {
+  offlineMode.isOnline = false;
+  offlineMode.applyOfflineTheme();
+  showOfflineNotification();
+});
 
 // --- 25. Initialization Event Listeners ---
 window.addEventListener('DOMContentLoaded', () => {
