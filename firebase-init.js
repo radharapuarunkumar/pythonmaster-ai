@@ -39,12 +39,13 @@ import {
 // ⚙️  REPLACE THIS CONFIG WITH YOUR FIREBASE PROJECT CONFIG
 // =============================================================
 const firebaseConfig = {
-  apiKey: "AIza....",
-  authDomain: "python-master-ai.firebaseapp.com",
-  projectId: "python-master-ai",
-  storageBucket: "python-master-ai.appspot.com",
-  messagingSenderId: "6936....",
-  appId: "1:6936...."
+  apiKey: "AIzaSyAEwI7b778jTMmqs5MAygl1W2xWplH8V4E",
+  authDomain: "python-master-ai-a1337.firebaseapp.com",
+  projectId: "python-master-ai-a1337",
+  storageBucket: "python-master-ai-a1337.firebasestorage.app",
+  messagingSenderId: "693618116938",
+  appId: "1:693618116938:web:c6916ee74a6f804b8d19b3",
+  measurementId: "G-VYJN10Y5P7"
 };
 // =============================================================
 
